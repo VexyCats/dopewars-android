@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_layout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<EditText
+    android:id="@+id/dealer_name"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="new dealer"
+    android:textSize="20px"
+    />
+<RadioGroup
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    >
+    <RadioButton
+        android:id="@+id/avatar1"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content"
+    />
+	<ImageView
+    	android:id="@+id/avatar1_img"
+    	android:layout_width="32px"
+    	android:layout_height="32px"
+    	android:src="@drawable/avatar1"
+    	android:scaleType="fitCenter"
+    	android:layout_marginRight="10px"
+	/>
+    <RadioButton
+        android:id="@+id/avatar2"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content"
+    />
+	<ImageView
+    	android:id="@+id/avatar2_img"
+    	android:layout_width="32px"
+    	android:layout_height="32px"
+    	android:src="@drawable/avatar2"
+    	android:scaleType="fitCenter"
+    	android:layout_marginRight="10px"
+	/>
+    <RadioButton
+        android:id="@+id/avatar3"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content"
+    />
+	<ImageView
+    	android:id="@+id/avatar3_img"
+    	android:layout_width="32px"
+    	android:layout_height="32px"
+    	android:src="@drawable/avatar3"
+    	android:scaleType="fitCenter"
+    	android:layout_marginRight="10px"
+	/>
+</RadioGroup>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="right"
+    >
+    <Button
+        android:id="@+id/confirm_edit"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.0"
+        android:text="Ok"
+        />
+    <Button
+        android:id="@+id/cancel_edit"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:layout_weight="1.0"
+        android:text="Cancel"
+    />
+</LinearLayout>
+</LinearLayout>
