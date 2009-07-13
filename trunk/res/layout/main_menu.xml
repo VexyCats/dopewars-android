@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<ImageView
+    android:id="@+id/background_image"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:src="@drawable/background_alley_dark"
+    android:scaleType="fitCenter"
+    />
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="1.0"
+    >
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="1.0"
+    >
+<Button
+    android:text="Classic Mode"
+    android:textColor="#fff"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="1.0"
+    android:background="@drawable/btn_translucent_blue"
+    />
+<Button
+    android:text="Hustler Mode\n(unlimited loans)"
+    android:textColor="#fff"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="1.0"
+    android:background="@drawable/btn_translucent_blue"
+    />
+</LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="1.0"
+    >
+<Button
+    android:text="Extended Mode\n(3 months)"
+    android:textColor="#fff"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="1.0"
+    android:background="@drawable/btn_translucent_blue"
+    />
+<Button
+    android:text="Extended Hustler Mode\n(unlimited loans)\n(3 months)"
+    android:textColor="#fff"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="1.0"
+    android:background="@drawable/btn_translucent_blue"
+    />
+</LinearLayout>
+</LinearLayout>
+<LinearLayout
+    android:id="@+id/edit_dealer"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:layout_centerInParent="true"
+    android:background="@drawable/btn_translucent_green"
+    >
+<ImageView
+    android:id="@+id/avatar_image"
+    android:layout_width="48px"
+    android:layout_height="48px"
+    android:src="@drawable/avatar1"
+    android:scaleType="fitCenter"
+/>
+<LinearLayout
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:layout_marginLeft="8px"
+    >
+<TextView
+    android:textColor="#ddd"
+    android:textSize="12px"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:text="Playing as:"
+    />
+<TextView
+    android:id="@+id/dealer_name"
+    android:textColor="#fff"
+    android:textSize="14px"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:text="Guest"
+    />
+</LinearLayout>
+</LinearLayout>
+</RelativeLayout>

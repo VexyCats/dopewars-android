@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="app_name">DopeWars</string>
+<string name="choose_dealer_prompt">Choose your dealer</string>
+</resources>
