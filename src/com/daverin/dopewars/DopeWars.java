@@ -1,10 +1,14 @@
 package com.daverin.dopewars;
 
+import java.util.Vector;
+
+import com.daverin.dopewars.Global.Drug;
+
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -15,6 +19,89 @@ import android.widget.TextView;
 public class DopeWars extends Activity {
 	
 	public static final int DIALOG_EDIT_DEALER = 1001;
+	
+	// Respond to a click on a game button by starting a game Activity.
+	public class GameStartListener implements View.OnClickListener {
+		public void onClick(View v) {
+			Global.base_drug_count_ = 6;
+			Global.drug_count_variance_ = 2;
+			Global.available_drugs_ = new Vector<Drug>();
+			Drug d = new Drug();
+			d.drug_name_ = "Weed";
+			d.base_price_ = 400;
+			d.range_ = 200;
+			d.outlier_high_ = false;
+			d.outlier_low_ = true;
+			d.outlier_low_probability_ = 0.10;
+			d.outlier_low_multiplier_ = 4;
+			Global.available_drugs_.add(d);
+			d = new Drug();
+			d.drug_name_ = "Acid";
+			d.base_price_ = 1500;
+			d.range_ = 400;
+			d.outlier_high_ = false;
+			d.outlier_low_ = true;
+			d.outlier_low_probability_ = 0.20;
+			d.outlier_low_multiplier_ = 3;
+			Global.available_drugs_.add(d);
+			d = new Drug();
+			d.drug_name_ = "Ludes";
+			d.base_price_ = 1500;
+			d.range_ = 400;
+			d.outlier_high_ = false;
+			d.outlier_low_ = true;
+			d.outlier_low_probability_ = 0.20;
+			d.outlier_low_multiplier_ = 3;
+			Global.available_drugs_.add(d);
+			d = new Drug();
+			d.drug_name_ = "Heroin";
+			d.base_price_ = 1500;
+			d.range_ = 400;
+			d.outlier_high_ = false;
+			d.outlier_low_ = true;
+			d.outlier_low_probability_ = 0.20;
+			d.outlier_low_multiplier_ = 3;
+			Global.available_drugs_.add(d);
+			d = new Drug();
+			d.drug_name_ = "Cocaine";
+			d.base_price_ = 1500;
+			d.range_ = 400;
+			d.outlier_high_ = false;
+			d.outlier_low_ = true;
+			d.outlier_low_probability_ = 0.20;
+			d.outlier_low_multiplier_ = 3;
+			Global.available_drugs_.add(d);
+			d = new Drug();
+			d.drug_name_ = "Shrooms";
+			d.base_price_ = 1500;
+			d.range_ = 400;
+			d.outlier_high_ = false;
+			d.outlier_low_ = true;
+			d.outlier_low_probability_ = 0.20;
+			d.outlier_low_multiplier_ = 3;
+			Global.available_drugs_.add(d);
+			d = new Drug();
+			d.drug_name_ = "Speed";
+			d.base_price_ = 1500;
+			d.range_ = 400;
+			d.outlier_high_ = false;
+			d.outlier_low_ = true;
+			d.outlier_low_probability_ = 0.20;
+			d.outlier_low_multiplier_ = 3;
+			Global.available_drugs_.add(d);
+			d = new Drug();
+			d.drug_name_ = "Hashish";
+			d.base_price_ = 1500;
+			d.range_ = 400;
+			d.outlier_high_ = false;
+			d.outlier_low_ = true;
+			d.outlier_low_probability_ = 0.20;
+			d.outlier_low_multiplier_ = 3;
+			Global.available_drugs_.add(d);
+    		Intent i = new Intent(v.getContext(), DopeWarsGame.class);
+       		startActivityForResult(i, 0);
+		}
+	}
 	
 	// Respond to a click on the dealer name by showing the dealer editing
 	// dialog.
@@ -75,6 +162,7 @@ public class DopeWars extends Activity {
         // Set up the main content of the view.
         setContentView(R.layout.main_menu);
         ((LinearLayout)findViewById(R.id.edit_dealer)).setOnClickListener(new EditListener());
+        ((Button)findViewById(R.id.classic_mode)).setOnClickListener(new GameStartListener());
 
         // Update the user interface on this page
 		updateUserInterface();
@@ -89,7 +177,12 @@ public class DopeWars extends Activity {
             	((Button)edit_dealer_dialog_.findViewById(R.id.confirm_edit)).setOnClickListener(new ConfirmEditListener());
             	((Button)edit_dealer_dialog_.findViewById(R.id.cancel_edit)).setOnClickListener(new CancelEditListener());
         	}
-        	edit_dealer_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        	
+        	// *** So far I haven't figured how to deal with this, the emulator no likes it,
+        	// *** but the phone is fine with it. So comment it out when testing, uncomment
+        	// *** it when building. Life sucks sometimes.
+        	//edit_dealer_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        	
             return edit_dealer_dialog_;
         }
         return super.onCreateDialog(id);

@@ -24,6 +24,7 @@
     android:layout_weight="1.0"
     >
 <Button
+    android:id="@+id/classic_mode"
     android:text="Classic Mode"
     android:textColor="#fff"
     android:layout_width="fill_parent"
