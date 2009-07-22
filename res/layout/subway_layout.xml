@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  >
+<ImageView
+    android:id="@+id/city_map_image"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/nyc_map"
+    android:scaleType="fitCenter"
+/>
+<Button
+    android:id="@+id/btn_bronx"
+    android:layout_width="90px"
+    android:layout_height="30px"
+    android:layout_x="80px"
+    android:layout_y="5px"
+    android:textSize="10px"
+    android:textColor="#fff"
+    android:text="Bronx"
+    android:background="@drawable/btn_translucent_green"
+/>
+<Button
+    android:id="@+id/btn_central_park"
+    android:layout_width="90px"
+    android:layout_height="30px"
+    android:layout_x="103px"
+    android:layout_y="60px"
+    android:textSize="10px"
+    android:textColor="#fff"
+    android:text="Central Park"
+    android:background="@drawable/btn_translucent_green"
+/>
+<Button
+    android:id="@+id/btn_ghetto"
+    android:layout_width="90px"
+    android:layout_height="30px"
+    android:layout_x="73px"
+    android:layout_y="100px"
+    android:textSize="10px"
+    android:textColor="#fff"
+    android:text="The Ghetto"
+    android:background="@drawable/btn_translucent_green"
+/>
+<Button
+    android:id="@+id/btn_manhattan"
+    android:layout_width="90px"
+    android:layout_height="30px"
+    android:layout_x="75px"
+    android:layout_y="143px"
+    android:textSize="10px"
+    android:textColor="#fff"
+    android:text="Manhattan"
+    android:background="@drawable/btn_translucent_green"
+/>
+<Button
+    android:id="@+id/btn_brooklyn"
+    android:layout_width="90px"
+    android:layout_height="30px"
+    android:layout_x="105px"
+    android:layout_y="220px"
+    android:textSize="10px"
+    android:textColor="#fff"
+    android:text="Brooklyn"
+    android:background="@drawable/btn_translucent_green"
+/>
+<Button
+    android:id="@+id/btn_coney_island"
+    android:layout_width="100px"
+    android:layout_height="30px"
+    android:layout_x="80px"
+    android:layout_y="335px"
+    android:textSize="10px"
+    android:textColor="#fff"
+    android:text="Coney Island"
+    android:background="@drawable/btn_translucent_green"
+/>
+</AbsoluteLayout>
