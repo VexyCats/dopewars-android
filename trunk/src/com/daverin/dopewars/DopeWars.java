@@ -23,81 +23,32 @@ public class DopeWars extends Activity {
 	// Respond to a click on a game button by starting a game Activity.
 	public class GameStartListener implements View.OnClickListener {
 		public void onClick(View v) {
-			Global.base_drug_count_ = 6;
-			Global.drug_count_variance_ = 2;
-			Global.available_drugs_ = new Vector<Drug>();
-			Drug d = new Drug();
-			d.drug_name_ = "Weed";
-			d.base_price_ = 400;
-			d.range_ = 200;
-			d.outlier_high_ = false;
-			d.outlier_low_ = true;
-			d.outlier_low_probability_ = 0.10;
-			d.outlier_low_multiplier_ = 4;
-			Global.available_drugs_.add(d);
-			d = new Drug();
-			d.drug_name_ = "Acid";
-			d.base_price_ = 1500;
-			d.range_ = 400;
-			d.outlier_high_ = false;
-			d.outlier_low_ = true;
-			d.outlier_low_probability_ = 0.20;
-			d.outlier_low_multiplier_ = 3;
-			Global.available_drugs_.add(d);
-			d = new Drug();
-			d.drug_name_ = "Ludes";
-			d.base_price_ = 1500;
-			d.range_ = 400;
-			d.outlier_high_ = false;
-			d.outlier_low_ = true;
-			d.outlier_low_probability_ = 0.20;
-			d.outlier_low_multiplier_ = 3;
-			Global.available_drugs_.add(d);
-			d = new Drug();
-			d.drug_name_ = "Heroin";
-			d.base_price_ = 1500;
-			d.range_ = 400;
-			d.outlier_high_ = false;
-			d.outlier_low_ = true;
-			d.outlier_low_probability_ = 0.20;
-			d.outlier_low_multiplier_ = 3;
-			Global.available_drugs_.add(d);
-			d = new Drug();
-			d.drug_name_ = "Cocaine";
-			d.base_price_ = 1500;
-			d.range_ = 400;
-			d.outlier_high_ = false;
-			d.outlier_low_ = true;
-			d.outlier_low_probability_ = 0.20;
-			d.outlier_low_multiplier_ = 3;
-			Global.available_drugs_.add(d);
-			d = new Drug();
-			d.drug_name_ = "Shrooms";
-			d.base_price_ = 1500;
-			d.range_ = 400;
-			d.outlier_high_ = false;
-			d.outlier_low_ = true;
-			d.outlier_low_probability_ = 0.20;
-			d.outlier_low_multiplier_ = 3;
-			Global.available_drugs_.add(d);
-			d = new Drug();
-			d.drug_name_ = "Speed";
-			d.base_price_ = 1500;
-			d.range_ = 400;
-			d.outlier_high_ = false;
-			d.outlier_low_ = true;
-			d.outlier_low_probability_ = 0.20;
-			d.outlier_low_multiplier_ = 3;
-			Global.available_drugs_.add(d);
-			d = new Drug();
-			d.drug_name_ = "Hashish";
-			d.base_price_ = 1500;
-			d.range_ = 400;
-			d.outlier_high_ = false;
-			d.outlier_low_ = true;
-			d.outlier_low_probability_ = 0.20;
-			d.outlier_low_multiplier_ = 3;
-			Global.available_drugs_.add(d);
+			// Reset the dealer's cash on hand and inventory to 0
+			DealerDataAdapter dealer_data = new DealerDataAdapter(
+					v.getContext());
+	        dealer_data.open();
+	        dealer_data.setGameCash(0);
+	        dealer_data.clearDealerInventory();
+	        
+	        dealer_data.clearAvailableDrugs();
+	        dealer_data.addDrug("Weed", 400, 200, false, false, (float)0.0, 0, (float)0.0, 0);
+	        dealer_data.addDrug("Acid", 1500, 400, false, false, (float)0.0, 0, (float)0.0, 0);
+	        dealer_data.addDrug("Ludes", 80, 20, false, false, (float)0.0, 0, (float)0.0, 0);
+	        dealer_data.addDrug("Heroin", 10000, 2000, false, false, (float)0.0, 0, (float)0.0, 0);
+	        dealer_data.addDrug("Cocaine", 20000, 3000, false, false, (float)0.0, 0, (float)0.0, 0);
+	        dealer_data.addDrug("Shrooms", 1000, 200, false, false, (float)0.0, 0, (float)0.0, 0);
+	        dealer_data.addDrug("Speed", 110, 30, false, false, (float)0.0, 0, (float)0.0, 0);
+	        dealer_data.addDrug("Hashish", 180, 40, false, false, (float)0.0, 0, (float)0.0, 0);
+	        
+	        dealer_data.addLocation("Brooklyn", 6, 1, 0, 0, true, true);
+	        dealer_data.addLocation("The Bronx", 8, 2, 0, 0, false, false);
+	        dealer_data.addLocation("The Ghetto", 8, 2, 0, 0, false, false);
+	        dealer_data.addLocation("Coney Island", 8, 2, 0, 0, false, false);
+	        dealer_data.addLocation("Manhattan", 8, 2, 0, 0, false, false);
+	        dealer_data.addLocation("Queens", 8, 2, 0, 0, false, false);
+	        
+	        dealer_data.close();
+	        
     		Intent i = new Intent(v.getContext(), DopeWarsGame.class);
        		startActivityForResult(i, 0);
 		}
@@ -141,12 +92,11 @@ public class DopeWars extends Activity {
 			DealerDataAdapter dealer_data = new DealerDataAdapter(
 					v.getContext());
 	        dealer_data.open();
-	        String last_name = dealer_data.getMostRecentDealerName();
-	        String last_avatar = dealer_data.getMostRecentAvatar();
+	        String last_name = dealer_data.getDealerName();
+	        String last_avatar = dealer_data.getDealerAvatar();
         	if (!last_name.equals(new_dealer_name) ||
         			(!last_avatar.equals(avatar_id))) {
-	        	dealer_data.setMostRecentDealerInfo(
-	        			new_dealer_name, avatar_id);
+	        	dealer_data.setDealerInfo(new_dealer_name, avatar_id);
 	        }
 			dismissDialog(DIALOG_EDIT_DEALER);
 			
@@ -193,8 +143,8 @@ public class DopeWars extends Activity {
         if(id == DIALOG_EDIT_DEALER) {
         	DealerDataAdapter dealer_data = new DealerDataAdapter(this);
 	        dealer_data.open();
-        	String current_dealer_name = dealer_data.getMostRecentDealerName();
-            String avatar_id = dealer_data.getMostRecentAvatar();
+        	String current_dealer_name = dealer_data.getDealerName();
+            String avatar_id = dealer_data.getDealerAvatar();
             dealer_data.close();
         	((TextView)edit_dealer_dialog_.findViewById(R.id.dealer_name)).setText(current_dealer_name);
 	        if (avatar_id.equals("1")) {
@@ -214,8 +164,8 @@ public class DopeWars extends Activity {
 		// Set the interface elements according to the latest entry in the database.
 		DealerDataAdapter dealer_data = new DealerDataAdapter(this);
 		dealer_data.open();
-	    String name = dealer_data.getMostRecentDealerName();
-	    String avatar = dealer_data.getMostRecentAvatar();
+	    String name = dealer_data.getDealerName();
+	    String avatar = dealer_data.getDealerAvatar();
 	    dealer_data.close();
 	    if (name.length() > 0 || avatar.length() > 0) {
 	    	((TextView)findViewById(R.id.dealer_name)).setText(name);

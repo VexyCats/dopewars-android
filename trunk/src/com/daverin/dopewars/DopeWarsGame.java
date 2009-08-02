@@ -44,10 +44,6 @@ public class DopeWarsGame extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Initialize variables
-        current_drugs_ = new Vector<Drug>();
-        current_drug_prices_ = new Vector<Integer>();
-        
         // Set up the main content of the view.
         setContentView(R.layout.main_game_screen);
         
@@ -132,11 +128,15 @@ public class DopeWarsGame extends Activity {
     			LinearLayout.LayoutParams.WRAP_CONTENT));
 		outer_layout.removeAllViews();
 		int total_width_added = 0;
-        for (int i = 0; i < current_drugs_.size(); ++i) {
+		DealerDataAdapter dealer_data = new DealerDataAdapter(this);
+        dealer_data.open();
+		for (int i = 0; i < dealer_data.numLocationDrugs(); ++i) {
         	// Construct the next button
+			String drug_name = dealer_data.getLocationDrugName(i);
         	LinearLayout next_drug = makeButton(R.drawable.btn_translucent_blue,
-        			R.drawable.weed, current_drugs_.elementAt(i).drug_name_,
-        			"$" + Integer.toString(current_drug_prices_.elementAt(i)));
+        			R.drawable.weed, drug_name,
+        			"$" + Integer.toString(
+        					dealer_data.getLocationDrugPrice(drug_name)));
         	
         	next_drug.measure(viewWidth, viewHeight);
         	if (next_drug.getMeasuredWidth() + total_width_added > viewWidth) {
@@ -171,24 +171,36 @@ public class DopeWarsGame extends Activity {
         if (total_width_added > 0) {
         	outer_layout.addView(current_row);
         }
+    	String current_dealer_name = dealer_data.getDealerName();
+        String avatar_id = dealer_data.getDealerAvatar();
+        String cash = dealer_data.getGameCash();
+        dealer_data.close();
+        ((TextView)findViewById(R.id.player_name)).setText(current_dealer_name);
+        ((TextView)findViewById(R.id.player_money)).setText("$" + cash);
+        ((ImageView)findViewById(R.id.avatar_image)).setImageResource(Integer.parseInt(avatar_id));
 	}
 	
 	public void setupLocation() {
 		// Determine the number and type of drugs available at the current location.
-		boolean[] drug_present = new boolean[Global.available_drugs_.size()];
-    	for (int i = 0; i < Global.available_drugs_.size(); ++i) {
+		DealerDataAdapter dealer_data = new DealerDataAdapter(this);
+        dealer_data.open();
+        int num_avail_drugs = dealer_data.numAvailableDrugs();
+		boolean[] drug_present = new boolean[num_avail_drugs];
+    	for (int i = 0; i < num_avail_drugs; ++i) {
     		drug_present[i] = false;
     	}
-    	int num_drugs_left = Global.available_drugs_.size();
-		int num_drugs_present = Global.base_drug_count_ +
-		        Global.rand_gen_.nextInt(Global.drug_count_variance_);
-		if (num_drugs_present > Global.available_drugs_.size()) {
-			num_drugs_present = Global.available_drugs_.size();
+    	int num_drugs_left = num_avail_drugs;
+    	int base_drugs_count = dealer_data.drugCountForLocation("Brooklyn");
+    	int drug_variance = dealer_data.drugVarianceForLocation("Brooklyn");
+		int num_drugs_present = base_drugs_count +
+		        Global.rand_gen_.nextInt(drug_variance + 1);
+		if (num_drugs_present > num_avail_drugs) {
+			num_drugs_present = num_avail_drugs;
 		}
 		if (num_drugs_present < 1) {
 			num_drugs_present = 1;
 		}
-    	while (num_drugs_left > Global.available_drugs_.size() - num_drugs_present) {
+    	while (num_drugs_left > num_avail_drugs - num_drugs_present) {
     		int next_drug = Global.rand_gen_.nextInt(num_drugs_left);
     		int drug_number = 0;
     		int drugs_skipped = 0;
@@ -205,35 +217,16 @@ public class DopeWarsGame extends Activity {
     		--num_drugs_left;
     	}
     	
-    	current_drugs_.clear();
-    	current_drug_prices_.clear();
-    	for (int i = 0; i < Global.available_drugs_.size(); ++i) {
+    	dealer_data.clearLocationDrugs();
+    	for (int i = 0; i < num_avail_drugs; ++i) {
     		if (drug_present[i]) {
-    			current_drugs_.add(Global.available_drugs_.elementAt(i));
-    			current_drug_prices_.add(chooseDrugPrice(Global.available_drugs_.elementAt(i)));
+    			String drug_name = dealer_data.getAvailableDrugName(i);
+    			int drug_price = dealer_data.chooseDrugPrice(drug_name);
+    			dealer_data.addDrugAtCurrentLocation(drug_name, drug_price);
     		}
     	}
+    	dealer_data.close();
 	}
-	
-	public Integer chooseDrugPrice(Drug d) {
-		int price = (int)(d.base_price_ - (d.range_ / 2.0) + Global.rand_gen_.nextDouble() * d.range_);
-		if (d.outlier_high_) {
-			if (Global.rand_gen_.nextDouble() < d.outlier_high_probability_) {
-				price = (int)(price * d.outlier_high_multiplier_);
-			}
-		} else if (d.outlier_low_) {
-			if (Global.rand_gen_.nextDouble() < d.outlier_low_probability_) {
-				price = (int)(price / d.outlier_low_multiplier_);
-				if (price < 1) {
-					price = 1;
-				}
-			}
-		}
-		return new Integer(price);
-	}
-	
-	public Vector<Drug> current_drugs_;
-	public Vector<Integer> current_drug_prices_;
 	
 	Dialog subway_dialog_;
 }
