@@ -17,13 +17,13 @@ public class Global {
 		public double outlier_low_multiplier_;
 	}
 	
-	public static long current_dealer_id_;
+//	public static long current_dealer_id_;
 	
 	// Random number generator!
     public static Random rand_gen_ = new Random();
     
     // Game setup information, set by the main menu and used by the game.
-    public static int base_drug_count_;
-	public static int drug_count_variance_;
-	public static Vector<Drug> available_drugs_;
+    //public static int base_drug_count_;
+	//public static int drug_count_variance_;
+	//public static Vector<Drug> available_drugs_;
 }
