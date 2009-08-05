@@ -13,16 +13,21 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.ViewGroup.MarginLayoutParams;
+import android.view.WindowManager.LayoutParams;
+import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
 
 public class DopeWarsGame extends Activity {
 	
 	public static final int DIALOG_SUBWAY = 1002;
+	public static final int DIALOG_DRUG_BUY = 1003;
 	
 	// Respond to a click on the subway.
 	public class SubwayListener implements View.OnClickListener {
@@ -31,13 +36,32 @@ public class DopeWarsGame extends Activity {
 		}
 	}
 	
+	public class DrugListener implements View.OnClickListener {
+		public DrugListener(String drug_name) {
+			drug_name_ = drug_name;
+		}
+		public void onClick(View v) {
+			dialog_drug_name_ = drug_name_;
+			showDialog(DIALOG_DRUG_BUY);
+		}
+		String drug_name_;
+	}
+	
 	// Response to a change in location.
 	public class ChangeLocationListener implements View.OnClickListener {
+		public ChangeLocationListener(String new_location) {
+			location_ = new_location;
+		}
 		public void onClick(View v) {
+			DealerDataAdapter dealer_data = new DealerDataAdapter(v.getContext());
+	        dealer_data.open();
+	        dealer_data.setGameLocation(location_);
+	        dealer_data.close();
 			setupLocation();
 			refreshDisplay();
 			dismissDialog(DIALOG_SUBWAY);
 		}
+		String location_;
 	}
 	
 	@Override
@@ -53,7 +77,7 @@ public class DopeWarsGame extends Activity {
 	
 	@Override
     protected Dialog onCreateDialog(int id) {
-        if(id == DIALOG_SUBWAY) {
+        if (id == DIALOG_SUBWAY) {
         	if (subway_dialog_ == null) {
         		subway_dialog_ = new Dialog(this);
         		subway_dialog_.setContentView(R.layout.subway_layout);
@@ -65,6 +89,18 @@ public class DopeWarsGame extends Activity {
         	//edit_dealer_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
         	
             return subway_dialog_;
+        } else if (id == DIALOG_DRUG_BUY) {
+        	if (drug_buy_dialog_ == null) {
+        		drug_buy_dialog_ = new Dialog(this);
+        		drug_buy_dialog_.setContentView(R.layout.drug_buy_layout);
+        	}
+        	
+        	// *** So far I haven't figured how to deal with this, the emulator no likes it,
+        	// *** but the phone is fine with it. So comment it out when testing, uncomment
+        	// *** it when building. Life sucks sometimes.
+        	//edit_dealer_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        	
+        	return drug_buy_dialog_;
         }
         return super.onCreateDialog(id);
     }
@@ -72,16 +108,29 @@ public class DopeWarsGame extends Activity {
 	@Override
     protected void onPrepareDialog(int id, Dialog d) {
         if(id == DIALOG_SUBWAY) {
-        	((Button)subway_dialog_.findViewById(R.id.btn_bronx)).setOnClickListener(new ChangeLocationListener());
-        	((Button)subway_dialog_.findViewById(R.id.btn_brooklyn)).setOnClickListener(new ChangeLocationListener());
-        	((Button)subway_dialog_.findViewById(R.id.btn_central_park)).setOnClickListener(new ChangeLocationListener());
-        	((Button)subway_dialog_.findViewById(R.id.btn_coney_island)).setOnClickListener(new ChangeLocationListener());
-        	((Button)subway_dialog_.findViewById(R.id.btn_ghetto)).setOnClickListener(new ChangeLocationListener());
-        	((Button)subway_dialog_.findViewById(R.id.btn_manhattan)).setOnClickListener(new ChangeLocationListener());
+        	RelativeLayout l = (RelativeLayout)subway_dialog_.findViewById(R.id.subway_button_layout);
+        	l.removeAllViews();
+        	DealerDataAdapter dealer_data = new DealerDataAdapter(this);
+	        dealer_data.open();
+	        int num_locations = dealer_data.getNumLocations();
+	        for (int i = 0; i < num_locations; ++i) {
+	        	String location_name = dealer_data.getLocationName(i);
+	        	Button b = new Button(this);
+	        	RelativeLayout.LayoutParams layout_params = new RelativeLayout.LayoutParams(90, 30);
+	        	layout_params.leftMargin = dealer_data.getLocationX(location_name);
+	        	layout_params.topMargin = dealer_data.getLocationY(location_name);
+	        	b.setLayoutParams(layout_params);
+	        	b.setText(location_name);
+	        	b.setOnClickListener(new ChangeLocationListener(location_name));
+	        	l.addView(b);
+	        }
+	        dealer_data.close();
         	// this may not have to do anything other than the width setting
         	WindowManager.LayoutParams dialog_params = subway_dialog_.getWindow().getAttributes();
         	dialog_params.width = WindowManager.LayoutParams.FILL_PARENT;
         	subway_dialog_.getWindow().setAttributes(dialog_params);
+        } else if (id == DIALOG_DRUG_BUY) {
+        	
         }
     }
 	
@@ -190,8 +239,9 @@ public class DopeWarsGame extends Activity {
     		drug_present[i] = false;
     	}
     	int num_drugs_left = num_avail_drugs;
-    	int base_drugs_count = dealer_data.drugCountForLocation("Brooklyn");
-    	int drug_variance = dealer_data.drugVarianceForLocation("Brooklyn");
+    	String current_location = dealer_data.getGameLocation();
+    	int base_drugs_count = dealer_data.drugCountForLocation(current_location);
+    	int drug_variance = dealer_data.drugVarianceForLocation(current_location);
 		int num_drugs_present = base_drugs_count +
 		        Global.rand_gen_.nextInt(drug_variance + 1);
 		if (num_drugs_present > num_avail_drugs) {
@@ -229,4 +279,7 @@ public class DopeWarsGame extends Activity {
 	}
 	
 	Dialog subway_dialog_;
+	Dialog drug_buy_dialog_;
+	
+	String dialog_drug_name_;
 }
