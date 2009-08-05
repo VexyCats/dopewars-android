@@ -40,12 +40,15 @@ public class DopeWars extends Activity {
 	        dealer_data.addDrug("Speed", 110, 30, false, false, (float)0.0, 0, (float)0.0, 0);
 	        dealer_data.addDrug("Hashish", 180, 40, false, false, (float)0.0, 0, (float)0.0, 0);
 	        
-	        dealer_data.addLocation("Brooklyn", 6, 1, 0, 0, true, true);
-	        dealer_data.addLocation("The Bronx", 8, 2, 0, 0, false, false);
-	        dealer_data.addLocation("The Ghetto", 8, 2, 0, 0, false, false);
-	        dealer_data.addLocation("Coney Island", 8, 2, 0, 0, false, false);
-	        dealer_data.addLocation("Manhattan", 8, 2, 0, 0, false, false);
-	        dealer_data.addLocation("Queens", 8, 2, 0, 0, false, false);
+	        dealer_data.clearAvailableLocations();
+	        dealer_data.addLocation("Brooklyn", 6, 1, 105, 220, true, true);
+	        dealer_data.addLocation("The Bronx", 8, 2, 80, 5, false, false);
+	        dealer_data.addLocation("The Ghetto", 8, 2, 73, 100, false, false);
+	        dealer_data.addLocation("Coney Island", 8, 2, 80, 335, false, false);
+	        dealer_data.addLocation("Manhattan", 8, 2, 75, 143, false, false);
+	        dealer_data.addLocation("Central Park", 8, 2, 103, 60, false, false);
+	        
+	        dealer_data.setGameLocation("Brooklyn");
 	        
 	        dealer_data.close();
 	        

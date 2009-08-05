@@ -231,6 +231,7 @@ public class DealerDataAdapter {
 		initial_game_table.put(KEY_GAME_INFO_SPACE, "0");
 		initial_game_table.put(KEY_GAME_INFO_DAYS, "0");
 		initial_game_table.put(KEY_GAME_INFO_LOCATION, "0");
+		db.insert(GAME_INFO_TABLE, null, initial_game_table);
 	}
 	
 	public String getGameCash() {
@@ -293,6 +294,25 @@ public class DealerDataAdapter {
 		return db.update(GAME_INFO_TABLE, args, null, null) > 0;
 	}
 	
+	public String getGameLocation() {
+		Cursor cursor = db.query(true, GAME_INFO_TABLE,
+				new String[] {KEY_GAME_INFO_LOCATION},
+				null, null, null, null, null, null);
+		if (cursor != null) {
+			if (cursor.getCount() > 0) {
+				cursor.moveToLast();
+				return cursor.getString(0);
+			}
+		}
+		return "";
+	}
+	
+	public boolean setGameLocation(String location) {
+		initGameTable();
+		ContentValues args = new ContentValues();
+		args.put(KEY_GAME_INFO_LOCATION, location);
+		return db.update(GAME_INFO_TABLE, args, null, null) > 0;
+	}
 
 	/**
 	 * ========================================================================
@@ -472,6 +492,62 @@ public class DealerDataAdapter {
 		db.insert(LOCATION_TABLE, null, args);
 	}
 	
+	public int getNumLocations() {
+		Cursor cursor = db.query(true, LOCATION_TABLE,
+				new String[] {KEY_LOCATION_ID},
+				null, null, null, null, null, null);
+		if (cursor != null) {
+			return cursor.getCount();
+		}
+		return 0;
+	}
+	
+	public String getLocationName(int index) {
+		Cursor cursor = db.query(true, LOCATION_TABLE,
+				new String[] {KEY_LOCATION_NAME},
+				null, null, null, null, null, null);
+		if (cursor != null) {
+			cursor.moveToFirst();
+			int count = 0;
+			while ((count < index) && (!cursor.isAfterLast())) {
+				cursor.moveToNext();
+				count++;
+			}
+			if (!cursor.isAfterLast()) {
+				return cursor.getString(0);
+			}
+		}
+		return "";
+	}
+	
+	public int getLocationX(String locationName) {	
+		Cursor cursor = db.query(true, LOCATION_TABLE,
+				new String[] {KEY_LOCATION_NAME, KEY_LOCATION_MAP_BUTTON_X},
+				KEY_LOCATION_NAME + "=\"" + locationName + "\"",
+				null, null, null, null, null);
+		if (cursor != null) {
+			if (cursor.getCount() > 0) {
+				cursor.moveToLast();
+				return Integer.parseInt(cursor.getString(1));
+			}
+		}
+		return 0;
+	}
+	
+	public int getLocationY(String locationName) {	
+		Cursor cursor = db.query(true, LOCATION_TABLE,
+				new String[] {KEY_LOCATION_NAME, KEY_LOCATION_MAP_BUTTON_Y},
+				KEY_LOCATION_NAME + "=\"" + locationName + "\"",
+				null, null, null, null, null);
+		if (cursor != null) {
+			if (cursor.getCount() > 0) {
+				cursor.moveToLast();
+				return Integer.parseInt(cursor.getString(1));
+			}
+		}
+		return 0;
+	}
+	
 	public int drugCountForLocation(String locationName) {	
 		Cursor cursor = db.query(true, LOCATION_TABLE,
 				new String[] {KEY_LOCATION_NAME, KEY_LOCATION_BASE_NUM_DRUGS},
@@ -498,5 +574,9 @@ public class DealerDataAdapter {
 			}
 		}
 		return 0;
+	}
+
+	public void clearAvailableLocations() {
+		db.delete(LOCATION_TABLE, null, null);
 	}
 }
