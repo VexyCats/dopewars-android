@@ -234,16 +234,16 @@ public class DealerDataAdapter {
 		db.insert(GAME_INFO_TABLE, null, initial_game_table);
 	}
 	
-	public String getGameCash() {
+	public int getGameCash() {
 		Cursor cursor = db.query(true, GAME_INFO_TABLE, new String[] {KEY_GAME_INFO_CASH},
 				null, null, null, null, null, null);
 		if (cursor != null) {
 			if (cursor.getCount() > 0) {
 				cursor.moveToLast();
-				return cursor.getString(0);
+				return Integer.parseInt(cursor.getString(0));
 			}
 		}
-		return "0";
+		return 0;
 	}
 	
 	public boolean setGameCash(int cash_amount) {

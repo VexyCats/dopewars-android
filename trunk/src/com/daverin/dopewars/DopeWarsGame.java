@@ -1,11 +1,5 @@
 package com.daverin.dopewars;
 
-import java.util.Vector;
-
-import com.daverin.dopewars.DopeWars.CancelEditListener;
-import com.daverin.dopewars.DopeWars.ConfirmEditListener;
-import com.daverin.dopewars.Global.Drug;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.graphics.Color;
@@ -13,14 +7,12 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.view.WindowManager.LayoutParams;
-import android.widget.AbsoluteLayout;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
 
@@ -93,6 +85,19 @@ public class DopeWarsGame extends Activity {
         	if (drug_buy_dialog_ == null) {
         		drug_buy_dialog_ = new Dialog(this);
         		drug_buy_dialog_.setContentView(R.layout.drug_buy_layout);
+                ((SeekBar)drug_buy_dialog_.findViewById(R.id.drug_quantity_slide)).setOnSeekBarChangeListener(
+                		new SeekBar.OnSeekBarChangeListener() {
+        			@Override
+        			public void onProgressChanged(SeekBar seekBar, int progress,
+        					boolean fromTouch) {
+        				((TextView)drug_buy_dialog_.findViewById(R.id.drug_quantity)).setText(Integer.toString(progress));
+        			}
+        			@Override
+        			public void onStartTrackingTouch(SeekBar seekBar) {}
+        			@Override
+        			public void onStopTrackingTouch(SeekBar seekBar) {}
+                	
+                });
         	}
         	
         	// *** So far I haven't figured how to deal with this, the emulator no likes it,
@@ -130,7 +135,15 @@ public class DopeWarsGame extends Activity {
         	dialog_params.width = WindowManager.LayoutParams.FILL_PARENT;
         	subway_dialog_.getWindow().setAttributes(dialog_params);
         } else if (id == DIALOG_DRUG_BUY) {
-        	
+        	// Determine how many of the drug the user could buy
+        	DealerDataAdapter dealer_data = new DealerDataAdapter(this);
+	        dealer_data.open();
+	        int cash = dealer_data.getGameCash();
+	        int drug_price = dealer_data.getLocationDrugPrice(dialog_drug_name_);
+	        int max_num_drugs = cash / drug_price;
+	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setMax(max_num_drugs);
+	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setProgress(max_num_drugs);
+	        dealer_data.close();
         }
     }
 	
@@ -186,6 +199,7 @@ public class DopeWarsGame extends Activity {
         			R.drawable.weed, drug_name,
         			"$" + Integer.toString(
         					dealer_data.getLocationDrugPrice(drug_name)));
+        	next_drug.setOnClickListener(new DrugListener(drug_name));
         	
         	next_drug.measure(viewWidth, viewHeight);
         	if (next_drug.getMeasuredWidth() + total_width_added > viewWidth) {
@@ -222,7 +236,7 @@ public class DopeWarsGame extends Activity {
         }
     	String current_dealer_name = dealer_data.getDealerName();
         String avatar_id = dealer_data.getDealerAvatar();
-        String cash = dealer_data.getGameCash();
+        String cash = Integer.toString(dealer_data.getGameCash());
         dealer_data.close();
         ((TextView)findViewById(R.id.player_name)).setText(current_dealer_name);
         ((TextView)findViewById(R.id.player_money)).setText("$" + cash);
