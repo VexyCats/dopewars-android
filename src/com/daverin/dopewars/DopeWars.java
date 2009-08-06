@@ -27,7 +27,7 @@ public class DopeWars extends Activity {
 			DealerDataAdapter dealer_data = new DealerDataAdapter(
 					v.getContext());
 	        dealer_data.open();
-	        dealer_data.setGameCash(0);
+	        dealer_data.setGameCash(5500);
 	        dealer_data.clearDealerInventory();
 	        
 	        dealer_data.clearAvailableDrugs();
