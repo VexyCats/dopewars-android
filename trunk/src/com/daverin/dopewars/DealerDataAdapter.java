@@ -1,7 +1,5 @@
 package com.daverin.dopewars;
 
-import com.daverin.dopewars.Global.Drug;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -19,6 +17,7 @@ public class DealerDataAdapter {
 	public static final String KEY_GAME_INFO_ID = "_id";
 	public static final String KEY_GAME_INFO_TYPE = "type";
 	public static final String KEY_GAME_INFO_CASH = "cash";
+	public static final String KEY_GAME_INFO_DEBT = "debt";
 	public static final String KEY_GAME_INFO_SPACE = "space";
 	public static final String KEY_GAME_INFO_DAYS = "days";
 	public static final String KEY_GAME_INFO_LOCATION = "location";
@@ -73,6 +72,7 @@ public class DealerDataAdapter {
     	KEY_GAME_INFO_ID + " integer primary key autoincrement, " +
     	KEY_GAME_INFO_TYPE + " text not null, " +
     	KEY_GAME_INFO_CASH + " text not null, " +
+    	KEY_GAME_INFO_DEBT + " text not null, " +
     	KEY_GAME_INFO_SPACE + " text not null, " +
     	KEY_GAME_INFO_DAYS + " text not null, " +
     	KEY_GAME_INFO_LOCATION + " text not null);";
@@ -228,10 +228,31 @@ public class DealerDataAdapter {
 		ContentValues initial_game_table = new ContentValues();
 		initial_game_table.put(KEY_GAME_INFO_TYPE, "0");
 		initial_game_table.put(KEY_GAME_INFO_CASH, "0");
+		initial_game_table.put(KEY_GAME_INFO_DEBT, "0");
 		initial_game_table.put(KEY_GAME_INFO_SPACE, "0");
 		initial_game_table.put(KEY_GAME_INFO_DAYS, "0");
 		initial_game_table.put(KEY_GAME_INFO_LOCATION, "0");
 		db.insert(GAME_INFO_TABLE, null, initial_game_table);
+	}
+
+	public int getGameDebt() {
+		Cursor cursor = db.query(true, GAME_INFO_TABLE, new String[] {KEY_GAME_INFO_DEBT},
+				null, null, null, null, null, null);
+		if (cursor != null) {
+			if (cursor.getCount() > 0) {
+				cursor.moveToLast();
+				return Integer.parseInt(cursor.getString(0));
+			}
+		}
+		return 0;
+	}
+	
+	public boolean setGameDebt(int debt_amount) {
+		initGameTable();
+		String debt_string = Integer.toString(debt_amount);
+		ContentValues args = new ContentValues();
+		args.put(KEY_GAME_INFO_DEBT, debt_string);
+		return db.update(GAME_INFO_TABLE, args, null, null) > 0;
 	}
 	
 	public int getGameCash() {

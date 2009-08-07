@@ -6,9 +6,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -28,13 +28,32 @@ public class DopeWarsGame extends Activity {
 		}
 	}
 	
-	public class DrugListener implements View.OnClickListener {
-		public DrugListener(String drug_name) {
+	public class BuyDrugListener implements View.OnClickListener {
+		public BuyDrugListener(String drug_name) {
 			drug_name_ = drug_name;
 		}
 		public void onClick(View v) {
 			dialog_drug_name_ = drug_name_;
 			showDialog(DIALOG_DRUG_BUY);
+		}
+		String drug_name_;
+	}
+	
+	public class CompleteSaleListener implements View.OnClickListener {
+		public CompleteSaleListener(String drug_name) {
+			drug_name_ = drug_name;
+		}
+		public void onClick(View v) {
+			DealerDataAdapter dealer_data = new DealerDataAdapter(v.getContext());
+	        dealer_data.open();
+	        int drug_price = dealer_data.getLocationDrugPrice(drug_name_);
+	        int drug_quantity = Integer.parseInt(((TextView)drug_buy_dialog_.findViewById(R.id.drug_quantity)).getText().toString());
+	        int old_game_cash = dealer_data.getGameCash();
+	        dealer_data.setGameCash(old_game_cash - drug_quantity * drug_price);
+	        //dealer_data.addInventory(drug_name_, drug_quantity);
+	        dealer_data.close();
+	        refreshDisplay();
+			dismissDialog(DIALOG_DRUG_BUY);
 		}
 		String drug_name_;
 	}
@@ -72,18 +91,14 @@ public class DopeWarsGame extends Activity {
         if (id == DIALOG_SUBWAY) {
         	if (subway_dialog_ == null) {
         		subway_dialog_ = new Dialog(this);
+        		subway_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
         		subway_dialog_.setContentView(R.layout.subway_layout);
         	}
-        	
-        	// *** So far I haven't figured how to deal with this, the emulator no likes it,
-        	// *** but the phone is fine with it. So comment it out when testing, uncomment
-        	// *** it when building. Life sucks sometimes.
-        	//edit_dealer_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        	
             return subway_dialog_;
         } else if (id == DIALOG_DRUG_BUY) {
         	if (drug_buy_dialog_ == null) {
         		drug_buy_dialog_ = new Dialog(this);
+        		drug_buy_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
         		drug_buy_dialog_.setContentView(R.layout.drug_buy_layout);
                 ((SeekBar)drug_buy_dialog_.findViewById(R.id.drug_quantity_slide)).setOnSeekBarChangeListener(
                 		new SeekBar.OnSeekBarChangeListener() {
@@ -99,11 +114,6 @@ public class DopeWarsGame extends Activity {
                 	
                 });
         	}
-        	
-        	// *** So far I haven't figured how to deal with this, the emulator no likes it,
-        	// *** but the phone is fine with it. So comment it out when testing, uncomment
-        	// *** it when building. Life sucks sometimes.
-        	//edit_dealer_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
         	
         	return drug_buy_dialog_;
         }
@@ -143,6 +153,7 @@ public class DopeWarsGame extends Activity {
 	        int max_num_drugs = cash / drug_price;
 	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setMax(max_num_drugs);
 	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setProgress(max_num_drugs);
+	        ((ImageView)(drug_buy_dialog_.findViewById(R.id.drug_icon))).setOnClickListener(new CompleteSaleListener(dialog_drug_name_));
 	        dealer_data.close();
         }
     }
@@ -195,12 +206,15 @@ public class DopeWarsGame extends Activity {
 		for (int i = 0; i < dealer_data.numLocationDrugs(); ++i) {
         	// Construct the next button
 			String drug_name = dealer_data.getLocationDrugName(i);
+			int drug_price = dealer_data.getLocationDrugPrice(drug_name);
         	LinearLayout next_drug = makeButton(R.drawable.btn_translucent_blue,
         			R.drawable.weed, drug_name,
-        			"$" + Integer.toString(
-        					dealer_data.getLocationDrugPrice(drug_name)));
-        	next_drug.setOnClickListener(new DrugListener(drug_name));
-        	
+        			"$" + Integer.toString(drug_price));
+        	int cash = dealer_data.getGameCash();
+        	if (cash > drug_price) {
+        		next_drug.setBackgroundResource(R.drawable.btn_translucent_green);
+        		next_drug.setOnClickListener(new BuyDrugListener(drug_name));
+        	}
         	next_drug.measure(viewWidth, viewHeight);
         	if (next_drug.getMeasuredWidth() + total_width_added > viewWidth) {
         		outer_layout.addView(current_row);
