@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,11 +21,19 @@ public class DopeWarsGame extends Activity {
 	
 	public static final int DIALOG_SUBWAY = 1002;
 	public static final int DIALOG_DRUG_BUY = 1003;
+	public static final int DIALOG_INVENTORY = 1004;
 	
 	// Respond to a click on the subway.
 	public class SubwayListener implements View.OnClickListener {
 		public void onClick(View v) {
 			showDialog(DIALOG_SUBWAY);
+		}
+	}
+	
+	// Respond to a click on the inventory button.
+	public class InventoryListener implements View.OnClickListener {
+		public void onClick(View v) {
+			showDialog(DIALOG_INVENTORY);
 		}
 	}
 	
@@ -52,9 +61,12 @@ public class DopeWarsGame extends Activity {
 	        int old_game_cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
 	        String new_game_info = Global.setAttribute(
 	        		"cash", Integer.toString(old_game_cash - drug_quantity * drug_price), game_info);
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, new_game_info);
 	        String current_inventory = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INVENTORY);
 	        String current_drug_amount = Global.parseAttribute(drug_name_, current_inventory);
+	        int current_space = Integer.parseInt(Global.parseAttribute("space", game_info));
+	        current_space = current_space - drug_quantity;
+	        new_game_info = Global.setAttribute("space", Integer.toString(current_space), game_info);
+	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, new_game_info);
 	        String new_drug_quantity = Integer.toString(drug_quantity);
 	        if (!current_drug_amount.equals("")) {
 	        	new_drug_quantity = Integer.toString(drug_quantity + Integer.parseInt(current_drug_amount));
@@ -108,6 +120,13 @@ public class DopeWarsGame extends Activity {
         		subway_dialog_.setContentView(R.layout.subway_layout);
         	}
             return subway_dialog_;
+        } else if (id == DIALOG_INVENTORY) {
+        	if (inventory_dialog_ == null) {
+        		inventory_dialog_ = new Dialog(this);
+        		inventory_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        		inventory_dialog_.setContentView(R.layout.inventory_layout);
+        	}
+        	return inventory_dialog_;
         } else if (id == DIALOG_DRUG_BUY) {
         	if (drug_buy_dialog_ == null) {
         		drug_buy_dialog_ = new Dialog(this);
@@ -159,15 +178,43 @@ public class DopeWarsGame extends Activity {
         		subway_dialog_.getWindow().getAttributes();
         	dialog_params.width = WindowManager.LayoutParams.FILL_PARENT;
         	subway_dialog_.getWindow().setAttributes(dialog_params);
+        } else if (id == DIALOG_INVENTORY) {
+        	LinearLayout l = (LinearLayout)inventory_dialog_.findViewById(R.id.main_layout);
+        	l.removeAllViews();
+        	String drug_list = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INVENTORY);
+        	int num_drugs = Global.attributeCount(drug_list);
+        	for (int i = 0; i < num_drugs; ++i) {
+        		String[] drug_info = Global.getAttribute(i, drug_list);
+        		LinearLayout next_drug = new LinearLayout(this);
+        		next_drug.setOrientation(LinearLayout.HORIZONTAL);
+        		next_drug.setLayoutParams(new LinearLayout.LayoutParams(
+            			LinearLayout.LayoutParams.WRAP_CONTENT,
+            			LinearLayout.LayoutParams.WRAP_CONTENT));
+        		TextView drug_name = new TextView(this);
+        		drug_name.setLayoutParams(new LinearLayout.LayoutParams(
+            			LinearLayout.LayoutParams.WRAP_CONTENT,
+            			LinearLayout.LayoutParams.WRAP_CONTENT));
+        		drug_name.setText(drug_info[0]);
+        		next_drug.addView(drug_name);
+        		TextView drug_quantity = new TextView(this);
+        		drug_quantity.setLayoutParams(new LinearLayout.LayoutParams(
+            			LinearLayout.LayoutParams.WRAP_CONTENT,
+            			LinearLayout.LayoutParams.WRAP_CONTENT));
+        		drug_quantity.setText(drug_info[1]);
+        		next_drug.addView(drug_quantity);
+        		l.addView(next_drug);
+        	}
         } else if (id == DIALOG_DRUG_BUY) {
         	// Determine how many of the drug the user could buy
 	        String game_info = dealer_data_.getDealerString(
 	        		DealerDataAdapter.KEY_DEALER_GAME_INFO);
 	        int cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
+	        int space = Integer.parseInt(Global.parseAttribute("space", game_info));
 	        String inventory = dealer_data_.getDealerString(
 	        		DealerDataAdapter.KEY_DEALER_LOCATION_INVENTORY);
 	        int drug_price = Integer.parseInt(Global.parseAttribute(dialog_drug_name_, inventory));
 	        int max_num_drugs = cash / drug_price;
+	        max_num_drugs = Math.min(max_num_drugs, space);
 	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setMax(max_num_drugs);
 	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setProgress(max_num_drugs);
 	        ((ImageView)(drug_buy_dialog_.findViewById(R.id.drug_icon))).setOnClickListener(
@@ -220,11 +267,13 @@ public class DopeWarsGame extends Activity {
 		outer_layout.removeAllViews();
 		int total_width_added = 0;
         dealer_data_.open();
+        String game_info = dealer_data_.getDealerString(
+        		DealerDataAdapter.KEY_DEALER_GAME_INFO);
         String location_inventory = dealer_data_.getDealerString(
         		DealerDataAdapter.KEY_DEALER_LOCATION_INVENTORY);
         int numLocationDrugs = Global.attributeCount(location_inventory);
-        int cash = Integer.parseInt(Global.parseAttribute("cash",
-    			dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO)));
+        int cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
+        int space = Integer.parseInt(Global.parseAttribute("space", game_info));
 		for (int i = 0; i < numLocationDrugs; ++i) {
         	// Construct the next button
 			String[] drug = Global.getAttribute(i, location_inventory);
@@ -232,7 +281,7 @@ public class DopeWarsGame extends Activity {
         	LinearLayout next_drug = makeButton(R.drawable.btn_translucent_blue,
         			R.drawable.weed, drug[0],
         			"$" + Integer.toString(drug_price));
-        	if (cash > drug_price) {
+        	if ((cash > drug_price) && (space > 0)) {
         		next_drug.setBackgroundResource(R.drawable.btn_translucent_green);
         		next_drug.setOnClickListener(new BuyDrugListener(drug[0]));
         	}
@@ -253,7 +302,6 @@ public class DopeWarsGame extends Activity {
     	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_blue,
     			R.drawable.avatar1, "Subway", " ");
     	subway_button.setOnClickListener(new SubwayListener());
-    	
     	subway_button.measure(viewWidth, viewHeight);
     	if (subway_button.getMeasuredWidth() + total_width_added > viewWidth) {
     		outer_layout.addView(current_row);
@@ -266,9 +314,27 @@ public class DopeWarsGame extends Activity {
     	}
     	total_width_added += subway_button.getMeasuredWidth();
     	current_row.addView(subway_button);
+        
+        // Add inventory button
+        LinearLayout inventory_button = makeButton(R.drawable.btn_translucent_blue,
+        		R.drawable.avatar1, "Inventory", " ");
+        inventory_button.setOnClickListener(new InventoryListener());
+        inventory_button.measure(viewWidth, viewHeight);
+    	if (inventory_button.getMeasuredWidth() + total_width_added > viewWidth) {
+    		outer_layout.addView(current_row);
+    		current_row = new LinearLayout(this);
+    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+        			LinearLayout.LayoutParams.FILL_PARENT,
+        			LinearLayout.LayoutParams.WRAP_CONTENT));
+    		total_width_added = 0;
+    	}
+    	total_width_added += inventory_button.getMeasuredWidth();
+    	current_row.addView(inventory_button);
         if (total_width_added > 0) {
         	outer_layout.addView(current_row);
         }
+        
         String current_dealer_name = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_NAME);
         String avatar_id = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_AVATAR_NAME);
         dealer_data_.close();
@@ -334,6 +400,7 @@ public class DopeWarsGame extends Activity {
 	
 	Dialog subway_dialog_;
 	Dialog drug_buy_dialog_;
+	Dialog inventory_dialog_;
 	
 	String dialog_drug_name_;
 	

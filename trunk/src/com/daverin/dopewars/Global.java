@@ -9,6 +9,9 @@ public class Global {
 	public static String DRUG_ATTR_PRICE_VARIANCE = "price_variance";
 	
 	public static int attributeCount(String attribute_list) {
+		if (attribute_list.equals("")) {
+			return 0;
+		}
 		return attribute_list.split("\\|").length;
 	}
 	
