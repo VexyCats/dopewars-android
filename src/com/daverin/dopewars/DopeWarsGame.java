@@ -48,6 +48,29 @@ public class DopeWarsGame extends Activity {
 		String drug_name_;
 	}
 	
+	public class SellDrugListener implements View.OnClickListener {
+		public SellDrugListener(String drug_name) {
+			drug_name_ = drug_name;
+		}
+		public void onClick(View v) {
+			dialog_drug_name_ = drug_name_;
+			// showDialog(DIALOG_DRUG_SELL);
+		}
+		String drug_name_;
+	}
+	
+	public class SellDrugListenerLong implements View.OnLongClickListener {
+		public SellDrugListenerLong(String drug_name) {
+			drug_name_ = drug_name;
+		}
+		public boolean onLongClick(View v) {
+			dialog_drug_name_ = drug_name_;
+			//showDialog(DIALOG_DRUG_SELL);
+			return true;
+		}
+		String drug_name_;
+	}
+	
 	public class CompleteSaleListener implements View.OnClickListener {
 		public CompleteSaleListener(String drug_name) {
 			drug_name_ = drug_name;
@@ -65,7 +88,7 @@ public class DopeWarsGame extends Activity {
 	        String current_drug_amount = Global.parseAttribute(drug_name_, current_inventory);
 	        int current_space = Integer.parseInt(Global.parseAttribute("space", game_info));
 	        current_space = current_space - drug_quantity;
-	        new_game_info = Global.setAttribute("space", Integer.toString(current_space), game_info);
+	        new_game_info = Global.setAttribute("space", Integer.toString(current_space), new_game_info);
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, new_game_info);
 	        String new_drug_quantity = Integer.toString(drug_quantity);
 	        if (!current_drug_amount.equals("")) {
@@ -274,16 +297,31 @@ public class DopeWarsGame extends Activity {
         int numLocationDrugs = Global.attributeCount(location_inventory);
         int cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
         int space = Integer.parseInt(Global.parseAttribute("space", game_info));
+        String current_inventory = dealer_data_.getDealerString(
+        		DealerDataAdapter.KEY_DEALER_GAME_INVENTORY);
 		for (int i = 0; i < numLocationDrugs; ++i) {
         	// Construct the next button
 			String[] drug = Global.getAttribute(i, location_inventory);
 			int drug_price = Integer.parseInt(drug[1]);
-        	LinearLayout next_drug = makeButton(R.drawable.btn_translucent_blue,
+			String current_drug_amount = Global.parseAttribute(drug[0], current_inventory);
+        	LinearLayout next_drug = makeButton(R.drawable.btn_translucent_gray,
         			R.drawable.weed, drug[0],
         			"$" + Integer.toString(drug_price));
+        	// Can buy
         	if ((cash > drug_price) && (space > 0)) {
-        		next_drug.setBackgroundResource(R.drawable.btn_translucent_green);
+        		// Can also sell
+        		if (!current_drug_amount.equals("")) {
+        		  next_drug.setBackgroundResource(R.drawable.btn_translucent_blue);
+        		  next_drug.setOnLongClickListener(new SellDrugListenerLong(drug[0]));
+        		// Can only buy
+        		} else {
+        			next_drug.setBackgroundResource(R.drawable.btn_translucent_green);
+        		}
         		next_drug.setOnClickListener(new BuyDrugListener(drug[0]));
+        	// Can only sell
+        	} else if (!current_drug_amount.equals("")) {
+        	  next_drug.setBackgroundResource(R.drawable.btn_translucent_orange);
+      		  next_drug.setOnClickListener(new SellDrugListener(drug[0]));
         	}
         	next_drug.measure(viewWidth, viewHeight);
         	if (next_drug.getMeasuredWidth() + total_width_added > viewWidth) {
@@ -299,7 +337,7 @@ public class DopeWarsGame extends Activity {
         	current_row.addView(next_drug);
         }
         // Add subway button
-    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_blue,
+    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
     			R.drawable.avatar1, "Subway", " ");
     	subway_button.setOnClickListener(new SubwayListener());
     	subway_button.measure(viewWidth, viewHeight);
@@ -316,7 +354,7 @@ public class DopeWarsGame extends Activity {
     	current_row.addView(subway_button);
         
         // Add inventory button
-        LinearLayout inventory_button = makeButton(R.drawable.btn_translucent_blue,
+        LinearLayout inventory_button = makeButton(R.drawable.btn_translucent_gray,
         		R.drawable.avatar1, "Inventory", " ");
         inventory_button.setOnClickListener(new InventoryListener());
         inventory_button.measure(viewWidth, viewHeight);
