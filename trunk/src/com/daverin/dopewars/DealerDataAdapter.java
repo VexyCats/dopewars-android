@@ -106,7 +106,6 @@ public class DealerDataAdapter {
 	
 	public void close() {
 		dealerDBHelper.close();
-		db.close();
 	}
 	
 	public void initDealerInfo() {
