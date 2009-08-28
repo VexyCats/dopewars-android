@@ -15,6 +15,10 @@
   * Customization
   * Score reporting
 
+= Little bug =
+
+Space isn't being subtracted right. Also I managed to buy enough to make my money available go negative.
+
 = Details of selling items =
 
 This will come after inventory because space left might play into it. I think my first intuition for this will be that if a drug has a gray background you can't do anything, if it has a green background you can buy (tap to buy), if it has an orange background you can sell (tap to sell), if it has a blue background you could do either, and a tap will buy, hold will sell. This might all change but that's my first intuition. So of course space comes into play because if you have no space you can't buy and this will probably be the most common case.
