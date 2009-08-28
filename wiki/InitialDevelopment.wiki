@@ -3,7 +3,7 @@
 = Big things =
 
   * Selling items
-  * Inventory list & space left
+  * Make inventory look good
   * Days progressing (and game end)
   * Loan shark
   * Bank
@@ -15,10 +15,10 @@
   * Customization
   * Score reporting
 
-= Details of inventory list & space left =
-
-This is what I'll do next I think, the inventory list should be pretty easy, just another button like the subway, the list will be a dialog probably, at first it's just visual, nothing to do, tap it to make it go away.
-
 = Details of selling items =
 
 This will come after inventory because space left might play into it. I think my first intuition for this will be that if a drug has a gray background you can't do anything, if it has a green background you can buy (tap to buy), if it has an orange background you can sell (tap to sell), if it has a blue background you could do either, and a tap will buy, hold will sell. This might all change but that's my first intuition. So of course space comes into play because if you have no space you can't buy and this will probably be the most common case.
+
+= Details of days progressing =
+
+Not much to do here, just move the days when moving locations and then do something at the end.
