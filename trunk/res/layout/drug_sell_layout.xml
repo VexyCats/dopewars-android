@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/drug_buy_layout"
+  android:orientation="horizontal"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  >
+<ImageView
+  android:id="@+id/drug_icon"
+  android:layout_width="55px"
+  android:layout_height="55px"
+  android:src="@drawable/weed"
+  android:scaleType="fitCenter"
+/>
+<LinearLayout
+  android:orientation="vertical"
+  android:layout_width="wrap_content"
+  android:layout_height="fill_parent"
+  android:gravity="center_vertical"
+  >
+<LinearLayout
+  android:orientation="horizontal"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  >
+<TextView
+  android:id="@+id/drug_name"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:textColor="#ffffff"
+  android:text="drug name"
+  />
+<TextView
+  android:id="@+id/drug_price"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:textColor="#00ff00"
+  android:gravity="right"
+  android:text="$0"
+  />
+</LinearLayout>
+<SeekBar
+    android:id="@+id/drug_quantity_slide"
+    android:layout_width="180px" 
+    android:layout_height="wrap_content" 
+    android:textSize="20px"
+/>
+</LinearLayout>
+<TextView
+  android:id="@+id/drug_quantity"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:gravity="center"
+  android:textSize="18px"
+  android:textColor="#ffffff"
+  android:paddingLeft="8px"
+  android:text="0"
+  />
+</LinearLayout>

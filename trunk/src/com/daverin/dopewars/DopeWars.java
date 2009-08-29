@@ -1,7 +1,5 @@
 package com.daverin.dopewars;
 
-import java.util.Vector;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -39,7 +37,7 @@ public class DopeWars extends Activity {
 	        
 	        // Clear the inventory, start with a standard amount of cash
 	        // and debt.
-	        String initial_game_state = "cash:55000|debt:2000|location:Brooklyn|space:100";
+	        String initial_game_state = "cash:55000|debt:2000|location:Brooklyn|space:100|max_space:100";
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
 	        		initial_game_state);
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INVENTORY,

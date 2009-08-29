@@ -8,7 +8,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,6 +21,7 @@ public class DopeWarsGame extends Activity {
 	public static final int DIALOG_SUBWAY = 1002;
 	public static final int DIALOG_DRUG_BUY = 1003;
 	public static final int DIALOG_INVENTORY = 1004;
+	public static final int DIALOG_DRUG_SELL = 1005;
 	
 	// Respond to a click on the subway.
 	public class SubwayListener implements View.OnClickListener {
@@ -54,7 +54,7 @@ public class DopeWarsGame extends Activity {
 		}
 		public void onClick(View v) {
 			dialog_drug_name_ = drug_name_;
-			// showDialog(DIALOG_DRUG_SELL);
+			showDialog(DIALOG_DRUG_SELL);
 		}
 		String drug_name_;
 	}
@@ -65,7 +65,7 @@ public class DopeWarsGame extends Activity {
 		}
 		public boolean onLongClick(View v) {
 			dialog_drug_name_ = drug_name_;
-			//showDialog(DIALOG_DRUG_SELL);
+			showDialog(DIALOG_DRUG_SELL);
 			return true;
 		}
 		String drug_name_;
@@ -99,6 +99,47 @@ public class DopeWarsGame extends Activity {
 	        dealer_data_.close();
 	        refreshDisplay();
 			dismissDialog(DIALOG_DRUG_BUY);
+		}
+		String drug_name_;
+	}
+	
+
+	public class CompleteBuyListener implements View.OnClickListener {
+		public CompleteBuyListener(String drug_name) {
+			drug_name_ = drug_name;
+		}
+		public void onClick(View v) {
+	        dealer_data_.open();
+	        String location_inventory = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_LOCATION_INVENTORY);
+	        int drug_price = Integer.parseInt(Global.parseAttribute(drug_name_, location_inventory));
+	        int drug_quantity = Integer.parseInt(((TextView)drug_buy_dialog_.findViewById(R.id.drug_quantity)).getText().toString());
+	        String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
+	        int old_game_cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
+	        String new_game_info = Global.setAttribute(
+	        		"cash", Integer.toString(old_game_cash + drug_quantity * drug_price), game_info);
+	        String current_inventory = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INVENTORY);
+	        String current_drug_amount = Global.parseAttribute(drug_name_, current_inventory);
+	        int max_space = Integer.parseInt(Global.parseAttribute("max_space", game_info));
+	        int current_space = Integer.parseInt(Global.parseAttribute("space", game_info));
+	        current_space = current_space + drug_quantity;
+	        if (current_space > max_space) {
+	        	current_space = max_space;
+	        }
+	        new_game_info = Global.setAttribute("space", Integer.toString(current_space), new_game_info);
+	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, new_game_info);
+	        int new_drug_quantity = Integer.parseInt(current_drug_amount) - drug_quantity;
+	        String new_inventory = current_inventory;
+	        if (new_drug_quantity == 0) {
+	        	new_inventory = Global.removeAttribute(drug_name_, current_inventory);
+		        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INVENTORY, new_inventory);
+	        } else {
+		        new_inventory = Global.setAttribute(drug_name_, Integer.toString(new_drug_quantity), current_inventory);
+		        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INVENTORY, new_inventory);
+	        }
+	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INVENTORY, new_inventory);
+	        dealer_data_.close();
+	        refreshDisplay();
+			dismissDialog(DIALOG_DRUG_SELL);
 		}
 		String drug_name_;
 	}
@@ -171,6 +212,27 @@ public class DopeWarsGame extends Activity {
         	}
         	
         	return drug_buy_dialog_;
+        } else if (id == DIALOG_DRUG_SELL) {
+        	if (drug_sell_dialog_ == null) {
+        		drug_sell_dialog_ = new Dialog(this);
+        		drug_sell_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        		drug_sell_dialog_.setContentView(R.layout.drug_sell_layout);
+                ((SeekBar)drug_sell_dialog_.findViewById(R.id.drug_quantity_slide)).setOnSeekBarChangeListener(
+                		new SeekBar.OnSeekBarChangeListener() {
+        			@Override
+        			public void onProgressChanged(SeekBar seekBar, int progress,
+        					boolean fromTouch) {
+        				((TextView)drug_sell_dialog_.findViewById(R.id.drug_quantity)).setText(Integer.toString(progress));
+        			}
+        			@Override
+        			public void onStartTrackingTouch(SeekBar seekBar) {}
+        			@Override
+        			public void onStopTrackingTouch(SeekBar seekBar) {}
+                	
+                });
+        	}
+        	
+        	return drug_sell_dialog_;
         }
         return super.onCreateDialog(id);
     }
@@ -238,10 +300,21 @@ public class DopeWarsGame extends Activity {
 	        int drug_price = Integer.parseInt(Global.parseAttribute(dialog_drug_name_, inventory));
 	        int max_num_drugs = cash / drug_price;
 	        max_num_drugs = Math.min(max_num_drugs, space);
-	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setMax(max_num_drugs);
 	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setProgress(max_num_drugs);
+	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setMax(max_num_drugs);
+	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setIndeterminate(false);
 	        ((ImageView)(drug_buy_dialog_.findViewById(R.id.drug_icon))).setOnClickListener(
 	        		new CompleteSaleListener(dialog_drug_name_));
+        } else if (id == DIALOG_DRUG_SELL) {
+        	// Determine how many of the drug the user could sell
+        	String inventory = dealer_data_.getDealerString(
+        			DealerDataAdapter.KEY_DEALER_GAME_INVENTORY);
+        	int drug_quantity = Integer.parseInt(Global.parseAttribute(dialog_drug_name_, inventory));
+	        ((SeekBar)(drug_sell_dialog_.findViewById(R.id.drug_quantity_slide))).setProgress(drug_quantity);
+	        ((SeekBar)(drug_sell_dialog_.findViewById(R.id.drug_quantity_slide))).setMax(drug_quantity);
+	        ((SeekBar)(drug_sell_dialog_.findViewById(R.id.drug_quantity_slide))).setIndeterminate(false);
+	        ((ImageView)(drug_sell_dialog_.findViewById(R.id.drug_icon))).setOnClickListener(
+	        		new CompleteBuyListener(dialog_drug_name_));
         }
         dealer_data_.close();
     }
@@ -438,6 +511,7 @@ public class DopeWarsGame extends Activity {
 	
 	Dialog subway_dialog_;
 	Dialog drug_buy_dialog_;
+	Dialog drug_sell_dialog_;
 	Dialog inventory_dialog_;
 	
 	String dialog_drug_name_;
