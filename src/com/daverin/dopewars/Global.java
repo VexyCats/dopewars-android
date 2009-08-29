@@ -1,7 +1,6 @@
 package com.daverin.dopewars;
 
 import java.util.Random;
-import java.util.Vector;
 
 public class Global {
 	// These are the drug attributes that the game knows how to handle.
@@ -58,6 +57,21 @@ public class Global {
 				new_attributes += "|";
 			}
 			new_attributes += attr + ":" + new_value;
+		}
+		return new_attributes;
+	}
+	
+	public static String removeAttribute(String attr, String attribute_list) {
+		String new_attributes = "";
+		String[] attributes = attribute_list.split("\\|");
+		for (int i = 0; i < attributes.length; ++i) {
+			String[] attr_pair = attributes[i].split(":");
+			if (!attr_pair[0].equals(attr)) {
+				if (new_attributes != "") {
+					new_attributes += "|";
+				}
+				new_attributes += attributes[i];
+			}
 		}
 		return new_attributes;
 	}
