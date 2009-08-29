@@ -2,9 +2,8 @@
 
 = Big things =
 
-  * Selling items
   * Make inventory look good
-  * Days progressing (and game end)
+  * Progress bar display problems
   * Loan shark
   * Bank
   * Big price change days
@@ -15,14 +14,18 @@
   * Customization
   * Score reporting
 
-= Little bug =
+= Loan shark details =
 
-Space isn't being subtracted right. Also I managed to buy enough to make my money available go negative.
+The loan shark amount should be pretty simple, and the bank account too, really, it'll be just another field in the game info, and get modified by dialogs just like the buy/sell drugs dialog. Super-easy, really.
 
-= Details of selling items =
+= Bank details =
 
-This will come after inventory because space left might play into it. I think my first intuition for this will be that if a drug has a gray background you can't do anything, if it has a green background you can buy (tap to buy), if it has an orange background you can sell (tap to sell), if it has a blue background you could do either, and a tap will buy, hold will sell. This might all change but that's my first intuition. So of course space comes into play because if you have no space you can't buy and this will probably be the most common case.
+See loan shark details.
 
-= Details of days progressing =
+= Big price chnage days =
 
-Not much to do here, just move the days when moving locations and then do something at the end.
+Shouldn't be too hard, just some new parameters on drugs and incorporating them into formulas.
+
+= Random messages =
+
+Really important, I haven't figured out how to handle it yet. Pop-up? Could be annoying. Scrolling marquee on the bottom? could be even worse waiting to read important info. Maybe random things could go in the background and more important things could come up front somehow?
