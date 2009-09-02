@@ -112,7 +112,7 @@ public class DopeWarsGame extends Activity {
 	        dealer_data_.open();
 	        String location_inventory = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_LOCATION_INVENTORY);
 	        int drug_price = Integer.parseInt(Global.parseAttribute(drug_name_, location_inventory));
-	        int drug_quantity = Integer.parseInt(((TextView)drug_buy_dialog_.findViewById(R.id.drug_quantity)).getText().toString());
+	        int drug_quantity = Integer.parseInt(((TextView)drug_sell_dialog_.findViewById(R.id.drug_quantity)).getText().toString());
 	        String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
 	        int old_game_cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
 	        String new_game_info = Global.setAttribute(
@@ -153,6 +153,8 @@ public class DopeWarsGame extends Activity {
 	        dealer_data_.open();
 	        String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
 	        String new_game_info = Global.setAttribute("location", location_, game_info);
+	        int days_left = Integer.parseInt(Global.parseAttribute("days_left", new_game_info)) - 1;
+	        new_game_info = Global.setAttribute("days_left", Integer.toString(days_left), new_game_info);
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, new_game_info);
 	        dealer_data_.close();
 			setupLocation();
@@ -410,21 +412,24 @@ public class DopeWarsGame extends Activity {
         	current_row.addView(next_drug);
         }
         // Add subway button
-    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
-    			R.drawable.avatar1, "Subway", " ");
-    	subway_button.setOnClickListener(new SubwayListener());
-    	subway_button.measure(viewWidth, viewHeight);
-    	if (subway_button.getMeasuredWidth() + total_width_added > viewWidth) {
-    		outer_layout.addView(current_row);
-    		current_row = new LinearLayout(this);
-    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-        			LinearLayout.LayoutParams.FILL_PARENT,
-        			LinearLayout.LayoutParams.WRAP_CONTENT));
-    		total_width_added = 0;
-    	}
-    	total_width_added += subway_button.getMeasuredWidth();
-    	current_row.addView(subway_button);
+		int days_left = Integer.parseInt(Global.parseAttribute("days_left", game_info));
+		if (days_left > 0) {
+	    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
+	    			R.drawable.avatar1, "Subway", "[" + Integer.toString(days_left) + "]");
+	    	subway_button.setOnClickListener(new SubwayListener());
+	    	subway_button.measure(viewWidth, viewHeight);
+	    	if (subway_button.getMeasuredWidth() + total_width_added > viewWidth) {
+	    		outer_layout.addView(current_row);
+	    		current_row = new LinearLayout(this);
+	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+	        			LinearLayout.LayoutParams.FILL_PARENT,
+	        			LinearLayout.LayoutParams.WRAP_CONTENT));
+	    		total_width_added = 0;
+	    	}
+	    	total_width_added += subway_button.getMeasuredWidth();
+	    	current_row.addView(subway_button);
+		}
         
         // Add inventory button
         LinearLayout inventory_button = makeButton(R.drawable.btn_translucent_gray,
