@@ -4,27 +4,26 @@
 
   * Make inventory look good
   * Progress bar display problems
-  * Loan shark
-  * Bank
   * Big price change days
   * Guns & new coats
+  * End of game
   * Officer hardass and his crew
   * Random messages
   * Graphics
   * Customization
   * Score reporting
 
-= Loan shark details =
-
-The loan shark amount should be pretty simple, and the bank account too, really, it'll be just another field in the game info, and get modified by dialogs just like the buy/sell drugs dialog. Super-easy, really.
-
-= Bank details =
-
-See loan shark details.
-
 = Big price chnage days =
 
 Shouldn't be too hard, just some new parameters on drugs and incorporating them into formulas.
+
+= Guns & new coats =
+
+Maybe have a random thing happen when moving locations and set that in the current game_info, like "new_coat_available" and "new_gun_available". On buying it's removed, on moving it's removed.
+
+= Office hardass (and other cops) =
+
+Hmm... dialog I guess? There can't be a way out though, but it'd be nice not to auto-kill when hitting back like I did in DW1. Maybe triggering an attack sets some game_info state, then every action checks that state before doing anything and re-opens the fight dialog. Sounds reasonable, assuming that check is pretty fast.
 
 = Random messages =
 
