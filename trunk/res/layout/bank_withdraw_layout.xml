@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/bank_withdraw_layout"
+  android:orientation="horizontal"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  >
+<ImageView
+  android:id="@+id/bank_icon"
+  android:layout_width="55px"
+  android:layout_height="55px"
+  android:src="@drawable/weed"
+  android:scaleType="fitCenter"
+/>
+<LinearLayout
+  android:orientation="vertical"
+  android:layout_width="wrap_content"
+  android:layout_height="fill_parent"
+  android:gravity="center_vertical"
+  >
+<LinearLayout
+  android:orientation="horizontal"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  >
+<TextView
+  android:id="@+id/bank_statement"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:textColor="#ffffff"
+  android:text="Fine, we'll give it back"
+  />
+</LinearLayout>
+<SeekBar
+    android:id="@+id/bank_amount_slide"
+    android:layout_width="180px" 
+    android:layout_height="wrap_content" 
+    android:textSize="20px"
+/>
+</LinearLayout>
+<TextView
+  android:id="@+id/bank_amount"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:gravity="center"
+  android:textSize="18px"
+  android:textColor="#ffffff"
+  android:paddingLeft="8px"
+  android:text="0"
+  />
+</LinearLayout>
