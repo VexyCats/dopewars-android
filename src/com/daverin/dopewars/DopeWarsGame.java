@@ -22,6 +22,9 @@ public class DopeWarsGame extends Activity {
 	public static final int DIALOG_DRUG_BUY = 1003;
 	public static final int DIALOG_INVENTORY = 1004;
 	public static final int DIALOG_DRUG_SELL = 1005;
+	public static final int DIALOG_LOAN_SHARK = 1006;
+	public static final int DIALOG_BANK_DEPOSIT = 1007;
+	public static final int DIALOG_BANK_WITHDRAW = 1008;
 	
 	// Respond to a click on the subway.
 	public class SubwayListener implements View.OnClickListener {
@@ -69,6 +72,25 @@ public class DopeWarsGame extends Activity {
 			return true;
 		}
 		String drug_name_;
+	}
+	
+	public class LoanSharkListener implements View.OnClickListener {
+		public void onClick(View v) {
+			showDialog(DIALOG_LOAN_SHARK);
+		}
+	}
+	
+	public class BankDepositListener implements View.OnClickListener {
+		public void onClick(View v) {
+			showDialog(DIALOG_BANK_DEPOSIT);
+		}
+	}
+	
+	public class BankWithdrawListener implements View.OnLongClickListener {
+		public boolean onLongClick(View v) {
+			showDialog(DIALOG_BANK_WITHDRAW);
+			return true;
+		}
 	}
 	
 	public class CompleteSaleListener implements View.OnClickListener {
@@ -142,6 +164,54 @@ public class DopeWarsGame extends Activity {
 			dismissDialog(DIALOG_DRUG_SELL);
 		}
 		String drug_name_;
+	}
+	
+	public class CompleteLoanListener implements View.OnClickListener {
+		public void onClick(View v) {
+			dealer_data_.open();
+			String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
+			int loan = Integer.parseInt(Global.parseAttribute("loan", game_info));
+			int cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
+	        int loan_payment = Integer.parseInt(((TextView)loan_shark_dialog_.findViewById(R.id.loan_amount)).getText().toString());
+	        String new_game_info = Global.setAttribute("loan", Integer.toString(loan - loan_payment), game_info);
+	        new_game_info = Global.setAttribute("cash", Integer.toString(cash - loan_payment), new_game_info);
+	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, new_game_info);
+			dealer_data_.close();
+			refreshDisplay();
+			dismissDialog(DIALOG_LOAN_SHARK);
+		}
+	}
+	
+	public class CompleteBankDepositListener implements View.OnClickListener {
+		public void onClick(View v) {
+			dealer_data_.open();
+			String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
+			int cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
+			int bank = Integer.parseInt(Global.parseAttribute("bank", game_info));
+	        int bank_deposit = Integer.parseInt(((TextView)bank_deposit_dialog_.findViewById(R.id.bank_amount)).getText().toString());
+	        String new_game_info = Global.setAttribute("cash", Integer.toString(cash - bank_deposit), game_info);
+	        new_game_info = Global.setAttribute("bank", Integer.toString(bank + bank_deposit), game_info);
+	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, new_game_info);
+			dealer_data_.close();
+			refreshDisplay();
+			dismissDialog(DIALOG_BANK_DEPOSIT);
+		}
+	}
+	
+	public class CompleteBankWithdrawListener implements View.OnClickListener {
+		public void onClick(View v) {
+			dealer_data_.open();
+			String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
+			int cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
+			int bank = Integer.parseInt(Global.parseAttribute("bank", game_info));
+	        int bank_withdrawal = Integer.parseInt(((TextView)bank_withdraw_dialog_.findViewById(R.id.bank_amount)).getText().toString());
+	        String new_game_info = Global.setAttribute("cash", Integer.toString(cash + bank_withdrawal), game_info);
+	        new_game_info = Global.setAttribute("bank", Integer.toString(bank - bank_withdrawal), game_info);
+	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, new_game_info);
+			dealer_data_.close();
+			refreshDisplay();
+			dismissDialog(DIALOG_BANK_DEPOSIT);
+		}
 	}
 	
 	// Response to a change in location.
@@ -235,6 +305,66 @@ public class DopeWarsGame extends Activity {
         	}
         	
         	return drug_sell_dialog_;
+        } else if (id == DIALOG_LOAN_SHARK) {
+        	if (loan_shark_dialog_ == null) {
+        		loan_shark_dialog_ = new Dialog(this);
+        		loan_shark_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        		loan_shark_dialog_.setContentView(R.layout.loan_shark_layout);
+                ((SeekBar)loan_shark_dialog_.findViewById(R.id.loan_amount_slide)).setOnSeekBarChangeListener(
+                		new SeekBar.OnSeekBarChangeListener() {
+        			@Override
+        			public void onProgressChanged(SeekBar seekBar, int progress,
+        					boolean fromTouch) {
+        				((TextView)loan_shark_dialog_.findViewById(R.id.loan_amount)).setText(Integer.toString(progress));
+        			}
+        			@Override
+        			public void onStartTrackingTouch(SeekBar seekBar) {}
+        			@Override
+        			public void onStopTrackingTouch(SeekBar seekBar) {}
+                	
+                });
+        	}
+        	return loan_shark_dialog_;
+        } else if (id == DIALOG_BANK_DEPOSIT) {
+        	if (bank_deposit_dialog_ == null) {
+        		bank_deposit_dialog_ = new Dialog(this);
+        		bank_deposit_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        		bank_deposit_dialog_.setContentView(R.layout.bank_deposit_layout);
+                ((SeekBar)bank_deposit_dialog_.findViewById(R.id.bank_amount_slide)).setOnSeekBarChangeListener(
+                		new SeekBar.OnSeekBarChangeListener() {
+        			@Override
+        			public void onProgressChanged(SeekBar seekBar, int progress,
+        					boolean fromTouch) {
+        				((TextView)bank_deposit_dialog_.findViewById(R.id.bank_amount)).setText(Integer.toString(progress));
+        			}
+        			@Override
+        			public void onStartTrackingTouch(SeekBar seekBar) {}
+        			@Override
+        			public void onStopTrackingTouch(SeekBar seekBar) {}
+                	
+                });
+        	}
+        	return bank_deposit_dialog_;
+        } else if (id == DIALOG_BANK_WITHDRAW) {
+        	if (bank_withdraw_dialog_ == null) {
+        		bank_withdraw_dialog_ = new Dialog(this);
+        		bank_withdraw_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        		bank_withdraw_dialog_.setContentView(R.layout.bank_withdraw_layout);
+                ((SeekBar)bank_withdraw_dialog_.findViewById(R.id.bank_amount_slide)).setOnSeekBarChangeListener(
+                		new SeekBar.OnSeekBarChangeListener() {
+        			@Override
+        			public void onProgressChanged(SeekBar seekBar, int progress,
+        					boolean fromTouch) {
+        				((TextView)bank_withdraw_dialog_.findViewById(R.id.bank_amount)).setText(Integer.toString(progress));
+        			}
+        			@Override
+        			public void onStartTrackingTouch(SeekBar seekBar) {}
+        			@Override
+        			public void onStopTrackingTouch(SeekBar seekBar) {}
+                	
+                });
+        	}
+        	return bank_withdraw_dialog_;
         }
         return super.onCreateDialog(id);
     }
@@ -317,6 +447,32 @@ public class DopeWarsGame extends Activity {
 	        ((SeekBar)(drug_sell_dialog_.findViewById(R.id.drug_quantity_slide))).setIndeterminate(false);
 	        ((ImageView)(drug_sell_dialog_.findViewById(R.id.drug_icon))).setOnClickListener(
 	        		new CompleteBuyListener(dialog_drug_name_));
+        } else if (id == DIALOG_LOAN_SHARK) {
+        	String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
+        	int cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
+        	int loan_amount = Integer.parseInt(Global.parseAttribute("loan", game_info));
+        	int max_loan = Math.min(cash, loan_amount);
+	        ((SeekBar)(loan_shark_dialog_.findViewById(R.id.loan_amount_slide))).setProgress(max_loan);
+	        ((SeekBar)(loan_shark_dialog_.findViewById(R.id.loan_amount_slide))).setMax(max_loan);
+	        ((SeekBar)(loan_shark_dialog_.findViewById(R.id.loan_amount_slide))).setIndeterminate(false);
+	        ((ImageView)(loan_shark_dialog_.findViewById(R.id.loan_icon))).setOnClickListener(
+	        		new CompleteLoanListener());
+        } else if (id == DIALOG_BANK_DEPOSIT) {
+        	String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
+        	int cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
+	        ((SeekBar)(bank_deposit_dialog_.findViewById(R.id.bank_amount_slide))).setProgress(cash);
+	        ((SeekBar)(bank_deposit_dialog_.findViewById(R.id.bank_amount_slide))).setMax(cash);
+	        ((SeekBar)(bank_deposit_dialog_.findViewById(R.id.bank_amount_slide))).setIndeterminate(false);
+	        ((ImageView)(bank_deposit_dialog_.findViewById(R.id.bank_icon))).setOnClickListener(
+	        		new CompleteBankDepositListener());
+        } else if (id == DIALOG_BANK_WITHDRAW) {
+        	String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
+        	int bank = Integer.parseInt(Global.parseAttribute("bank", game_info));
+	        ((SeekBar)(bank_withdraw_dialog_.findViewById(R.id.bank_amount_slide))).setProgress(bank);
+	        ((SeekBar)(bank_withdraw_dialog_.findViewById(R.id.bank_amount_slide))).setMax(bank);
+	        ((SeekBar)(bank_withdraw_dialog_.findViewById(R.id.bank_amount_slide))).setIndeterminate(false);
+	        ((ImageView)(bank_withdraw_dialog_.findViewById(R.id.bank_icon))).setOnClickListener(
+	        		new CompleteBankWithdrawListener());
         }
         dealer_data_.close();
     }
@@ -411,7 +567,52 @@ public class DopeWarsGame extends Activity {
         	total_width_added += next_drug.getMeasuredWidth();
         	current_row.addView(next_drug);
         }
-        // Add subway button
+		
+		// Add loan shark button
+		String location = Global.parseAttribute("location", game_info);
+		String loan_location = Global.parseAttribute("loan_location", game_info);
+		if (location.equals(loan_location)) {
+			int loan_shark_amount = Integer.parseInt(Global.parseAttribute("loan", game_info));
+			LinearLayout loan_shark_button = makeButton(R.drawable.btn_translucent_gray,
+	    			R.drawable.avatar1, "Loan Shark", Integer.toString(loan_shark_amount));
+		    loan_shark_button.setOnClickListener(new LoanSharkListener());
+		    loan_shark_button.measure(viewWidth, viewHeight);
+		    if (loan_shark_button.getMeasuredWidth() + total_width_added > viewWidth) {
+		    	outer_layout.addView(current_row);
+	    		current_row = new LinearLayout(this);
+	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+	        			LinearLayout.LayoutParams.FILL_PARENT,
+	        			LinearLayout.LayoutParams.WRAP_CONTENT));
+	    		total_width_added = 0;
+		    }
+	    	total_width_added += loan_shark_button.getMeasuredWidth();
+	    	current_row.addView(loan_shark_button);
+		}
+		
+		// Add bank button
+		String bank_location = Global.parseAttribute("bank_location", game_info);
+		if (location.equals(bank_location)) {
+			int bank_amount = Integer.parseInt(Global.parseAttribute("bank", game_info));
+			LinearLayout bank_button = makeButton(R.drawable.btn_translucent_gray,
+	    			R.drawable.avatar1, "Bank", Integer.toString(bank_amount));
+			bank_button.setOnClickListener(new BankDepositListener());
+			bank_button.setOnLongClickListener(new BankWithdrawListener());
+			bank_button.measure(viewWidth, viewHeight);
+		    if (bank_button.getMeasuredWidth() + total_width_added > viewWidth) {
+		    	outer_layout.addView(current_row);
+	    		current_row = new LinearLayout(this);
+	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+	        			LinearLayout.LayoutParams.FILL_PARENT,
+	        			LinearLayout.LayoutParams.WRAP_CONTENT));
+	    		total_width_added = 0;
+		    }
+	    	total_width_added += bank_button.getMeasuredWidth();
+	    	current_row.addView(bank_button);
+		}
+        
+		// Add subway button
 		int days_left = Integer.parseInt(Global.parseAttribute("days_left", game_info));
 		if (days_left > 0) {
 	    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
@@ -518,6 +719,9 @@ public class DopeWarsGame extends Activity {
 	Dialog drug_buy_dialog_;
 	Dialog drug_sell_dialog_;
 	Dialog inventory_dialog_;
+	Dialog loan_shark_dialog_;
+	Dialog bank_deposit_dialog_;
+	Dialog bank_withdraw_dialog_;
 	
 	String dialog_drug_name_;
 	

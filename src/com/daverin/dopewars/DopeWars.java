@@ -36,8 +36,8 @@ public class DopeWars extends Activity {
 	        }
 	        
 	        // Clear the inventory, start with a standard amount of cash
-	        // and debt.
-	        String initial_game_state = "cash:55000|debt:2000|location:Brooklyn|space:100|max_space:100|days_left:5";
+	        // and debt. This stuff will eventually be determined by game settings.
+	        String initial_game_state = "cash:55000|debt:2000|location:Brooklyn|space:100|max_space:100|days_left:5|loan:5500|bank:0|loan_location:Brooklyn|bank_location:Brooklyn";
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
 	        		initial_game_state);
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INVENTORY,
