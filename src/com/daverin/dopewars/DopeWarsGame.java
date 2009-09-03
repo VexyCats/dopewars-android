@@ -18,6 +18,8 @@ import android.widget.ImageView.ScaleType;
 
 public class DopeWarsGame extends Activity {
 	
+	// The dialogs available in the game include moving from place to place on the subway,
+	// buyin and selling drugs, looking at your inventory, the loan shark, and the bank.
 	public static final int DIALOG_SUBWAY = 1002;
 	public static final int DIALOG_DRUG_BUY = 1003;
 	public static final int DIALOG_INVENTORY = 1004;
@@ -26,71 +28,56 @@ public class DopeWarsGame extends Activity {
 	public static final int DIALOG_BANK_DEPOSIT = 1007;
 	public static final int DIALOG_BANK_WITHDRAW = 1008;
 	
-	// Respond to a click on the subway.
-	public class SubwayListener implements View.OnClickListener {
-		public void onClick(View v) {
-			showDialog(DIALOG_SUBWAY);
+	// Respond to a click that just opens a dialog with no additional information.
+	public class BasicDialogListener implements View.OnClickListener {
+		public BasicDialogListener(int dialog_id) {
+			dialog_id_ = dialog_id;
 		}
+		public void onClick(View v) {
+			showDialog(dialog_id_);
+		}
+		int dialog_id_;
 	}
 	
-	// Respond to a click on the inventory button.
-	public class InventoryListener implements View.OnClickListener {
-		public void onClick(View v) {
-			showDialog(DIALOG_INVENTORY);
+	// Respond to a long click that just opens a dialog with no additional information.
+	public class LongClickDialogListener implements View.OnLongClickListener {
+		public LongClickDialogListener(int dialog_id) {
+			dialog_id_ = dialog_id;
 		}
+		public boolean onLongClick(View v) {
+			showDialog(dialog_id_);
+			return true;
+		}
+		int dialog_id_;
 	}
 	
-	public class BuyDrugListener implements View.OnClickListener {
-		public BuyDrugListener(String drug_name) {
+	// Respond to a click that needs a drug to operate on.
+	public class DrugClickListener implements View.OnClickListener {
+		public DrugClickListener(String drug_name, int dialog_id) {
 			drug_name_ = drug_name;
+			dialog_id_ = dialog_id;
 		}
 		public void onClick(View v) {
 			dialog_drug_name_ = drug_name_;
-			showDialog(DIALOG_DRUG_BUY);
+			showDialog(dialog_id_);
 		}
 		String drug_name_;
+		int dialog_id_;
 	}
 	
-	public class SellDrugListener implements View.OnClickListener {
-		public SellDrugListener(String drug_name) {
+	// Respond to a long click that needs a drug to operate on.
+	public class DrugLongClickListener implements View.OnLongClickListener {
+		public DrugLongClickListener(String drug_name, int dialog_id) {
 			drug_name_ = drug_name;
-		}
-		public void onClick(View v) {
-			dialog_drug_name_ = drug_name_;
-			showDialog(DIALOG_DRUG_SELL);
-		}
-		String drug_name_;
-	}
-	
-	public class SellDrugListenerLong implements View.OnLongClickListener {
-		public SellDrugListenerLong(String drug_name) {
-			drug_name_ = drug_name;
+			dialog_id_ = dialog_id;
 		}
 		public boolean onLongClick(View v) {
 			dialog_drug_name_ = drug_name_;
-			showDialog(DIALOG_DRUG_SELL);
+			showDialog(dialog_id_);
 			return true;
 		}
 		String drug_name_;
-	}
-	
-	public class LoanSharkListener implements View.OnClickListener {
-		public void onClick(View v) {
-			showDialog(DIALOG_LOAN_SHARK);
-		}
-	}
-	
-	public class BankDepositListener implements View.OnClickListener {
-		public void onClick(View v) {
-			showDialog(DIALOG_BANK_DEPOSIT);
-		}
-	}
-	
-	public class BankWithdrawListener implements View.OnLongClickListener {
-		public boolean onLongClick(View v) {
-			showDialog(DIALOG_BANK_WITHDRAW);
-			return true;
-		}
+		int dialog_id_;
 	}
 	
 	public class CompleteSaleListener implements View.OnClickListener {
@@ -543,16 +530,16 @@ public class DopeWarsGame extends Activity {
         		// Can also sell
         		if (!current_drug_amount.equals("")) {
         		  next_drug.setBackgroundResource(R.drawable.btn_translucent_blue);
-        		  next_drug.setOnLongClickListener(new SellDrugListenerLong(drug[0]));
+        		  next_drug.setOnLongClickListener(new DrugLongClickListener(drug[0], DIALOG_DRUG_SELL));
         		// Can only buy
         		} else {
         			next_drug.setBackgroundResource(R.drawable.btn_translucent_green);
         		}
-        		next_drug.setOnClickListener(new BuyDrugListener(drug[0]));
+        		next_drug.setOnClickListener(new DrugClickListener(drug[0], DIALOG_DRUG_BUY));
         	// Can only sell
         	} else if (!current_drug_amount.equals("")) {
         	  next_drug.setBackgroundResource(R.drawable.btn_translucent_orange);
-      		  next_drug.setOnClickListener(new SellDrugListener(drug[0]));
+      		  next_drug.setOnClickListener(new DrugClickListener(drug[0], DIALOG_DRUG_SELL));
         	}
         	next_drug.measure(viewWidth, viewHeight);
         	if (next_drug.getMeasuredWidth() + total_width_added > viewWidth) {
@@ -575,7 +562,7 @@ public class DopeWarsGame extends Activity {
 			int loan_shark_amount = Integer.parseInt(Global.parseAttribute("loan", game_info));
 			LinearLayout loan_shark_button = makeButton(R.drawable.btn_translucent_gray,
 	    			R.drawable.avatar1, "Loan Shark", Integer.toString(loan_shark_amount));
-		    loan_shark_button.setOnClickListener(new LoanSharkListener());
+		    loan_shark_button.setOnClickListener(new BasicDialogListener(DIALOG_LOAN_SHARK));
 		    loan_shark_button.measure(viewWidth, viewHeight);
 		    if (loan_shark_button.getMeasuredWidth() + total_width_added > viewWidth) {
 		    	outer_layout.addView(current_row);
@@ -596,8 +583,8 @@ public class DopeWarsGame extends Activity {
 			int bank_amount = Integer.parseInt(Global.parseAttribute("bank", game_info));
 			LinearLayout bank_button = makeButton(R.drawable.btn_translucent_gray,
 	    			R.drawable.avatar1, "Bank", Integer.toString(bank_amount));
-			bank_button.setOnClickListener(new BankDepositListener());
-			bank_button.setOnLongClickListener(new BankWithdrawListener());
+			bank_button.setOnClickListener(new BasicDialogListener(DIALOG_BANK_DEPOSIT));
+			bank_button.setOnLongClickListener(new LongClickDialogListener(DIALOG_BANK_WITHDRAW));
 			bank_button.measure(viewWidth, viewHeight);
 		    if (bank_button.getMeasuredWidth() + total_width_added > viewWidth) {
 		    	outer_layout.addView(current_row);
@@ -617,7 +604,7 @@ public class DopeWarsGame extends Activity {
 		if (days_left > 0) {
 	    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
 	    			R.drawable.avatar1, "Subway", "[" + Integer.toString(days_left) + "]");
-	    	subway_button.setOnClickListener(new SubwayListener());
+	    	subway_button.setOnClickListener(new BasicDialogListener(DIALOG_SUBWAY));
 	    	subway_button.measure(viewWidth, viewHeight);
 	    	if (subway_button.getMeasuredWidth() + total_width_added > viewWidth) {
 	    		outer_layout.addView(current_row);
@@ -635,7 +622,7 @@ public class DopeWarsGame extends Activity {
         // Add inventory button
         LinearLayout inventory_button = makeButton(R.drawable.btn_translucent_gray,
         		R.drawable.avatar1, "Inventory", " ");
-        inventory_button.setOnClickListener(new InventoryListener());
+        inventory_button.setOnClickListener(new BasicDialogListener(DIALOG_INVENTORY));
         inventory_button.measure(viewWidth, viewHeight);
     	if (inventory_button.getMeasuredWidth() + total_width_added > viewWidth) {
     		outer_layout.addView(current_row);
