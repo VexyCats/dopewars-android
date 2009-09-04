@@ -8,7 +8,7 @@
     android:id="@+id/background_image"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:src="@drawable/background_alley_dark"
+    android:src="@drawable/main_menu_background"
     android:scaleType="fitCenter"
     />
 <LinearLayout

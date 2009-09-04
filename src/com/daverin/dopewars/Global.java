@@ -1,11 +1,25 @@
 package com.daverin.dopewars;
 
+import java.util.HashMap;
 import java.util.Random;
 
 public class Global {
 	// These are the drug attributes that the game knows how to handle.
 	public static String DRUG_ATTR_BASE_PRICE = "base_price";
 	public static String DRUG_ATTR_PRICE_VARIANCE = "price_variance";
+	public static HashMap<String,Integer> drug_icons_;
+	
+	public static void loadIcons() {
+		drug_icons_ = new HashMap<String,Integer>();
+		drug_icons_.put("weed", R.drawable.weed);
+		drug_icons_.put("acid", R.drawable.acid);
+		drug_icons_.put("ludes", R.drawable.ludes);
+		drug_icons_.put("heroin", R.drawable.heroin);
+		drug_icons_.put("cocaine", R.drawable.cocaine);
+		drug_icons_.put("shrooms", R.drawable.shrooms);
+		drug_icons_.put("speed", R.drawable.speed);
+		drug_icons_.put("hashish", R.drawable.hashish);
+	}
 	
 	public static int attributeCount(String attribute_list) {
 		if (attribute_list.equals("")) {

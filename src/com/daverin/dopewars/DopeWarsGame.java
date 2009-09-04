@@ -19,7 +19,7 @@ import android.widget.ImageView.ScaleType;
 public class DopeWarsGame extends Activity {
 	
 	// The dialogs available in the game include moving from place to place on the subway,
-	// buyin and selling drugs, looking at your inventory, the loan shark, and the bank.
+	// buying and selling drugs, looking at your inventory, the loan shark, and the bank.
 	public static final int DIALOG_SUBWAY = 1002;
 	public static final int DIALOG_DRUG_BUY = 1003;
 	public static final int DIALOG_INVENTORY = 1004;
@@ -211,6 +211,12 @@ public class DopeWarsGame extends Activity {
 	        String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
 	        String new_game_info = Global.setAttribute("location", location_, game_info);
 	        int days_left = Integer.parseInt(Global.parseAttribute("days_left", new_game_info)) - 1;
+	        int loan = Integer.parseInt(Global.parseAttribute("loan", new_game_info));
+	        loan = loan + (int)((double)loan * 0.10);
+	        int bank = Integer.parseInt(Global.parseAttribute("bank", new_game_info));
+	        bank = bank + (int)((double)bank * 0.05);
+	        new_game_info = Global.setAttribute("loan", Integer.toString(loan), new_game_info);
+	        new_game_info = Global.setAttribute("bank", Integer.toString(bank), new_game_info);
 	        new_game_info = Global.setAttribute("days_left", Integer.toString(days_left), new_game_info);
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, new_game_info);
 	        dealer_data_.close();
@@ -236,123 +242,23 @@ public class DopeWarsGame extends Activity {
 	
 	@Override
     protected Dialog onCreateDialog(int id) {
-        if (id == DIALOG_SUBWAY) {
-        	if (subway_dialog_ == null) {
-        		subway_dialog_ = new Dialog(this);
-        		subway_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        		subway_dialog_.setContentView(R.layout.subway_layout);
-        	}
-            return subway_dialog_;
-        } else if (id == DIALOG_INVENTORY) {
-        	if (inventory_dialog_ == null) {
-        		inventory_dialog_ = new Dialog(this);
-        		inventory_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        		inventory_dialog_.setContentView(R.layout.inventory_layout);
-        	}
-        	return inventory_dialog_;
-        } else if (id == DIALOG_DRUG_BUY) {
-        	if (drug_buy_dialog_ == null) {
-        		drug_buy_dialog_ = new Dialog(this);
-        		drug_buy_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        		drug_buy_dialog_.setContentView(R.layout.drug_buy_layout);
-                ((SeekBar)drug_buy_dialog_.findViewById(R.id.drug_quantity_slide)).setOnSeekBarChangeListener(
-                		new SeekBar.OnSeekBarChangeListener() {
-        			@Override
-        			public void onProgressChanged(SeekBar seekBar, int progress,
-        					boolean fromTouch) {
-        				((TextView)drug_buy_dialog_.findViewById(R.id.drug_quantity)).setText(Integer.toString(progress));
-        			}
-        			@Override
-        			public void onStartTrackingTouch(SeekBar seekBar) {}
-        			@Override
-        			public void onStopTrackingTouch(SeekBar seekBar) {}
-                	
-                });
-        	}
-        	
-        	return drug_buy_dialog_;
-        } else if (id == DIALOG_DRUG_SELL) {
-        	if (drug_sell_dialog_ == null) {
-        		drug_sell_dialog_ = new Dialog(this);
-        		drug_sell_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        		drug_sell_dialog_.setContentView(R.layout.drug_sell_layout);
-                ((SeekBar)drug_sell_dialog_.findViewById(R.id.drug_quantity_slide)).setOnSeekBarChangeListener(
-                		new SeekBar.OnSeekBarChangeListener() {
-        			@Override
-        			public void onProgressChanged(SeekBar seekBar, int progress,
-        					boolean fromTouch) {
-        				((TextView)drug_sell_dialog_.findViewById(R.id.drug_quantity)).setText(Integer.toString(progress));
-        			}
-        			@Override
-        			public void onStartTrackingTouch(SeekBar seekBar) {}
-        			@Override
-        			public void onStopTrackingTouch(SeekBar seekBar) {}
-                	
-                });
-        	}
-        	
-        	return drug_sell_dialog_;
-        } else if (id == DIALOG_LOAN_SHARK) {
-        	if (loan_shark_dialog_ == null) {
-        		loan_shark_dialog_ = new Dialog(this);
-        		loan_shark_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        		loan_shark_dialog_.setContentView(R.layout.loan_shark_layout);
-                ((SeekBar)loan_shark_dialog_.findViewById(R.id.loan_amount_slide)).setOnSeekBarChangeListener(
-                		new SeekBar.OnSeekBarChangeListener() {
-        			@Override
-        			public void onProgressChanged(SeekBar seekBar, int progress,
-        					boolean fromTouch) {
-        				((TextView)loan_shark_dialog_.findViewById(R.id.loan_amount)).setText(Integer.toString(progress));
-        			}
-        			@Override
-        			public void onStartTrackingTouch(SeekBar seekBar) {}
-        			@Override
-        			public void onStopTrackingTouch(SeekBar seekBar) {}
-                	
-                });
-        	}
-        	return loan_shark_dialog_;
-        } else if (id == DIALOG_BANK_DEPOSIT) {
-        	if (bank_deposit_dialog_ == null) {
-        		bank_deposit_dialog_ = new Dialog(this);
-        		bank_deposit_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        		bank_deposit_dialog_.setContentView(R.layout.bank_deposit_layout);
-                ((SeekBar)bank_deposit_dialog_.findViewById(R.id.bank_amount_slide)).setOnSeekBarChangeListener(
-                		new SeekBar.OnSeekBarChangeListener() {
-        			@Override
-        			public void onProgressChanged(SeekBar seekBar, int progress,
-        					boolean fromTouch) {
-        				((TextView)bank_deposit_dialog_.findViewById(R.id.bank_amount)).setText(Integer.toString(progress));
-        			}
-        			@Override
-        			public void onStartTrackingTouch(SeekBar seekBar) {}
-        			@Override
-        			public void onStopTrackingTouch(SeekBar seekBar) {}
-                	
-                });
-        	}
-        	return bank_deposit_dialog_;
-        } else if (id == DIALOG_BANK_WITHDRAW) {
-        	if (bank_withdraw_dialog_ == null) {
-        		bank_withdraw_dialog_ = new Dialog(this);
-        		bank_withdraw_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        		bank_withdraw_dialog_.setContentView(R.layout.bank_withdraw_layout);
-                ((SeekBar)bank_withdraw_dialog_.findViewById(R.id.bank_amount_slide)).setOnSeekBarChangeListener(
-                		new SeekBar.OnSeekBarChangeListener() {
-        			@Override
-        			public void onProgressChanged(SeekBar seekBar, int progress,
-        					boolean fromTouch) {
-        				((TextView)bank_withdraw_dialog_.findViewById(R.id.bank_amount)).setText(Integer.toString(progress));
-        			}
-        			@Override
-        			public void onStartTrackingTouch(SeekBar seekBar) {}
-        			@Override
-        			public void onStopTrackingTouch(SeekBar seekBar) {}
-                	
-                });
-        	}
-        	return bank_withdraw_dialog_;
-        }
+		initDialogs();
+		switch(id) {
+		case DIALOG_SUBWAY:
+			return subway_dialog_;
+		case DIALOG_INVENTORY:
+			return inventory_dialog_;
+		case DIALOG_DRUG_BUY:
+			return drug_buy_dialog_;
+		case DIALOG_DRUG_SELL:
+			return drug_sell_dialog_;
+		case DIALOG_LOAN_SHARK:
+			return loan_shark_dialog_;
+		case DIALOG_BANK_DEPOSIT:
+			return bank_deposit_dialog_;
+		case DIALOG_BANK_WITHDRAW:
+			return bank_withdraw_dialog_;
+		}
         return super.onCreateDialog(id);
     }
 	
@@ -522,8 +428,11 @@ public class DopeWarsGame extends Activity {
 			String[] drug = Global.getAttribute(i, location_inventory);
 			int drug_price = Integer.parseInt(drug[1]);
 			String current_drug_amount = Global.parseAttribute(drug[0], current_inventory);
+			String drug_info = dealer_data_.getDrugAttributes(drug[0]);
+			String drug_icon = Global.parseAttribute("icon", drug_info);
+			int drug_picture = Global.drug_icons_.get(drug_icon);
         	LinearLayout next_drug = makeButton(R.drawable.btn_translucent_gray,
-        			R.drawable.weed, drug[0],
+        			drug_picture, drug[0],
         			"$" + Integer.toString(drug_price));
         	// Can buy
         	if ((cash > drug_price) && (space > 0)) {
@@ -561,7 +470,7 @@ public class DopeWarsGame extends Activity {
 		if (location.equals(loan_location)) {
 			int loan_shark_amount = Integer.parseInt(Global.parseAttribute("loan", game_info));
 			LinearLayout loan_shark_button = makeButton(R.drawable.btn_translucent_gray,
-	    			R.drawable.avatar1, "Loan Shark", Integer.toString(loan_shark_amount));
+	    			R.drawable.loan_shark, "Shark", Integer.toString(loan_shark_amount));
 		    loan_shark_button.setOnClickListener(new BasicDialogListener(DIALOG_LOAN_SHARK));
 		    loan_shark_button.measure(viewWidth, viewHeight);
 		    if (loan_shark_button.getMeasuredWidth() + total_width_added > viewWidth) {
@@ -582,7 +491,7 @@ public class DopeWarsGame extends Activity {
 		if (location.equals(bank_location)) {
 			int bank_amount = Integer.parseInt(Global.parseAttribute("bank", game_info));
 			LinearLayout bank_button = makeButton(R.drawable.btn_translucent_gray,
-	    			R.drawable.avatar1, "Bank", Integer.toString(bank_amount));
+	    			R.drawable.bank, "Bank", Integer.toString(bank_amount));
 			bank_button.setOnClickListener(new BasicDialogListener(DIALOG_BANK_DEPOSIT));
 			bank_button.setOnLongClickListener(new LongClickDialogListener(DIALOG_BANK_WITHDRAW));
 			bank_button.measure(viewWidth, viewHeight);
@@ -603,7 +512,7 @@ public class DopeWarsGame extends Activity {
 		int days_left = Integer.parseInt(Global.parseAttribute("days_left", game_info));
 		if (days_left > 0) {
 	    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
-	    			R.drawable.avatar1, "Subway", "[" + Integer.toString(days_left) + "]");
+	    			R.drawable.subway, "Subway", "[" + Integer.toString(days_left) + "]");
 	    	subway_button.setOnClickListener(new BasicDialogListener(DIALOG_SUBWAY));
 	    	subway_button.measure(viewWidth, viewHeight);
 	    	if (subway_button.getMeasuredWidth() + total_width_added > viewWidth) {
@@ -621,7 +530,7 @@ public class DopeWarsGame extends Activity {
         
         // Add inventory button
         LinearLayout inventory_button = makeButton(R.drawable.btn_translucent_gray,
-        		R.drawable.avatar1, "Inventory", " ");
+        		R.drawable.backpack, "Coat", " ");
         inventory_button.setOnClickListener(new BasicDialogListener(DIALOG_INVENTORY));
         inventory_button.measure(viewWidth, viewHeight);
     	if (inventory_button.getMeasuredWidth() + total_width_added > viewWidth) {
@@ -713,4 +622,115 @@ public class DopeWarsGame extends Activity {
 	String dialog_drug_name_;
 	
 	DealerDataAdapter dealer_data_;
+	
+
+	// This function is at the end because it's gross. There is lots of replicated stuff here for
+	// no good reason at all.
+	private void initDialogs() {
+		if (subway_dialog_ == null) {
+			subway_dialog_ = new Dialog(this);
+    		subway_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    		subway_dialog_.setContentView(R.layout.subway_layout);
+		}
+		if (inventory_dialog_ == null) {
+    		inventory_dialog_ = new Dialog(this);
+    		inventory_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    		inventory_dialog_.setContentView(R.layout.inventory_layout);
+    	}
+    	if (drug_buy_dialog_ == null) {
+    		drug_buy_dialog_ = new Dialog(this);
+    		drug_buy_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    		drug_buy_dialog_.setContentView(R.layout.drug_buy_layout);
+            ((SeekBar)drug_buy_dialog_.findViewById(R.id.drug_quantity_slide)).
+            		setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+    			@Override
+    			public void onProgressChanged(SeekBar seekBar, int progress,
+    					boolean fromTouch) {
+    				((TextView)drug_buy_dialog_.findViewById(R.id.drug_quantity)).setText(
+    						Integer.toString(progress));
+    			}
+    			@Override
+    			public void onStartTrackingTouch(SeekBar seekBar) {}
+    			@Override
+    			public void onStopTrackingTouch(SeekBar seekBar) {}
+            	
+            });
+    	}
+    	if (drug_sell_dialog_ == null) {
+    		drug_sell_dialog_ = new Dialog(this);
+    		drug_sell_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    		drug_sell_dialog_.setContentView(R.layout.drug_sell_layout);
+            ((SeekBar)drug_sell_dialog_.findViewById(R.id.drug_quantity_slide)).
+            		setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+    			@Override
+    			public void onProgressChanged(SeekBar seekBar, int progress,
+    					boolean fromTouch) {
+    				((TextView)drug_sell_dialog_.findViewById(R.id.drug_quantity)).setText(
+    						Integer.toString(progress));
+    			}
+    			@Override
+    			public void onStartTrackingTouch(SeekBar seekBar) {}
+    			@Override
+    			public void onStopTrackingTouch(SeekBar seekBar) {}
+            	
+            });
+    	}
+    	if (loan_shark_dialog_ == null) {
+    		loan_shark_dialog_ = new Dialog(this);
+    		loan_shark_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    		loan_shark_dialog_.setContentView(R.layout.loan_shark_layout);
+            ((SeekBar)loan_shark_dialog_.findViewById(R.id.loan_amount_slide)).
+            		setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+    			@Override
+    			public void onProgressChanged(SeekBar seekBar, int progress,
+    					boolean fromTouch) {
+    				((TextView)loan_shark_dialog_.findViewById(R.id.loan_amount)).setText(
+    						Integer.toString(progress));
+    			}
+    			@Override
+    			public void onStartTrackingTouch(SeekBar seekBar) {}
+    			@Override
+    			public void onStopTrackingTouch(SeekBar seekBar) {}
+            	
+            });
+    	}
+    	if (bank_deposit_dialog_ == null) {
+    		bank_deposit_dialog_ = new Dialog(this);
+    		bank_deposit_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    		bank_deposit_dialog_.setContentView(R.layout.bank_deposit_layout);
+            ((SeekBar)bank_deposit_dialog_.findViewById(R.id.bank_amount_slide)).
+            		setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+    			@Override
+    			public void onProgressChanged(SeekBar seekBar, int progress,
+    					boolean fromTouch) {
+    				((TextView)bank_deposit_dialog_.findViewById(R.id.bank_amount)).setText(
+    						Integer.toString(progress));
+    			}
+    			@Override
+    			public void onStartTrackingTouch(SeekBar seekBar) {}
+    			@Override
+    			public void onStopTrackingTouch(SeekBar seekBar) {}
+            	
+            });
+    	}
+    	if (bank_withdraw_dialog_ == null) {
+    		bank_withdraw_dialog_ = new Dialog(this);
+    		bank_withdraw_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    		bank_withdraw_dialog_.setContentView(R.layout.bank_withdraw_layout);
+            ((SeekBar)bank_withdraw_dialog_.findViewById(R.id.bank_amount_slide)).
+            		setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+    			@Override
+    			public void onProgressChanged(SeekBar seekBar, int progress,
+    					boolean fromTouch) {
+    				((TextView)bank_withdraw_dialog_.findViewById(R.id.bank_amount)).setText(
+    						Integer.toString(progress));
+    			}
+    			@Override
+    			public void onStartTrackingTouch(SeekBar seekBar) {}
+    			@Override
+    			public void onStopTrackingTouch(SeekBar seekBar) {}
+            	
+            });
+    	}
+	}
 }

@@ -30,38 +30,50 @@ public class DopeWars extends Activity {
 	        if (dealer_name.equals("")) {
 	        	dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_NAME, "Guest");
 	        }
-	        String avatar_id = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_AVATAR_NAME);
+	        String avatar_id = dealer_data_.getDealerString(
+	        		DealerDataAdapter.KEY_DEALER_AVATAR_NAME);
 	        if (avatar_id.equals("")) {
 	        	dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_AVATAR_NAME, "0");
 	        }
 	        
 	        // Clear the inventory, start with a standard amount of cash
 	        // and debt. This stuff will eventually be determined by game settings.
-	        String initial_game_state = "cash:55000|debt:2000|location:Brooklyn|space:100|max_space:100|days_left:5|loan:5500|bank:0|loan_location:Brooklyn|bank_location:Brooklyn";
+	        String initial_game_state = "cash:55000|debt:2000|location:Brooklyn|space:100|" +
+	        	"max_space:100|days_left:5|loan:5500|bank:0|loan_location:Brooklyn|" +
+	        	"bank_location:Brooklyn";
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
 	        		initial_game_state);
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INVENTORY,
 	        		"");
 	        
+	        // *** I'm not sure where the best place for this is yet ***
+	        Global.loadIcons();
+	        
 	        // *** This part will be setup by the xml file ***
 	        dealer_data_.clearAvailableDrugs();
-	        dealer_data_.addDrug("Weed", "base_price:400|price_variance:200");
-	        dealer_data_.addDrug("Acid", "base_price:1500|price_variance:400");
-	        dealer_data_.addDrug("Ludes", "base_price:80|price_variance:20");
-	        dealer_data_.addDrug("Heroin", "base_price:10000|price_variance:2000");
-	        dealer_data_.addDrug("Cocaine", "base_price:20000|price_variance:3000");
-	        dealer_data_.addDrug("Shrooms", "base_price:1000|price_variance:200");
-	        dealer_data_.addDrug("Speed", "base_price:110|price_variance:30");
-	        dealer_data_.addDrug("Hashish", "base_price:180|price_variance:40");
+	        dealer_data_.addDrug("Weed", "base_price:400|price_variance:200|icon:weed");
+	        dealer_data_.addDrug("Acid", "base_price:1500|price_variance:400|icon:acid");
+	        dealer_data_.addDrug("Ludes", "base_price:80|price_variance:20|icon:ludes");
+	        dealer_data_.addDrug("Heroin", "base_price:10000|price_variance:2000|icon:heroin");
+	        dealer_data_.addDrug("Cocaine", "base_price:20000|price_variance:3000|icon:cocaine");
+	        dealer_data_.addDrug("Shrooms", "base_price:1000|price_variance:200|icon:shrooms");
+	        dealer_data_.addDrug("Speed", "base_price:110|price_variance:30|icon:speed");
+	        dealer_data_.addDrug("Hashish", "base_price:180|price_variance:40|icon:hashish");
 	        
 	        // *** This part will also be setup by the xml file ***
 	        dealer_data_.clearAvailableLocations();
-	        dealer_data_.addLocation("Brooklyn", "base_drugs:6|drug_variance:1|map_x:105|map_y:220|has_bank:true|has_loan_shark:true");
+	        dealer_data_.addLocation("Brooklyn",
+	        		"base_drugs:6|drug_variance:1|map_x:105|map_y:220|has_bank:true|" +
+	        		"has_loan_shark:true");
 	        dealer_data_.addLocation("The Bronx", "base_drugs:8|drug_variance:2|map_x:80|map_y:5");
-	        dealer_data_.addLocation("The Ghetto", "base_drugs:8|drug_variance:2|map_x:73|map_y:100");
-	        dealer_data_.addLocation("Coney Island", "base_drugs:8|drug_variance:2|map_x:80|map_y:335");
-	        dealer_data_.addLocation("Manhattan", "base_drugs:8|drug_variance:2|map_x:75|map_y:143");
-	        dealer_data_.addLocation("Central Park", "base_drugs:8|drug_variance:2|map_x:103|map_y:60");
+	        dealer_data_.addLocation("The Ghetto", "base_drugs:8|drug_variance:2|" +
+	        		"map_x:73|map_y:100");
+	        dealer_data_.addLocation("Coney Island", "base_drugs:8|drug_variance:2|" +
+	        		"map_x:80|map_y:335");
+	        dealer_data_.addLocation("Manhattan", "base_drugs:8|drug_variance:2|" +
+	        		"map_x:75|map_y:143");
+	        dealer_data_.addLocation("Central Park", "base_drugs:8|drug_variance:2|" +
+	        		"map_x:103|map_y:60");
 	        
 	        dealer_data_.close();
 	        
