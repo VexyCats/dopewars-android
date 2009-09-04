@@ -51,14 +51,14 @@ public class DopeWars extends Activity {
 	        
 	        // *** This part will be setup by the xml file ***
 	        dealer_data_.clearAvailableDrugs();
-	        dealer_data_.addDrug("Weed", "base_price:400|price_variance:200|icon:weed");
+	        dealer_data_.addDrug("Weed", "base_price:400|price_variance:200|icon:weed|low_probability:0.1|low_multiplier:0.5");
 	        dealer_data_.addDrug("Acid", "base_price:1500|price_variance:400|icon:acid");
 	        dealer_data_.addDrug("Ludes", "base_price:80|price_variance:20|icon:ludes");
-	        dealer_data_.addDrug("Heroin", "base_price:10000|price_variance:2000|icon:heroin");
-	        dealer_data_.addDrug("Cocaine", "base_price:20000|price_variance:3000|icon:cocaine");
+	        dealer_data_.addDrug("Heroin", "base_price:10000|price_variance:2000|icon:heroin|high_probability:0.1|high_multiplier:2.0");
+	        dealer_data_.addDrug("Cocaine", "base_price:20000|price_variance:3000|icon:cocaine|high_probability:0.1|high_multiplier:2.0");
 	        dealer_data_.addDrug("Shrooms", "base_price:1000|price_variance:200|icon:shrooms");
 	        dealer_data_.addDrug("Speed", "base_price:110|price_variance:30|icon:speed");
-	        dealer_data_.addDrug("Hashish", "base_price:180|price_variance:40|icon:hashish");
+	        dealer_data_.addDrug("Hashish", "base_price:180|price_variance:40|icon:hashish|low_probability:0.1|low_multiplier:0.5");
 	        
 	        // *** This part will also be setup by the xml file ***
 	        dealer_data_.clearAvailableLocations();
