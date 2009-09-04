@@ -2,6 +2,7 @@ package com.daverin.dopewars;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Vector;
 
 public class Global {
 	// These are the drug attributes that the game knows how to handle.
@@ -35,6 +36,18 @@ public class Global {
 		} else {
 			return attributes[attr].split(":");
 		}
+	}
+	
+	public static HashMap<String, String> parseAllAttributes(String attribute_list) {
+		HashMap<String, String> attributes = new HashMap<String, String>();
+		String[] attribute_array = attribute_list.split("\\|");
+		for (int i = 0; i < attribute_array.length; ++i) {
+			String[] attribute_pair = attribute_array[i].split(":");
+			if (attribute_pair.length == 2) {
+				attributes.put(attribute_pair[0], attribute_pair[1]);
+			}
+		}
+		return attributes;
 	}
 	
 	public static String parseAttribute(String attr, String attribute_list) {
@@ -90,24 +103,33 @@ public class Global {
 		return new_attributes;
 	}
 	
-	public static String chooseDrugPrice(String drug_attributes) {
-		int base_price = Integer.parseInt(parseAttribute("base_price", drug_attributes));
-		int price_variance = Integer.parseInt(parseAttribute("price_variance", drug_attributes));
+	// The first element of the vector is always the price, any other elements are messages
+	// to be shown about the price.
+	public static Vector<String> chooseDrugPrice(String name, String drug_attributes) {
+		Vector<String> price_and_messages = new Vector<String>();
+		HashMap<String, String> drug_attribute_map = parseAllAttributes(drug_attributes);
+		int base_price = Integer.parseInt(drug_attribute_map.get("base_price"));
+		int price_variance = Integer.parseInt(drug_attribute_map.get("price_variance"));
 		int price = (int)(base_price - price_variance / 2.0 +
 				Global.rand_gen_.nextDouble() * price_variance);
-		/*
-		if (Boolean.parseBoolean(cursor.getString(3))) {
-			if (Global.rand_gen_.nextDouble() < Double.parseDouble(cursor.getString(7))) {
-				price = (int)(price * Double.parseDouble(cursor.getString(8)));
+		// Check for price jumps
+		if (drug_attribute_map.get("low_probability") != null) {
+			float low_probability = Float.parseFloat(drug_attribute_map.get("low_probability"));
+			if (rand_gen_.nextFloat() < low_probability) {
+				float multiplier = Float.parseFloat(drug_attribute_map.get("low_multiplier"));
+				price = (int)(price * multiplier);
+				price_and_messages.add(name + " is being sold at very low prices!");
+			}
+		} else if (drug_attribute_map.get("high_probability") != null) {
+			float high_probability = Float.parseFloat(drug_attribute_map.get("high_probability"));
+			if (rand_gen_.nextFloat() < high_probability) {
+				float multiplier = Float.parseFloat(drug_attribute_map.get("high_multiplier"));
+				price = (int)(price * multiplier);
+				price_and_messages.add(name + " is being sold at very high prices!");
 			}
 		}
-		if (Boolean.parseBoolean(cursor.getString(4))) {
-			if (Global.rand_gen_.nextDouble() < Double.parseDouble(cursor.getString(5))) {
-				price = (int)(price / Double.parseDouble(cursor.getString(6)));
-			}
-		}
-		*/
-		return Integer.toString(price);
+		price_and_messages.insertElementAt(Integer.toString(price), 0);
+		return price_and_messages;
 	}
 	
 	// Random number generator!

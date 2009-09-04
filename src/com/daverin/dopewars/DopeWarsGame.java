@@ -1,5 +1,8 @@
 package com.daverin.dopewars;
 
+import java.util.HashMap;
+import java.util.Vector;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.graphics.Color;
@@ -414,30 +417,30 @@ public class DopeWarsGame extends Activity {
 		outer_layout.removeAllViews();
 		int total_width_added = 0;
         dealer_data_.open();
-        String game_info = dealer_data_.getDealerString(
-        		DealerDataAdapter.KEY_DEALER_GAME_INFO);
+        HashMap<String, String> game_info = Global.parseAllAttributes(
+        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
         String location_inventory = dealer_data_.getDealerString(
         		DealerDataAdapter.KEY_DEALER_LOCATION_INVENTORY);
         int numLocationDrugs = Global.attributeCount(location_inventory);
-        int cash = Integer.parseInt(Global.parseAttribute("cash", game_info));
-        int space = Integer.parseInt(Global.parseAttribute("space", game_info));
-        String current_inventory = dealer_data_.getDealerString(
-        		DealerDataAdapter.KEY_DEALER_GAME_INVENTORY);
+        int cash = Integer.parseInt(game_info.get("cash"));
+        int space = Integer.parseInt(game_info.get("space"));
+        HashMap<String, String> current_inventory = Global.parseAllAttributes(
+        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INVENTORY));
 		for (int i = 0; i < numLocationDrugs; ++i) {
         	// Construct the next button
 			String[] drug = Global.getAttribute(i, location_inventory);
 			int drug_price = Integer.parseInt(drug[1]);
-			String current_drug_amount = Global.parseAttribute(drug[0], current_inventory);
-			String drug_info = dealer_data_.getDrugAttributes(drug[0]);
-			String drug_icon = Global.parseAttribute("icon", drug_info);
-			int drug_picture = Global.drug_icons_.get(drug_icon);
+			String current_drug_amount = current_inventory.get(drug[0]);
+			HashMap<String, String> drug_info = Global.parseAllAttributes(
+					dealer_data_.getDrugAttributes(drug[0]));
+			int drug_picture = Global.drug_icons_.get(drug_info.get("icon"));
         	LinearLayout next_drug = makeButton(R.drawable.btn_translucent_gray,
         			drug_picture, drug[0],
         			"$" + Integer.toString(drug_price));
         	// Can buy
         	if ((cash > drug_price) && (space > 0)) {
         		// Can also sell
-        		if (!current_drug_amount.equals("")) {
+        		if (current_drug_amount != null) {
         		  next_drug.setBackgroundResource(R.drawable.btn_translucent_blue);
         		  next_drug.setOnLongClickListener(new DrugLongClickListener(drug[0], DIALOG_DRUG_SELL));
         		// Can only buy
@@ -465,10 +468,8 @@ public class DopeWarsGame extends Activity {
         }
 		
 		// Add loan shark button
-		String location = Global.parseAttribute("location", game_info);
-		String loan_location = Global.parseAttribute("loan_location", game_info);
-		if (location.equals(loan_location)) {
-			int loan_shark_amount = Integer.parseInt(Global.parseAttribute("loan", game_info));
+		if (game_info.get("location").equals(game_info.get("loan_location"))) {
+			int loan_shark_amount = Integer.parseInt(game_info.get("loan"));
 			LinearLayout loan_shark_button = makeButton(R.drawable.btn_translucent_gray,
 	    			R.drawable.loan_shark, "Shark", Integer.toString(loan_shark_amount));
 		    loan_shark_button.setOnClickListener(new BasicDialogListener(DIALOG_LOAN_SHARK));
@@ -487,9 +488,8 @@ public class DopeWarsGame extends Activity {
 		}
 		
 		// Add bank button
-		String bank_location = Global.parseAttribute("bank_location", game_info);
-		if (location.equals(bank_location)) {
-			int bank_amount = Integer.parseInt(Global.parseAttribute("bank", game_info));
+		if (game_info.get("location").equals(game_info.get("bank_location"))) {
+			int bank_amount = Integer.parseInt(game_info.get("bank"));
 			LinearLayout bank_button = makeButton(R.drawable.btn_translucent_gray,
 	    			R.drawable.bank, "Bank", Integer.toString(bank_amount));
 			bank_button.setOnClickListener(new BasicDialogListener(DIALOG_BANK_DEPOSIT));
@@ -509,7 +509,7 @@ public class DopeWarsGame extends Activity {
 		}
         
 		// Add subway button
-		int days_left = Integer.parseInt(Global.parseAttribute("days_left", game_info));
+		int days_left = Integer.parseInt(game_info.get("days_left"));
 		if (days_left > 0) {
 	    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
 	    			R.drawable.subway, "Subway", "[" + Integer.toString(days_left) + "]");
@@ -565,15 +565,13 @@ public class DopeWarsGame extends Activity {
     		drug_present[i] = false;
     	}
     	int num_drugs_left = num_avail_drugs;
-    	String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
-    	String current_location = Global.parseAttribute("location", game_info);
-    	String location_attributes = dealer_data_.getLocationAttributes(current_location);
-    	int base_drugs_count = Integer.parseInt(Global.parseAttribute(
-    			"base_drugs",location_attributes));
-    	int drug_variance = Integer.parseInt(Global.parseAttribute(
-    			"drug_variance",location_attributes));
-		int num_drugs_present = base_drugs_count +
-		        Global.rand_gen_.nextInt(drug_variance + 1);
+    	HashMap<String, String> game_info = Global.parseAllAttributes(
+    			dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
+    	HashMap<String, String> location_attributes = Global.parseAllAttributes(
+    			dealer_data_.getLocationAttributes(game_info.get("location")));
+    	int base_drugs_count = Integer.parseInt(location_attributes.get("base_drugs"));
+    	int drug_variance = Integer.parseInt(location_attributes.get("drug_variance"));
+		int num_drugs_present = base_drugs_count + Global.rand_gen_.nextInt(drug_variance + 1);
 		if (num_drugs_present > num_avail_drugs) {
 			num_drugs_present = num_avail_drugs;
 		}
@@ -604,10 +602,13 @@ public class DopeWarsGame extends Activity {
     			if (location_drugs != "") {
     				location_drugs += "|";
     			}
-    			location_drugs += drug_name + ":" + Global.chooseDrugPrice(dealer_data_.getDrugAttributes(drug_name));
+    			Vector<String> price_and_messages = Global.chooseDrugPrice(
+    					drug_name, dealer_data_.getDrugAttributes(drug_name));
+    			location_drugs += drug_name + ":" + price_and_messages.elementAt(0);
     		}
     	}
-    	dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_LOCATION_INVENTORY, location_drugs);
+    	dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_LOCATION_INVENTORY,
+    			location_drugs);
     	dealer_data_.close();
 	}
 	
