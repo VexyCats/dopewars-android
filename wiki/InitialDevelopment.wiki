@@ -4,7 +4,6 @@
 
   * Make inventory look good
   * Progress bar display problems
-  * Big price change days
   * Guns & new coats
   * End of game
   * Officer hardass and his crew
@@ -12,10 +11,7 @@
   * Graphics
   * Customization
   * Score reporting
-
-= Big price chnage days =
-
-Shouldn't be too hard, just some new parameters on drugs and incorporating them into formulas.
+  * Orientation swap testing
 
 = Guns & new coats =
 
@@ -28,3 +24,10 @@ Hmm... dialog I guess? There can't be a way out though, but it'd be nice not to 
 = Random messages =
 
 Really important, I haven't figured out how to handle it yet. Pop-up? Could be annoying. Scrolling marquee on the bottom? could be even worse waiting to read important info. Maybe random things could go in the background and more important things could come up front somehow?
+
+= Littler things =
+
+  * Display the space left on the inventory/coat button
+  * Display current cash somewhere that's not a special bar at the bottom
+  * Display the name somewhere that's not a special bar at the bottom
+  * Lots of little code cleanup type things
