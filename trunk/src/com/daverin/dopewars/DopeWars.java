@@ -1,5 +1,7 @@
 package com.daverin.dopewars;
 
+import java.util.HashMap;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -38,43 +40,146 @@ public class DopeWars extends Activity {
 	        
 	        // Clear the inventory, start with a standard amount of cash
 	        // and debt. This stuff will eventually be determined by game settings.
-	        String initial_game_state = "cash:55000|debt:2000|location:Brooklyn|space:100|" +
-	        	"max_space:100|days_left:5|loan:5500|bank:0|loan_location:Brooklyn|" +
-	        	"bank_location:Brooklyn";
+	        CurrentGameInformation game_info = new CurrentGameInformation("");
+	        game_info.cash_ = 55000;
+	        game_info.loan_ = 2000;
+	        game_info.location_ = 0;
+	        game_info.space_ = 100;
+	        game_info.max_space_ = 100;
+	        game_info.days_left_ = 5;
+	        game_info.bank_ = 0;
+	        game_info.dealer_inventory_.clear();
+	        game_info.location_inventory_.clear();
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		initial_game_state);
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INVENTORY,
-	        		"");
+	        		game_info.serializeCurrentGameInformation());
 	        
 	        // *** I'm not sure where the best place for this is yet ***
 	        Global.loadIcons();
 	        
 	        // *** This part will be setup by the xml file ***
-	        dealer_data_.clearAvailableDrugs();
-	        dealer_data_.addDrug("Weed", "base_price:400|price_variance:200|icon:weed|low_probability:0.1|low_multiplier:0.5");
-	        dealer_data_.addDrug("Acid", "base_price:1500|price_variance:400|icon:acid");
-	        dealer_data_.addDrug("Ludes", "base_price:80|price_variance:20|icon:ludes");
-	        dealer_data_.addDrug("Heroin", "base_price:10000|price_variance:2000|icon:heroin|high_probability:0.1|high_multiplier:2.0");
-	        dealer_data_.addDrug("Cocaine", "base_price:20000|price_variance:3000|icon:cocaine|high_probability:0.1|high_multiplier:2.0");
-	        dealer_data_.addDrug("Shrooms", "base_price:1000|price_variance:200|icon:shrooms");
-	        dealer_data_.addDrug("Speed", "base_price:110|price_variance:30|icon:speed");
-	        dealer_data_.addDrug("Hashish", "base_price:180|price_variance:40|icon:hashish|low_probability:0.1|low_multiplier:0.5");
+	        GameInformation game_information = new GameInformation("");
+	        game_information.drugs_.clear();
+	        HashMap<String, Float> weed_info = new HashMap<String, Float>();
+	        weed_info.put("base_price", (float)400);
+	        weed_info.put("price_variance", (float)200);
+	        weed_info.put("icon", (float)0);
+	        weed_info.put("low_probability", (float)0.1);
+	        weed_info.put("low_multiplier", (float)0.5);
+	        game_information.drugs_.put("Weed", weed_info);
+	        HashMap<String, Float> acid_info = new HashMap<String, Float>();
+	        acid_info.put("base_price", (float)1500);
+	        acid_info.put("price_variance", (float)400);
+	        acid_info.put("icon", (float)1);
+	        game_information.drugs_.put("Acid", acid_info);
+	        HashMap<String, Float> ludes_info = new HashMap<String, Float>();
+	        ludes_info.put("base_price", (float)80);
+	        ludes_info.put("price_variance", (float)20);
+	        ludes_info.put("icon", (float)2);
+	        game_information.drugs_.put("Ludes", ludes_info);
+	        HashMap<String, Float> heroin_info = new HashMap<String, Float>();
+	        heroin_info.put("base_price", (float)10000);
+	        heroin_info.put("price_variance", (float)2000);
+	        heroin_info.put("icon", (float)3);
+	        heroin_info.put("high_probability", (float)0.1);
+	        heroin_info.put("high_multiplier", (float)0.5);
+	        game_information.drugs_.put("Heroin", heroin_info);
+	        HashMap<String, Float> cocaine_info = new HashMap<String, Float>();
+	        cocaine_info.put("base_price", (float)20000);
+	        cocaine_info.put("price_variance", (float)3000);
+	        cocaine_info.put("icon", (float)4);
+	        cocaine_info.put("high_probability", (float)0.1);
+	        cocaine_info.put("high_multiplier", (float)2.0);
+	        game_information.drugs_.put("Cocaine", cocaine_info);
+	        HashMap<String, Float> shrooms_info = new HashMap<String, Float>();
+	        shrooms_info.put("base_price", (float)1000);
+	        shrooms_info.put("price_variance", (float)200);
+	        shrooms_info.put("icon", (float)5);
+	        game_information.drugs_.put("Shrooms", shrooms_info);
+	        HashMap<String, Float> speed_info = new HashMap<String, Float>();
+	        speed_info.put("base_price", (float)110);
+	        speed_info.put("price_variance", (float)30);
+	        speed_info.put("icon", (float)6);
+	        game_information.drugs_.put("Speed", speed_info);
+	        HashMap<String, Float> hash_info = new HashMap<String, Float>();
+	        hash_info.put("base_price", (float)180);
+	        hash_info.put("price_variance", (float)40);
+	        hash_info.put("icon", (float)7);
+	        hash_info.put("low_probability", (float)0.1);
+	        hash_info.put("low_multiplier", (float)0.5);
+	        game_information.drugs_.put("Hashish", hash_info);
+	        
+	        // *** This part will be setup by the xml file ***
+	        game_information.coats_.clear();
+	        HashMap<String, Float> gucci_info = new HashMap<String, Float>();
+	        gucci_info.put("additional_space", (float)10);
+	        gucci_info.put("base_price", (float)2000);
+	        gucci_info.put("price_variance", (float)200);
+	        gucci_info.put("space_factor", (float)0.2);
+	        game_information.coats_.put("Gucci", gucci_info);
+	        HashMap<String, Float> dg_info = new HashMap<String, Float>();
+	        dg_info.put("additional_space", (float)20);
+	        dg_info.put("base_price", (float)4000);
+	        dg_info.put("price_variance", (float)400);
+	        dg_info.put("space_factor", (float)0.4);
+	        game_information.coats_.put("D&G", dg_info);
+	        
+	        // *** This part will be setup by the xml file ***
+	        game_information.guns_.clear();
+	        HashMap<String, Float> baretta_info = new HashMap<String, Float>();
+	        baretta_info.put("firepower", (float)6.0);
+	        baretta_info.put("base_price", (float)500);
+	        baretta_info.put("price_variance", (float)0);
+	        baretta_info.put("space", (float)5);
+	        game_information.guns_.put("Baretta", baretta_info);
+	        HashMap<String, Float> satnite_info = new HashMap<String, Float>();
+	        satnite_info.put("firepower", (float)8.0);
+	        satnite_info.put("base_price", (float)1000);
+	        satnite_info.put("price_variance", (float)0);
+	        satnite_info.put("space", (float)8);
+	        game_information.guns_.put("Saturday Night Special", satnite_info);
 	        
 	        // *** This part will also be setup by the xml file ***
-	        dealer_data_.clearAvailableLocations();
-	        dealer_data_.addLocation("Brooklyn",
-	        		"base_drugs:6|drug_variance:1|map_x:105|map_y:220|has_bank:true|" +
-	        		"has_loan_shark:true");
-	        dealer_data_.addLocation("The Bronx", "base_drugs:8|drug_variance:2|map_x:80|map_y:5");
-	        dealer_data_.addLocation("The Ghetto", "base_drugs:8|drug_variance:2|" +
-	        		"map_x:73|map_y:100");
-	        dealer_data_.addLocation("Coney Island", "base_drugs:8|drug_variance:2|" +
-	        		"map_x:80|map_y:335");
-	        dealer_data_.addLocation("Manhattan", "base_drugs:8|drug_variance:2|" +
-	        		"map_x:75|map_y:143");
-	        dealer_data_.addLocation("Central Park", "base_drugs:8|drug_variance:2|" +
-	        		"map_x:103|map_y:60");
+	        game_information.locations_.clear();
+	        HashMap<String, Float> brooklyn_info = new HashMap<String, Float>();
+	        brooklyn_info.put("base_drugs", (float)6.0);
+	        brooklyn_info.put("drug_variance", (float)1.0);
+	        brooklyn_info.put("map_x", (float)105.0);
+	        brooklyn_info.put("map_y", (float)220.0);
+	        brooklyn_info.put("has_bank", (float)1.0);
+	        brooklyn_info.put("has_loan_shark", (float)1.0);
+	        game_information.locations_.put("Brooklyn", brooklyn_info);
+	        HashMap<String, Float> bronx_info = new HashMap<String, Float>();
+	        bronx_info.put("base_drugs", (float)8.0);
+	        bronx_info.put("drug_variance", (float)2.0);
+	        bronx_info.put("map_x", (float)80.0);
+	        bronx_info.put("map_y", (float)5.0);
+	        game_information.locations_.put("The Bronx", bronx_info);
+	        HashMap<String, Float> ghetto_info = new HashMap<String, Float>();
+	        ghetto_info.put("base_drugs", (float)8.0);
+	        ghetto_info.put("drug_variance", (float)2.0);
+	        ghetto_info.put("map_x", (float)73.0);
+	        ghetto_info.put("map_y", (float)100.0);
+	        game_information.locations_.put("The Ghetto", ghetto_info);
+	        HashMap<String, Float> coney_island_info = new HashMap<String, Float>();
+	        coney_island_info.put("base_drugs", (float)8.0);
+	        coney_island_info.put("drug_variance", (float)2.0);
+	        coney_island_info.put("map_x", (float)80.0);
+	        coney_island_info.put("map_y", (float)335.0);
+	        game_information.locations_.put("Coney Island", coney_island_info);
+	        HashMap<String, Float> manhattan_info = new HashMap<String, Float>();
+	        manhattan_info.put("base_drugs", (float)8.0);
+	        manhattan_info.put("drug_variance", (float)2.0);
+	        manhattan_info.put("map_x", (float)75.0);
+	        manhattan_info.put("map_y", (float)143.0);
+	        game_information.locations_.put("Manhattan", manhattan_info);
+	        HashMap<String, Float> central_park_info = new HashMap<String, Float>();
+	        central_park_info.put("base_drugs", (float)8.0);
+	        central_park_info.put("drug_variance", (float)2.0);
+	        central_park_info.put("map_x", (float)103.0);
+	        central_park_info.put("map_y", (float)60.0);
+	        game_information.locations_.put("Central Park", central_park_info);
 	        
+	        dealer_data_.setGameStrings(game_information.serializeGameInformation());
 	        dealer_data_.close();
 	        
     		Intent i = new Intent(v.getContext(), DopeWarsGame.class);
