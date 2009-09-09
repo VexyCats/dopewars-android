@@ -1,8 +1,6 @@
 package com.daverin.dopewars;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Vector;
 
 import android.app.Activity;
@@ -83,6 +81,46 @@ public class DopeWarsGame extends Activity {
 		}
 		String drug_name_;
 		int dialog_id_;
+	}
+	
+	public class BuyCoatListener implements View.OnClickListener {
+		public void onClick(View v) {
+			dealer_data_.open();
+	        CurrentGameInformation game_info = new CurrentGameInformation(
+	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
+	        GameInformation game_information = new GameInformation(
+	        		dealer_data_.getGameStrings());
+	        String coat_name = game_info.coat_inventory_.keySet().iterator().next();
+	        int coat_price = game_info.coat_inventory_.get(coat_name).intValue();
+	        game_info.cash_ -= coat_price;
+	        game_info.max_space_ += game_information.coats_.get(coat_name).get("additional_space");
+	        game_info.space_ += game_information.coats_.get(coat_name).get("additional_space");
+	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());
+	        dealer_data_.close();
+	        refreshDisplay();
+		}
+	}
+	
+	public class BuyGunListener implements View.OnClickListener {
+		public void onClick(View v) {
+			dealer_data_.open();
+	        CurrentGameInformation game_info = new CurrentGameInformation(
+	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
+	        GameInformation game_information = new GameInformation(
+	        		dealer_data_.getGameStrings());
+	        String gun_name = game_info.gun_inventory_.keySet().iterator().next();
+	        int gun_price = game_info.coat_inventory_.get(gun_name).intValue();
+	        game_info.cash_ -= gun_price;
+	        game_info.space_ -= game_information.guns_.get(gun_name).get("space");
+	        if (game_info.dealer_guns_.get(gun_name) != null) {
+	        	game_info.dealer_guns_.put(gun_name, game_info.dealer_guns_.get(gun_name) + 1);
+	        } else {
+	        	game_info.dealer_guns_.put(gun_name, (float)1);
+	        }
+	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());
+	        dealer_data_.close();
+	        refreshDisplay();
+		}
 	}
 	
 	public class CompleteSaleListener implements View.OnClickListener {
@@ -190,10 +228,12 @@ public class DopeWarsGame extends Activity {
 	        dealer_data_.open();
 	        CurrentGameInformation game_info = new CurrentGameInformation(
 	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
+	        GameInformation game_information = new GameInformation(
+	        		dealer_data_.getGameStrings());
 	        game_info.location_ = location_;
 	        game_info.days_left_ -= 1;
-	        game_info.loan_ += (int)((double)game_info.loan_ * 0.10);
-	        game_info.bank_ += (int)((double)game_info.bank_ * 0.05);
+	        game_info.loan_ += (int)((double)game_info.loan_ * game_information.loan_interest_rate_);
+	        game_info.bank_ += (int)((double)game_info.bank_ * game_information.bank_interest_rate_);
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());
 	        dealer_data_.close();
 			setupLocation();
@@ -467,6 +507,54 @@ public class DopeWarsGame extends Activity {
 	    	current_row.addView(bank_button);
 		}
         
+        // Add coat button
+        if (game_info.coat_inventory_.size() > 0) {
+        	String coat_name = game_info.coat_inventory_.keySet().iterator().next();
+        	int coat_price = game_info.coat_inventory_.get(coat_name).intValue();
+			LinearLayout coat_button = makeButton(R.drawable.btn_translucent_gray,
+	    			R.drawable.bank, coat_name, Integer.toString(coat_price));
+			if (coat_price <= game_info.cash_) {
+				coat_button.setOnClickListener(new BuyCoatListener());
+				coat_button.setBackgroundResource(R.drawable.btn_translucent_green);
+			}
+			coat_button.measure(viewWidth, viewHeight);
+		    if (coat_button.getMeasuredWidth() + total_width_added > viewWidth) {
+		    	outer_layout.addView(current_row);
+	    		current_row = new LinearLayout(this);
+	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+	        			LinearLayout.LayoutParams.FILL_PARENT,
+	        			LinearLayout.LayoutParams.WRAP_CONTENT));
+	    		total_width_added = 0;
+		    }
+	    	total_width_added += coat_button.getMeasuredWidth();
+	    	current_row.addView(coat_button);
+		}
+        
+        // Add gun button
+        if (game_info.gun_inventory_.size() > 0) {
+        	String gun_name = game_info.gun_inventory_.keySet().iterator().next();
+        	int gun_price = game_info.gun_inventory_.get(gun_name).intValue();
+			LinearLayout gun_button = makeButton(R.drawable.btn_translucent_gray,
+	    			R.drawable.bank, gun_name, Integer.toString(gun_price));
+			if (gun_price <= game_info.cash_) {
+				gun_button.setOnClickListener(new BuyGunListener());
+				gun_button.setBackgroundResource(R.drawable.btn_translucent_green);
+			}
+			gun_button.measure(viewWidth, viewHeight);
+		    if (gun_button.getMeasuredWidth() + total_width_added > viewWidth) {
+		    	outer_layout.addView(current_row);
+	    		current_row = new LinearLayout(this);
+	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+	        			LinearLayout.LayoutParams.FILL_PARENT,
+	        			LinearLayout.LayoutParams.WRAP_CONTENT));
+	    		total_width_added = 0;
+		    }
+	    	total_width_added += gun_button.getMeasuredWidth();
+	    	current_row.addView(gun_button);
+		}
+        
 		// Add subway button
 		if (game_info.days_left_ > 0) {
 	    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
@@ -563,6 +651,27 @@ public class DopeWarsGame extends Activity {
     			game_info.location_inventory_.put(drug_name, Float.parseFloat(price_and_messages.elementAt(0)));
     		}
     	}
+    	
+    	game_info.coat_inventory_.clear();
+    	if (Global.rand_gen_.nextDouble() < game_information_.coat_likelihood_) {
+    		int coat_number = Global.rand_gen_.nextInt(game_information_.coats_.size());
+    		String coat_name = (String)game_information_.coats_.keySet().toArray()[coat_number];
+    		int coat_price = (int)(game_information_.coats_.get(coat_name).get("base_price") +
+    				(Global.rand_gen_.nextDouble() - 0.5) *
+    				game_information_.coats_.get(coat_name).get("price_variance"));
+    		game_info.coat_inventory_.put(coat_name, (float)coat_price);
+    	}
+    	
+    	game_info.gun_inventory_.clear();
+    	if (Global.rand_gen_.nextDouble() < game_information_.gun_likelihood_) {
+    		int gun_number = Global.rand_gen_.nextInt(game_information_.guns_.size());
+    		String gun_name = (String)game_information_.guns_.keySet().toArray()[gun_number];
+    		int gun_price = (int)(game_information_.guns_.get(gun_name).get("base_price") +
+    				(Global.rand_gen_.nextDouble() - 0.5) *
+    				game_information_.guns_.get(gun_name).get("price_variance"));
+    		game_info.gun_inventory_.put(gun_name, (float)gun_price);
+    	}
+    	
         dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());
     	dealer_data_.close();
 	}

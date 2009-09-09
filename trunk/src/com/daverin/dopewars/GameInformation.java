@@ -26,6 +26,14 @@ public class GameInformation {
 				loan_location_ = Integer.parseInt(group[1]);
 			} else if (group[0].equals("bank_location")) {
 				bank_location_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals("loan_interest_rate")) {
+				loan_interest_rate_ = Float.parseFloat(group[1]);
+			} else if (group[0].equals("bank_interest_rate")) {
+				bank_interest_rate_ = Float.parseFloat(group[1]);
+			} else if (group[0].equals("coat_likelihood")) {
+				coat_likelihood_ = Float.parseFloat(group[1]);
+			} else if (group[0].equals("gun_likelihood")) {
+				gun_likelihood_ = Float.parseFloat(group[1]);
 			} else {
 				Log.d("dopewars", "Unknown game info group");
 			}
@@ -39,7 +47,11 @@ public class GameInformation {
 		    "guns--" + Global.serializeAttributeGroup(guns_) + "&&" +
 		    "locations--" + Global.serializeAttributeGroup(locations_) + "&&" +
 		    "loan_location--" + Integer.toString(loan_location_) + "&&" +
-		    "bank_location--" + Integer.toString(bank_location_);
+		    "bank_location--" + Integer.toString(bank_location_) + "&&" +
+		    "loan_interest_rate--" + Float.toString(loan_interest_rate_) + "&&" +
+		    "bank_interest_rate--" + Float.toString(bank_interest_rate_) + "&&" +
+		    "coat_likelihood--" + Float.toString(coat_likelihood_) + "&&" +
+		    "gun_likelihood--" + Float.toString(gun_likelihood_);
 		return serialized_game_info;
 	}
 	
@@ -49,4 +61,8 @@ public class GameInformation {
 	public HashMap<String, HashMap<String, Float>> locations_;
 	public int loan_location_;
 	public int bank_location_;
+	public float loan_interest_rate_;
+	public float bank_interest_rate_;
+	public float coat_likelihood_;
+	public float gun_likelihood_;
 }

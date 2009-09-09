@@ -179,6 +179,13 @@ public class DopeWars extends Activity {
 	        central_park_info.put("map_y", (float)60.0);
 	        game_information.locations_.put("Central Park", central_park_info);
 	        
+	        game_information.loan_location_ = 0;
+	        game_information.bank_location_ = 0;
+	        game_information.loan_interest_rate_ = (float)0.1;
+	        game_information.bank_interest_rate_ = (float)0.05;
+	        game_information.coat_likelihood_ = (float)0.1;
+	        game_information.gun_likelihood_ = (float)0.1;
+	        
 	        dealer_data_.setGameStrings(game_information.serializeGameInformation());
 	        dealer_data_.close();
 	        
