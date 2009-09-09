@@ -4,7 +4,6 @@
 
   * Make inventory look good
   * Progress bar display problems
-  * Guns & new coats
   * End of game
   * Officer hardass and his crew
   * Random messages
@@ -12,10 +11,6 @@
   * Customization
   * Score reporting
   * Orientation swap testing
-
-= Guns & new coats =
-
-Maybe have a random thing happen when moving locations and set that in the current game_info, like "new_coat_available" and "new_gun_available". On buying it's removed, on moving it's removed.
 
 = Office hardass (and other cops) =
 
