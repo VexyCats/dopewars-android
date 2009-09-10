@@ -16,6 +16,8 @@
 
 Hmm... dialog I guess? There can't be a way out though, but it'd be nice not to auto-kill when hitting back like I did in DW1. Maybe triggering an attack sets some game_info state, then every action checks that state before doing anything and re-opens the fight dialog. Sounds reasonable, assuming that check is pretty fast.
 
+NO! This is so much easier than that, all I need to do is set a flag in the current game info and then change the button population to reflect the fight, and the background is enough to let you know you're fighting hardass. So I'll just need a first button that says how many there are, like line 1 is Hardass and line 2 is how many deputies he has. Then there's Fight Run and Wait buttons. Pressing them will have to relay a message somewhere though... For a first pass I'm tempted to have it stack at the bottom, maybe figure a way to just hide itself on click. Then random messages can use the same technique, again as a first pass.
+
 = Random messages =
 
 Really important, I haven't figured out how to handle it yet. Pop-up? Could be annoying. Scrolling marquee on the bottom? could be even worse waiting to read important info. Maybe random things could go in the background and more important things could come up front somehow?
