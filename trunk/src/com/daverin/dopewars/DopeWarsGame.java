@@ -83,6 +83,48 @@ public class DopeWarsGame extends Activity {
 		int dialog_id_;
 	}
 	
+	public class FightListener implements View.OnClickListener {
+		public void onClick(View v) {
+			dealer_data_.open();
+	        CurrentGameInformation game_info = new CurrentGameInformation(
+	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
+	        GameInformation game_information = new GameInformation(
+	        		dealer_data_.getGameStrings());
+	        int total_dealer_firepower = 0;
+	        Iterator<String> gun_names = game_info.dealer_guns_.keySet().iterator();
+	        while (gun_names.hasNext()) {
+	        	String next_gun_name = gun_names.next();
+	        	total_dealer_firepower += game_information.guns_.get(next_gun_name).get("firepower") * game_info.dealer_guns_.get(next_gun_name);
+	        }
+	        if (total_dealer_firepower > game_info.cops_health_) {
+	        	game_info.cops_health_ = 0;
+	        	game_info.cash_ += Global.rand_gen_.nextInt(5) + 1 * 1000;
+	        } else {
+	        	game_info.dealer_health_ -= 6 + Math.max(0, (game_info.cops_health_ - 10));
+	        	game_info.cops_health_ -= total_dealer_firepower;
+	        }
+	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());
+	        dealer_data_.close();
+	        refreshDisplay();
+		}
+	}
+	
+	public class RunListener implements View.OnClickListener {
+		public void onClick(View v) {
+			dealer_data_.open();
+	        CurrentGameInformation game_info = new CurrentGameInformation(
+	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
+	        if (Global.rand_gen_.nextDouble() < 0.5) {
+	        	game_info.cash_ = Math.max(0, game_info.cash_ - Global.rand_gen_.nextInt(5) + 1 * 1000);
+	        	game_info.cops_health_ = 0;
+	        } else {
+	        	game_info.dealer_health_ -= 6 + Math.max(0, (game_info.cops_health_ - 10));
+	        }
+	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());
+	        dealer_data_.close();
+	        refreshDisplay();
+		}
+	}
 	public class BuyCoatListener implements View.OnClickListener {
 		public void onClick(View v) {
 			dealer_data_.open();
@@ -95,6 +137,7 @@ public class DopeWarsGame extends Activity {
 	        game_info.cash_ -= coat_price;
 	        game_info.max_space_ += game_information.coats_.get(coat_name).get("additional_space");
 	        game_info.space_ += game_information.coats_.get(coat_name).get("additional_space");
+	        game_info.coat_inventory_.clear();
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());
 	        dealer_data_.close();
 	        refreshDisplay();
@@ -109,7 +152,7 @@ public class DopeWarsGame extends Activity {
 	        GameInformation game_information = new GameInformation(
 	        		dealer_data_.getGameStrings());
 	        String gun_name = game_info.gun_inventory_.keySet().iterator().next();
-	        int gun_price = game_info.coat_inventory_.get(gun_name).intValue();
+	        int gun_price = game_info.gun_inventory_.get(gun_name).intValue();
 	        game_info.cash_ -= gun_price;
 	        game_info.space_ -= game_information.guns_.get(gun_name).get("space");
 	        if (game_info.dealer_guns_.get(gun_name) != null) {
@@ -117,6 +160,7 @@ public class DopeWarsGame extends Activity {
 	        } else {
 	        	game_info.dealer_guns_.put(gun_name, (float)1);
 	        }
+	        game_info.gun_inventory_.clear();
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());
 	        dealer_data_.close();
 	        refreshDisplay();
@@ -398,8 +442,10 @@ public class DopeWarsGame extends Activity {
     	new_button.addView(button_image);
     	TextView main_text = new TextView(this);
     	main_text.setLayoutParams(new LinearLayout.LayoutParams(
-    			LinearLayout.LayoutParams.WRAP_CONTENT,
+    			48,
     			LinearLayout.LayoutParams.WRAP_CONTENT));
+    	main_text.setGravity(Gravity.CENTER);
+    	main_text.setHorizontallyScrolling(true);
     	main_text.setTextColor(Color.WHITE);
     	main_text.setText(main_string);
     	new_button.addView(main_text);
@@ -407,6 +453,7 @@ public class DopeWarsGame extends Activity {
     	secondary_text.setLayoutParams(new LinearLayout.LayoutParams(
     			LinearLayout.LayoutParams.WRAP_CONTENT,
     			LinearLayout.LayoutParams.WRAP_CONTENT));
+    	secondary_text.setHorizontallyScrolling(true);
     	secondary_text.setTextColor(Color.GREEN);
     	secondary_text.setText(secondary_string);
     	new_button.addView(secondary_text);
@@ -430,138 +477,234 @@ public class DopeWarsGame extends Activity {
         		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
         GameInformation game_information = new GameInformation(
         		dealer_data_.getGameStrings());
-        Iterator<String> drug_names = game_info.location_inventory_.keySet().iterator();
-        while (drug_names.hasNext()) {
-        	String drug_name = drug_names.next();
-        	int drug_price = game_info.location_inventory_.get(drug_name).intValue();
-			int drug_picture = Global.drug_icons_.get(game_information_.drugs_.get(drug_name).get("icon").intValue());
-        	LinearLayout next_drug = makeButton(R.drawable.btn_translucent_gray,
-        			drug_picture, drug_name,
-        			"$" + Integer.toString(drug_price));
-        	// Can buy
-        	if ((game_info.cash_ > drug_price) && (game_info.space_ > 0)) {
-        		// Can also sell
-        		if (game_info.dealer_inventory_.get(drug_name) != null) {
-        		  next_drug.setBackgroundResource(R.drawable.btn_translucent_blue);
-        		  next_drug.setOnLongClickListener(new DrugLongClickListener(drug_name, DIALOG_DRUG_SELL));
-        		// Can only buy
-        		} else {
-        			next_drug.setBackgroundResource(R.drawable.btn_translucent_green);
-        		}
-        		next_drug.setOnClickListener(new DrugClickListener(drug_name, DIALOG_DRUG_BUY));
-        	// Can only sell
-        	} else if (game_info.dealer_inventory_.get(drug_name) != null) {
-        	  next_drug.setBackgroundResource(R.drawable.btn_translucent_orange);
-      		  next_drug.setOnClickListener(new DrugClickListener(drug_name, DIALOG_DRUG_SELL));
-        	}
-        	next_drug.measure(viewWidth, viewHeight);
-        	if (next_drug.getMeasuredWidth() + total_width_added > viewWidth) {
-        		outer_layout.addView(current_row);
-        		current_row = new LinearLayout(this);
-        		current_row.setOrientation(LinearLayout.HORIZONTAL);
-        		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-            			LinearLayout.LayoutParams.FILL_PARENT,
-            			LinearLayout.LayoutParams.WRAP_CONTENT));
-        		total_width_added = 0;
-        	}
-        	total_width_added += next_drug.getMeasuredWidth();
-        	current_row.addView(next_drug);
-        }
-		
-		// Add loan shark button
-        if (game_info.location_ == game_information.loan_location_) {
-			LinearLayout loan_shark_button = makeButton(R.drawable.btn_translucent_gray,
-	    			R.drawable.loan_shark, "Shark", Integer.toString(game_info.loan_));
-		    loan_shark_button.setOnClickListener(new BasicDialogListener(DIALOG_LOAN_SHARK));
-		    loan_shark_button.measure(viewWidth, viewHeight);
-		    if (loan_shark_button.getMeasuredWidth() + total_width_added > viewWidth) {
-		    	outer_layout.addView(current_row);
-	    		current_row = new LinearLayout(this);
-	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-	        			LinearLayout.LayoutParams.FILL_PARENT,
-	        			LinearLayout.LayoutParams.WRAP_CONTENT));
-	    		total_width_added = 0;
-		    }
-	    	total_width_added += loan_shark_button.getMeasuredWidth();
-	    	current_row.addView(loan_shark_button);
-		}
-		
-		// Add bank button
-        if (game_info.location_ == game_information.bank_location_) {
-			LinearLayout bank_button = makeButton(R.drawable.btn_translucent_gray,
-	    			R.drawable.bank, "Bank", Integer.toString(game_info.bank_));
-			bank_button.setOnClickListener(new BasicDialogListener(DIALOG_BANK_DEPOSIT));
-			bank_button.setOnLongClickListener(new LongClickDialogListener(DIALOG_BANK_WITHDRAW));
-			bank_button.measure(viewWidth, viewHeight);
-		    if (bank_button.getMeasuredWidth() + total_width_added > viewWidth) {
-		    	outer_layout.addView(current_row);
-	    		current_row = new LinearLayout(this);
-	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-	        			LinearLayout.LayoutParams.FILL_PARENT,
-	        			LinearLayout.LayoutParams.WRAP_CONTENT));
-	    		total_width_added = 0;
-		    }
-	    	total_width_added += bank_button.getMeasuredWidth();
-	    	current_row.addView(bank_button);
-		}
         
-        // Add coat button
-        if (game_info.coat_inventory_.size() > 0) {
-        	String coat_name = game_info.coat_inventory_.keySet().iterator().next();
-        	int coat_price = game_info.coat_inventory_.get(coat_name).intValue();
-			LinearLayout coat_button = makeButton(R.drawable.btn_translucent_gray,
-	    			R.drawable.bank, coat_name, Integer.toString(coat_price));
-			if (coat_price <= game_info.cash_) {
-				coat_button.setOnClickListener(new BuyCoatListener());
-				coat_button.setBackgroundResource(R.drawable.btn_translucent_green);
+        // First check if there are cops. If there are cops don't show anything other than the
+        // fight related buttons and info.
+        if (game_info.cops_health_ > 0) {
+        	LinearLayout hardass_button = makeButton(R.drawable.btn_translucent_gray,
+        			R.drawable.loan_shark, "Hardass",
+        			Integer.toString(Math.min(10, game_info.cops_health_)));
+        	hardass_button.measure(viewWidth, viewHeight);
+		    if (hardass_button.getMeasuredWidth() + total_width_added > viewWidth) {
+		    	outer_layout.addView(current_row);
+	    		current_row = new LinearLayout(this);
+	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+	        			LinearLayout.LayoutParams.FILL_PARENT,
+	        			LinearLayout.LayoutParams.WRAP_CONTENT));
+	    		total_width_added = 0;
+		    }
+	    	total_width_added += hardass_button.getMeasuredWidth();
+	    	current_row.addView(hardass_button);
+	    	
+	    	if (game_info.cops_health_ > 10) {
+	    		LinearLayout deputies_button = makeButton(R.drawable.btn_translucent_gray,
+	    				R.drawable.loan_shark, "Deputies",
+	    				Integer.toString(game_info.cops_health_ - 10));
+	    		deputies_button.measure(viewWidth, viewHeight);
+			    if (deputies_button.getMeasuredWidth() + total_width_added > viewWidth) {
+			    	outer_layout.addView(current_row);
+		    		current_row = new LinearLayout(this);
+		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+		        			LinearLayout.LayoutParams.FILL_PARENT,
+		        			LinearLayout.LayoutParams.WRAP_CONTENT));
+		    		total_width_added = 0;
+			    }
+		    	total_width_added += deputies_button.getMeasuredWidth();
+		    	current_row.addView(deputies_button);
+	    	}
+	    	
+	    	if (game_info.dealer_guns_.size() > 0) {
+	    		LinearLayout fight_button = makeButton(R.drawable.btn_translucent_green,
+	    				R.drawable.loan_shark, "Fight",
+	    				Integer.toString(game_info.dealer_health_));
+	    		fight_button.setOnClickListener(new FightListener());
+	    		fight_button.measure(viewWidth, viewHeight);
+			    if (fight_button.getMeasuredWidth() + total_width_added > viewWidth) {
+			    	outer_layout.addView(current_row);
+		    		current_row = new LinearLayout(this);
+		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+		        			LinearLayout.LayoutParams.FILL_PARENT,
+		        			LinearLayout.LayoutParams.WRAP_CONTENT));
+		    		total_width_added = 0;
+			    }
+		    	total_width_added += fight_button.getMeasuredWidth();
+		    	current_row.addView(fight_button);
+	    	}
+	    	
+	    	LinearLayout run_button = makeButton(R.drawable.btn_translucent_green,
+    				R.drawable.loan_shark, "Run",
+    				Integer.toString(game_info.dealer_health_));
+	    	run_button.setOnClickListener(new RunListener());
+	    	run_button.measure(viewWidth, viewHeight);
+		    if (run_button.getMeasuredWidth() + total_width_added > viewWidth) {
+		    	outer_layout.addView(current_row);
+	    		current_row = new LinearLayout(this);
+	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+	        			LinearLayout.LayoutParams.FILL_PARENT,
+	        			LinearLayout.LayoutParams.WRAP_CONTENT));
+	    		total_width_added = 0;
+		    }
+	    	total_width_added += run_button.getMeasuredWidth();
+	    	current_row.addView(run_button);
+
+	        if (total_width_added > 0) {
+	        	outer_layout.addView(current_row);
+	        }
+        } else {
+	        Iterator<String> drug_names = game_info.location_inventory_.keySet().iterator();
+	        while (drug_names.hasNext()) {
+	        	String drug_name = drug_names.next();
+	        	int drug_price = game_info.location_inventory_.get(drug_name).intValue();
+				int drug_picture = Global.drug_icons_.get(game_information_.drugs_.get(drug_name).get("icon").intValue());
+	        	LinearLayout next_drug = makeButton(R.drawable.btn_translucent_gray,
+	        			drug_picture, drug_name,
+	        			"$" + Integer.toString(drug_price));
+	        	// Can buy
+	        	if ((game_info.cash_ > drug_price) && (game_info.space_ > 0)) {
+	        		// Can also sell
+	        		if (game_info.dealer_inventory_.get(drug_name) != null) {
+	        		  next_drug.setBackgroundResource(R.drawable.btn_translucent_blue);
+	        		  next_drug.setOnLongClickListener(new DrugLongClickListener(drug_name, DIALOG_DRUG_SELL));
+	        		// Can only buy
+	        		} else {
+	        			next_drug.setBackgroundResource(R.drawable.btn_translucent_green);
+	        		}
+	        		next_drug.setOnClickListener(new DrugClickListener(drug_name, DIALOG_DRUG_BUY));
+	        	// Can only sell
+	        	} else if (game_info.dealer_inventory_.get(drug_name) != null) {
+	        	  next_drug.setBackgroundResource(R.drawable.btn_translucent_orange);
+	      		  next_drug.setOnClickListener(new DrugClickListener(drug_name, DIALOG_DRUG_SELL));
+	        	}
+	        	next_drug.measure(viewWidth, viewHeight);
+	        	if (next_drug.getMeasuredWidth() + total_width_added > viewWidth) {
+	        		outer_layout.addView(current_row);
+	        		current_row = new LinearLayout(this);
+	        		current_row.setOrientation(LinearLayout.HORIZONTAL);
+	        		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+	            			LinearLayout.LayoutParams.FILL_PARENT,
+	            			LinearLayout.LayoutParams.WRAP_CONTENT));
+	        		total_width_added = 0;
+	        	}
+	        	total_width_added += next_drug.getMeasuredWidth();
+	        	current_row.addView(next_drug);
+	        }
+			
+			// Add loan shark button
+	        if (game_info.location_ == game_information.loan_location_) {
+				LinearLayout loan_shark_button = makeButton(R.drawable.btn_translucent_gray,
+		    			R.drawable.loan_shark, "Shark", Integer.toString(game_info.loan_));
+			    loan_shark_button.setOnClickListener(new BasicDialogListener(DIALOG_LOAN_SHARK));
+			    loan_shark_button.measure(viewWidth, viewHeight);
+			    if (loan_shark_button.getMeasuredWidth() + total_width_added > viewWidth) {
+			    	outer_layout.addView(current_row);
+		    		current_row = new LinearLayout(this);
+		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+		        			LinearLayout.LayoutParams.FILL_PARENT,
+		        			LinearLayout.LayoutParams.WRAP_CONTENT));
+		    		total_width_added = 0;
+			    }
+		    	total_width_added += loan_shark_button.getMeasuredWidth();
+		    	current_row.addView(loan_shark_button);
 			}
-			coat_button.measure(viewWidth, viewHeight);
-		    if (coat_button.getMeasuredWidth() + total_width_added > viewWidth) {
-		    	outer_layout.addView(current_row);
-	    		current_row = new LinearLayout(this);
-	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-	        			LinearLayout.LayoutParams.FILL_PARENT,
-	        			LinearLayout.LayoutParams.WRAP_CONTENT));
-	    		total_width_added = 0;
-		    }
-	    	total_width_added += coat_button.getMeasuredWidth();
-	    	current_row.addView(coat_button);
-		}
-        
-        // Add gun button
-        if (game_info.gun_inventory_.size() > 0) {
-        	String gun_name = game_info.gun_inventory_.keySet().iterator().next();
-        	int gun_price = game_info.gun_inventory_.get(gun_name).intValue();
-			LinearLayout gun_button = makeButton(R.drawable.btn_translucent_gray,
-	    			R.drawable.bank, gun_name, Integer.toString(gun_price));
-			if (gun_price <= game_info.cash_) {
-				gun_button.setOnClickListener(new BuyGunListener());
-				gun_button.setBackgroundResource(R.drawable.btn_translucent_green);
+			
+			// Add bank button
+	        if (game_info.location_ == game_information.bank_location_) {
+				LinearLayout bank_button = makeButton(R.drawable.btn_translucent_gray,
+		    			R.drawable.bank, "Bank", Integer.toString(game_info.bank_));
+				bank_button.setOnClickListener(new BasicDialogListener(DIALOG_BANK_DEPOSIT));
+				bank_button.setOnLongClickListener(new LongClickDialogListener(DIALOG_BANK_WITHDRAW));
+				bank_button.measure(viewWidth, viewHeight);
+			    if (bank_button.getMeasuredWidth() + total_width_added > viewWidth) {
+			    	outer_layout.addView(current_row);
+		    		current_row = new LinearLayout(this);
+		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+		        			LinearLayout.LayoutParams.FILL_PARENT,
+		        			LinearLayout.LayoutParams.WRAP_CONTENT));
+		    		total_width_added = 0;
+			    }
+		    	total_width_added += bank_button.getMeasuredWidth();
+		    	current_row.addView(bank_button);
 			}
-			gun_button.measure(viewWidth, viewHeight);
-		    if (gun_button.getMeasuredWidth() + total_width_added > viewWidth) {
-		    	outer_layout.addView(current_row);
-	    		current_row = new LinearLayout(this);
-	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-	        			LinearLayout.LayoutParams.FILL_PARENT,
-	        			LinearLayout.LayoutParams.WRAP_CONTENT));
-	    		total_width_added = 0;
-		    }
-	    	total_width_added += gun_button.getMeasuredWidth();
-	    	current_row.addView(gun_button);
-		}
-        
-		// Add subway button
-		if (game_info.days_left_ > 0) {
-	    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
-	    			R.drawable.subway, "Subway", "[" + Integer.toString(game_info.days_left_) + "]");
-	    	subway_button.setOnClickListener(new BasicDialogListener(DIALOG_SUBWAY));
-	    	subway_button.measure(viewWidth, viewHeight);
-	    	if (subway_button.getMeasuredWidth() + total_width_added > viewWidth) {
+	        
+	        // Add coat button
+	        if (game_info.coat_inventory_.size() > 0) {
+	        	String coat_name = game_info.coat_inventory_.keySet().iterator().next();
+	        	int coat_price = game_info.coat_inventory_.get(coat_name).intValue();
+				LinearLayout coat_button = makeButton(R.drawable.btn_translucent_gray,
+		    			R.drawable.bank, coat_name, Integer.toString(coat_price));
+				if (coat_price <= game_info.cash_) {
+					coat_button.setOnClickListener(new BuyCoatListener());
+					coat_button.setBackgroundResource(R.drawable.btn_translucent_green);
+				}
+				coat_button.measure(viewWidth, viewHeight);
+			    if (coat_button.getMeasuredWidth() + total_width_added > viewWidth) {
+			    	outer_layout.addView(current_row);
+		    		current_row = new LinearLayout(this);
+		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+		        			LinearLayout.LayoutParams.FILL_PARENT,
+		        			LinearLayout.LayoutParams.WRAP_CONTENT));
+		    		total_width_added = 0;
+			    }
+		    	total_width_added += coat_button.getMeasuredWidth();
+		    	current_row.addView(coat_button);
+			}
+	        
+	        // Add gun button
+	        if (game_info.gun_inventory_.size() > 0) {
+	        	String gun_name = game_info.gun_inventory_.keySet().iterator().next();
+	        	int gun_price = game_info.gun_inventory_.get(gun_name).intValue();
+				LinearLayout gun_button = makeButton(R.drawable.btn_translucent_gray,
+		    			R.drawable.bank, gun_name, Integer.toString(gun_price));
+				if (gun_price <= game_info.cash_) {
+					gun_button.setOnClickListener(new BuyGunListener());
+					gun_button.setBackgroundResource(R.drawable.btn_translucent_green);
+				}
+				gun_button.measure(viewWidth, viewHeight);
+			    if (gun_button.getMeasuredWidth() + total_width_added > viewWidth) {
+			    	outer_layout.addView(current_row);
+		    		current_row = new LinearLayout(this);
+		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+		        			LinearLayout.LayoutParams.FILL_PARENT,
+		        			LinearLayout.LayoutParams.WRAP_CONTENT));
+		    		total_width_added = 0;
+			    }
+		    	total_width_added += gun_button.getMeasuredWidth();
+		    	current_row.addView(gun_button);
+			}
+	        
+			// Add subway button
+			if (game_info.days_left_ > 0) {
+		    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
+		    			R.drawable.subway, "Subway", "[" + Integer.toString(game_info.days_left_) + "]");
+		    	subway_button.setOnClickListener(new BasicDialogListener(DIALOG_SUBWAY));
+		    	subway_button.measure(viewWidth, viewHeight);
+		    	if (subway_button.getMeasuredWidth() + total_width_added > viewWidth) {
+		    		outer_layout.addView(current_row);
+		    		current_row = new LinearLayout(this);
+		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
+		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+		        			LinearLayout.LayoutParams.FILL_PARENT,
+		        			LinearLayout.LayoutParams.WRAP_CONTENT));
+		    		total_width_added = 0;
+		    	}
+		    	total_width_added += subway_button.getMeasuredWidth();
+		    	current_row.addView(subway_button);
+			}
+	        
+	        // Add inventory button
+	        LinearLayout inventory_button = makeButton(R.drawable.btn_translucent_gray,
+	        		R.drawable.backpack, "Coat", " ");
+	        inventory_button.setOnClickListener(new BasicDialogListener(DIALOG_INVENTORY));
+	        inventory_button.measure(viewWidth, viewHeight);
+	    	if (inventory_button.getMeasuredWidth() + total_width_added > viewWidth) {
 	    		outer_layout.addView(current_row);
 	    		current_row = new LinearLayout(this);
 	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
@@ -570,36 +713,13 @@ public class DopeWarsGame extends Activity {
 	        			LinearLayout.LayoutParams.WRAP_CONTENT));
 	    		total_width_added = 0;
 	    	}
-	    	total_width_added += subway_button.getMeasuredWidth();
-	    	current_row.addView(subway_button);
-		}
-        
-        // Add inventory button
-        LinearLayout inventory_button = makeButton(R.drawable.btn_translucent_gray,
-        		R.drawable.backpack, "Coat", " ");
-        inventory_button.setOnClickListener(new BasicDialogListener(DIALOG_INVENTORY));
-        inventory_button.measure(viewWidth, viewHeight);
-    	if (inventory_button.getMeasuredWidth() + total_width_added > viewWidth) {
-    		outer_layout.addView(current_row);
-    		current_row = new LinearLayout(this);
-    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-        			LinearLayout.LayoutParams.FILL_PARENT,
-        			LinearLayout.LayoutParams.WRAP_CONTENT));
-    		total_width_added = 0;
-    	}
-    	total_width_added += inventory_button.getMeasuredWidth();
-    	current_row.addView(inventory_button);
-        if (total_width_added > 0) {
-        	outer_layout.addView(current_row);
+	    	total_width_added += inventory_button.getMeasuredWidth();
+	    	current_row.addView(inventory_button);
+	        if (total_width_added > 0) {
+	        	outer_layout.addView(current_row);
+	        }
         }
-        
-        String current_dealer_name = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_NAME);
-        String avatar_id = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_AVATAR_NAME);
         dealer_data_.close();
-        ((TextView)findViewById(R.id.player_name)).setText(current_dealer_name);
-        ((TextView)findViewById(R.id.player_money)).setText("$" + Integer.toString(game_info.cash_));
-        ((ImageView)findViewById(R.id.avatar_image)).setImageResource(Integer.parseInt(avatar_id));
 	}
 	
 	public void setupLocation() {
@@ -670,6 +790,13 @@ public class DopeWarsGame extends Activity {
     				(Global.rand_gen_.nextDouble() - 0.5) *
     				game_information_.guns_.get(gun_name).get("price_variance"));
     		game_info.gun_inventory_.put(gun_name, (float)gun_price);
+    	}
+    	
+    	// TODO: This is weak and needs more, but for now hardass has 10 health and each deputy has 1,
+    	// and Hardass has 1 firepower and each deputy has 1.
+    	game_info.cops_health_ = 0;
+    	if (Global.rand_gen_.nextDouble() < game_information_.cops_likelihood_) {
+    		game_info.cops_health_ = 10 + Global.rand_gen_.nextInt(3);
     	}
     	
         dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());

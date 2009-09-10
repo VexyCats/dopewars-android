@@ -34,6 +34,8 @@ public class GameInformation {
 				coat_likelihood_ = Float.parseFloat(group[1]);
 			} else if (group[0].equals("gun_likelihood")) {
 				gun_likelihood_ = Float.parseFloat(group[1]);
+			} else if (group[0].equals("cops_likelihood")) {
+				cops_likelihood_ = Float.parseFloat(group[1]);
 			} else {
 				Log.d("dopewars", "Unknown game info group");
 			}
@@ -51,7 +53,8 @@ public class GameInformation {
 		    "loan_interest_rate--" + Float.toString(loan_interest_rate_) + "&&" +
 		    "bank_interest_rate--" + Float.toString(bank_interest_rate_) + "&&" +
 		    "coat_likelihood--" + Float.toString(coat_likelihood_) + "&&" +
-		    "gun_likelihood--" + Float.toString(gun_likelihood_);
+		    "gun_likelihood--" + Float.toString(gun_likelihood_) + "&&" +
+		    "cops_likelihood--" + Float.toString(cops_likelihood_);
 		return serialized_game_info;
 	}
 	
@@ -65,4 +68,5 @@ public class GameInformation {
 	public float bank_interest_rate_;
 	public float coat_likelihood_;
 	public float gun_likelihood_;
+	public float cops_likelihood_;
 }
