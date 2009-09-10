@@ -48,6 +48,8 @@ public class DopeWars extends Activity {
 	        game_info.max_space_ = 100;
 	        game_info.days_left_ = 5;
 	        game_info.bank_ = 0;
+	        game_info.dealer_health_ = 100;
+	        game_info.cops_health_ = 0;
 	        game_info.dealer_inventory_.clear();
 	        game_info.location_inventory_.clear();
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
@@ -183,8 +185,9 @@ public class DopeWars extends Activity {
 	        game_information.bank_location_ = 0;
 	        game_information.loan_interest_rate_ = (float)0.1;
 	        game_information.bank_interest_rate_ = (float)0.05;
-	        game_information.coat_likelihood_ = (float)0.1;
-	        game_information.gun_likelihood_ = (float)0.1;
+	        game_information.coat_likelihood_ = (float)0.9;
+	        game_information.gun_likelihood_ = (float)0.9;
+	        game_information.cops_likelihood_ = (float)0.9;
 	        
 	        dealer_data_.setGameStrings(game_information.serializeGameInformation());
 	        dealer_data_.close();

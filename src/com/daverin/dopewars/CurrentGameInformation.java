@@ -7,6 +7,7 @@ import android.util.Log;
 public class CurrentGameInformation {
 	public CurrentGameInformation(String serialized_current_game_info) {
 		dealer_inventory_ = new HashMap<String, Float>();
+		dealer_guns_ = new HashMap<String, Float>();
 		location_inventory_ = new HashMap<String, Float>();
 		coat_inventory_ = new HashMap<String, Float>();
 		gun_inventory_ = new HashMap<String, Float>();
@@ -29,6 +30,10 @@ public class CurrentGameInformation {
 				location_ = Integer.parseInt(group[1]);
 			} else if (group[0].equals("days_left")) {
 				days_left_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals("dealer_health")) {
+				dealer_health_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals("cops_health")) {
+				cops_health_ = Integer.parseInt(group[1]);
 			} else if (group[0].equals("dealer_inventory")) {
 				dealer_inventory_ = Global.deserializeAttributes(group[1]);
 			} else if (group[0].equals("dealer_guns")) {
@@ -54,7 +59,10 @@ public class CurrentGameInformation {
 			"bank--" + Integer.toString(bank_) + "&&" +
 			"location--" + Integer.toString(location_) + "&&" +
 			"days_left--" + Integer.toString(days_left_) + "&&" +
+			"dealer_health--" + Integer.toString(dealer_health_) + "&&" +
+			"cops_health--" + Integer.toString(cops_health_) + "&&" +
 			"dealer_inventory--" + Global.serializeAttributes(dealer_inventory_) + "&&" +
+			"dealer_guns--" + Global.serializeAttributes(dealer_guns_) + "&&" +
 			"location_inventory--" + Global.serializeAttributes(location_inventory_) + "&&" +
 			"coat_inventory--" + Global.serializeAttributes(coat_inventory_) + "&&" +
 			"gun_inventory--" + Global.serializeAttributes(gun_inventory_);
@@ -68,6 +76,8 @@ public class CurrentGameInformation {
 	int bank_;
 	int location_;
 	int days_left_;
+	int dealer_health_;
+	int cops_health_;
 	HashMap<String, Float> dealer_inventory_;
 	HashMap<String, Float> dealer_guns_;
 	HashMap<String, Float> location_inventory_;
