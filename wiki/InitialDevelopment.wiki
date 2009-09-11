@@ -27,16 +27,23 @@ The score reporting server to start could just do mostly what the existing serve
   * graphics
   * orientation swapping
   * center all the buttons
-  * display cash all the time
-  * display space left on inventory/coat button
-  * display the name somewhere? (is it needed?)
   * split the messages into fight & drug messages
   * make the messages disappear when they're tapped
   * make the messages more pop-up-video instead of the stack at the bottom
+  * scrollable container for buttons
+  * customizable ui, like text/image sizes (thinking about other phones)
 
-== Cash & space display ==
+== Inventory screen ==
 
-I wonder if it's necessary to have a name on the inventory button? then I could put the cash there, in like a human readable format (2 Mil) and then a more detailed view on the inventory screen (bam! done.).
+Probably will go through a lot of tweaks but for a first pass, I'm thinking a tabular list of drugs and quantities, same list in a different color for guns and quantities, then the space left and overall space, cash on hand, cash in bank, and amount owed.
+
+== Progress bar display ==
+
+Just a bug, can't figure out how to make it resize itself to the maximum before display, just need some good old fashioned UI hackery.
+
+== Scrollable container for buttons ==
+
+In widescreen mode, or on other phones, the buttons might not all fit, so the container should be scrollable somehow to accommodate that.
 
 = Code =
 
