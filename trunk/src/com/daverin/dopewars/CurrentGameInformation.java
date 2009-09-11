@@ -11,6 +11,7 @@ public class CurrentGameInformation {
 		location_inventory_ = new HashMap<String, Float>();
 		coat_inventory_ = new HashMap<String, Float>();
 		gun_inventory_ = new HashMap<String, Float>();
+		messages_ = new HashMap<String, Float>();
 		String[] string_groups = serialized_current_game_info.split("&&");
 		for (int i = 0; i < string_groups.length; ++i) {
 			String[] group = string_groups[i].split("--");
@@ -44,6 +45,8 @@ public class CurrentGameInformation {
 				coat_inventory_ = Global.deserializeAttributes(group[1]);
 			} else if (group[0].equals("gun_inventory")) {
 				gun_inventory_ = Global.deserializeAttributes(group[1]);
+			} else if (group[0].equals("messages")) {
+				messages_ = Global.deserializeAttributes(group[1]);
 			} else {
 				Log.d("dopewars", "Unknown game info group");
 			}
@@ -65,7 +68,8 @@ public class CurrentGameInformation {
 			"dealer_guns--" + Global.serializeAttributes(dealer_guns_) + "&&" +
 			"location_inventory--" + Global.serializeAttributes(location_inventory_) + "&&" +
 			"coat_inventory--" + Global.serializeAttributes(coat_inventory_) + "&&" +
-			"gun_inventory--" + Global.serializeAttributes(gun_inventory_);
+			"gun_inventory--" + Global.serializeAttributes(gun_inventory_) + "&&" +
+			"messages--" + Global.serializeAttributes(messages_);
 		return serialized_game_info;
 	}
 	
@@ -83,4 +87,5 @@ public class CurrentGameInformation {
 	HashMap<String, Float> location_inventory_;
 	HashMap<String, Float> coat_inventory_;
 	HashMap<String, Float> gun_inventory_;
+	HashMap<String, Float> messages_;
 }
