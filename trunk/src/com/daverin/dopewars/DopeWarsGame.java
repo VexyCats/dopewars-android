@@ -601,8 +601,22 @@ public class DopeWarsGame extends Activity {
 			}
 	        
 	        // Add inventory button
+			float factor = (float)1.0;
+			String suffix = "";
+			if (game_info.cash_ > 1000000000) {
+				factor = (float)1000000000.0;
+				suffix = " Bil";
+			} else if (game_info.cash_ > 1000000) {
+				factor = (float)1000000.0;
+				suffix = " Mil";
+			} else if (game_info.cash_ > 1000) {
+				factor = (float)1000.0;
+				suffix = " G's";
+			}
+			String human_readable_cash = "$" + (new Float(game_info.cash_ / factor)).intValue() + suffix;
 	        LinearLayout inventory_button = makeButton(R.drawable.btn_translucent_gray,
-	        		R.drawable.backpack, "Coat", " ");
+	        		R.drawable.backpack, "(" + Integer.toString(game_info.space_) + ")",
+	        		human_readable_cash);
 	        inventory_button.setOnClickListener(new BasicDialogListener(DIALOG_INVENTORY));
     		pushButton(inventory_button);
         }
