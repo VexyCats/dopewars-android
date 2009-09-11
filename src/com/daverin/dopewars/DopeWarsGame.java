@@ -461,17 +461,32 @@ public class DopeWarsGame extends Activity {
     	return new_button;
 	}
 	
+	public void pushButton(LinearLayout button) {
+		button.measure(viewWidth_, viewHeight_);
+		if (button.getMeasuredWidth() + total_width_added_ > viewWidth_) {
+			outer_layout_.addView(current_row_);
+    		current_row_ = new LinearLayout(this);
+    		current_row_.setOrientation(LinearLayout.HORIZONTAL);
+    		current_row_.setLayoutParams(new LinearLayout.LayoutParams(
+        			LinearLayout.LayoutParams.FILL_PARENT,
+        			LinearLayout.LayoutParams.WRAP_CONTENT));
+    		total_width_added_ = 0;
+		}
+    	total_width_added_ += button.getMeasuredWidth();
+    	current_row_.addView(button);
+	}
+	
 	public void refreshDisplay() {
-        int viewWidth = this.getResources().getDisplayMetrics().widthPixels;
-        int viewHeight = this.getResources().getDisplayMetrics().heightPixels;
-		LinearLayout outer_layout = (LinearLayout)findViewById(R.id.outer_layout);
-		LinearLayout current_row = new LinearLayout(this);
-		current_row.setOrientation(LinearLayout.HORIZONTAL);
-		current_row.setLayoutParams(new LinearLayout.LayoutParams(
+        viewWidth_ = this.getResources().getDisplayMetrics().widthPixels;
+        viewHeight_ = this.getResources().getDisplayMetrics().heightPixels;
+		outer_layout_ = (LinearLayout)findViewById(R.id.outer_layout);
+		current_row_ = new LinearLayout(this);
+		current_row_.setOrientation(LinearLayout.HORIZONTAL);
+		current_row_.setLayoutParams(new LinearLayout.LayoutParams(
     			LinearLayout.LayoutParams.FILL_PARENT,
     			LinearLayout.LayoutParams.WRAP_CONTENT));
-		outer_layout.removeAllViews();
-		int total_width_added = 0;
+		outer_layout_.removeAllViews();
+		total_width_added_ = 0;
         dealer_data_.open();
         CurrentGameInformation game_info = new CurrentGameInformation(
         		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
@@ -484,35 +499,13 @@ public class DopeWarsGame extends Activity {
         	LinearLayout hardass_button = makeButton(R.drawable.btn_translucent_gray,
         			R.drawable.loan_shark, "Hardass",
         			Integer.toString(Math.min(10, game_info.cops_health_)));
-        	hardass_button.measure(viewWidth, viewHeight);
-		    if (hardass_button.getMeasuredWidth() + total_width_added > viewWidth) {
-		    	outer_layout.addView(current_row);
-	    		current_row = new LinearLayout(this);
-	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-	        			LinearLayout.LayoutParams.FILL_PARENT,
-	        			LinearLayout.LayoutParams.WRAP_CONTENT));
-	    		total_width_added = 0;
-		    }
-	    	total_width_added += hardass_button.getMeasuredWidth();
-	    	current_row.addView(hardass_button);
+        	pushButton(hardass_button);
 	    	
 	    	if (game_info.cops_health_ > 10) {
 	    		LinearLayout deputies_button = makeButton(R.drawable.btn_translucent_gray,
 	    				R.drawable.loan_shark, "Deputies",
 	    				Integer.toString(game_info.cops_health_ - 10));
-	    		deputies_button.measure(viewWidth, viewHeight);
-			    if (deputies_button.getMeasuredWidth() + total_width_added > viewWidth) {
-			    	outer_layout.addView(current_row);
-		    		current_row = new LinearLayout(this);
-		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-		        			LinearLayout.LayoutParams.FILL_PARENT,
-		        			LinearLayout.LayoutParams.WRAP_CONTENT));
-		    		total_width_added = 0;
-			    }
-		    	total_width_added += deputies_button.getMeasuredWidth();
-		    	current_row.addView(deputies_button);
+	    		pushButton(deputies_button);
 	    	}
 	    	
 	    	if (game_info.dealer_guns_.size() > 0) {
@@ -520,40 +513,14 @@ public class DopeWarsGame extends Activity {
 	    				R.drawable.loan_shark, "Fight",
 	    				Integer.toString(game_info.dealer_health_));
 	    		fight_button.setOnClickListener(new FightListener());
-	    		fight_button.measure(viewWidth, viewHeight);
-			    if (fight_button.getMeasuredWidth() + total_width_added > viewWidth) {
-			    	outer_layout.addView(current_row);
-		    		current_row = new LinearLayout(this);
-		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-		        			LinearLayout.LayoutParams.FILL_PARENT,
-		        			LinearLayout.LayoutParams.WRAP_CONTENT));
-		    		total_width_added = 0;
-			    }
-		    	total_width_added += fight_button.getMeasuredWidth();
-		    	current_row.addView(fight_button);
+	    		pushButton(fight_button);
 	    	}
 	    	
 	    	LinearLayout run_button = makeButton(R.drawable.btn_translucent_green,
     				R.drawable.loan_shark, "Run",
     				Integer.toString(game_info.dealer_health_));
 	    	run_button.setOnClickListener(new RunListener());
-	    	run_button.measure(viewWidth, viewHeight);
-		    if (run_button.getMeasuredWidth() + total_width_added > viewWidth) {
-		    	outer_layout.addView(current_row);
-	    		current_row = new LinearLayout(this);
-	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-	        			LinearLayout.LayoutParams.FILL_PARENT,
-	        			LinearLayout.LayoutParams.WRAP_CONTENT));
-	    		total_width_added = 0;
-		    }
-	    	total_width_added += run_button.getMeasuredWidth();
-	    	current_row.addView(run_button);
-
-	        if (total_width_added > 0) {
-	        	outer_layout.addView(current_row);
-	        }
+	    	pushButton(run_button);
         } else {
 	        Iterator<String> drug_names = game_info.location_inventory_.keySet().iterator();
 	        while (drug_names.hasNext()) {
@@ -579,18 +546,7 @@ public class DopeWarsGame extends Activity {
 	        	  next_drug.setBackgroundResource(R.drawable.btn_translucent_orange);
 	      		  next_drug.setOnClickListener(new DrugClickListener(drug_name, DIALOG_DRUG_SELL));
 	        	}
-	        	next_drug.measure(viewWidth, viewHeight);
-	        	if (next_drug.getMeasuredWidth() + total_width_added > viewWidth) {
-	        		outer_layout.addView(current_row);
-	        		current_row = new LinearLayout(this);
-	        		current_row.setOrientation(LinearLayout.HORIZONTAL);
-	        		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-	            			LinearLayout.LayoutParams.FILL_PARENT,
-	            			LinearLayout.LayoutParams.WRAP_CONTENT));
-	        		total_width_added = 0;
-	        	}
-	        	total_width_added += next_drug.getMeasuredWidth();
-	        	current_row.addView(next_drug);
+	    		pushButton(next_drug);
 	        }
 			
 			// Add loan shark button
@@ -598,18 +554,7 @@ public class DopeWarsGame extends Activity {
 				LinearLayout loan_shark_button = makeButton(R.drawable.btn_translucent_gray,
 		    			R.drawable.loan_shark, "Shark", Integer.toString(game_info.loan_));
 			    loan_shark_button.setOnClickListener(new BasicDialogListener(DIALOG_LOAN_SHARK));
-			    loan_shark_button.measure(viewWidth, viewHeight);
-			    if (loan_shark_button.getMeasuredWidth() + total_width_added > viewWidth) {
-			    	outer_layout.addView(current_row);
-		    		current_row = new LinearLayout(this);
-		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-		        			LinearLayout.LayoutParams.FILL_PARENT,
-		        			LinearLayout.LayoutParams.WRAP_CONTENT));
-		    		total_width_added = 0;
-			    }
-		    	total_width_added += loan_shark_button.getMeasuredWidth();
-		    	current_row.addView(loan_shark_button);
+	    		pushButton(loan_shark_button);
 			}
 			
 			// Add bank button
@@ -618,18 +563,7 @@ public class DopeWarsGame extends Activity {
 		    			R.drawable.bank, "Bank", Integer.toString(game_info.bank_));
 				bank_button.setOnClickListener(new BasicDialogListener(DIALOG_BANK_DEPOSIT));
 				bank_button.setOnLongClickListener(new LongClickDialogListener(DIALOG_BANK_WITHDRAW));
-				bank_button.measure(viewWidth, viewHeight);
-			    if (bank_button.getMeasuredWidth() + total_width_added > viewWidth) {
-			    	outer_layout.addView(current_row);
-		    		current_row = new LinearLayout(this);
-		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-		        			LinearLayout.LayoutParams.FILL_PARENT,
-		        			LinearLayout.LayoutParams.WRAP_CONTENT));
-		    		total_width_added = 0;
-			    }
-		    	total_width_added += bank_button.getMeasuredWidth();
-		    	current_row.addView(bank_button);
+	    		pushButton(bank_button);
 			}
 	        
 	        // Add coat button
@@ -642,18 +576,7 @@ public class DopeWarsGame extends Activity {
 					coat_button.setOnClickListener(new BuyCoatListener());
 					coat_button.setBackgroundResource(R.drawable.btn_translucent_green);
 				}
-				coat_button.measure(viewWidth, viewHeight);
-			    if (coat_button.getMeasuredWidth() + total_width_added > viewWidth) {
-			    	outer_layout.addView(current_row);
-		    		current_row = new LinearLayout(this);
-		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-		        			LinearLayout.LayoutParams.FILL_PARENT,
-		        			LinearLayout.LayoutParams.WRAP_CONTENT));
-		    		total_width_added = 0;
-			    }
-		    	total_width_added += coat_button.getMeasuredWidth();
-		    	current_row.addView(coat_button);
+	    		pushButton(coat_button);
 			}
 	        
 	        // Add gun button
@@ -666,18 +589,7 @@ public class DopeWarsGame extends Activity {
 					gun_button.setOnClickListener(new BuyGunListener());
 					gun_button.setBackgroundResource(R.drawable.btn_translucent_green);
 				}
-				gun_button.measure(viewWidth, viewHeight);
-			    if (gun_button.getMeasuredWidth() + total_width_added > viewWidth) {
-			    	outer_layout.addView(current_row);
-		    		current_row = new LinearLayout(this);
-		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-		        			LinearLayout.LayoutParams.FILL_PARENT,
-		        			LinearLayout.LayoutParams.WRAP_CONTENT));
-		    		total_width_added = 0;
-			    }
-		    	total_width_added += gun_button.getMeasuredWidth();
-		    	current_row.addView(gun_button);
+	    		pushButton(gun_button);
 			}
 	        
 			// Add subway button
@@ -685,40 +597,35 @@ public class DopeWarsGame extends Activity {
 		    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
 		    			R.drawable.subway, "Subway", "[" + Integer.toString(game_info.days_left_) + "]");
 		    	subway_button.setOnClickListener(new BasicDialogListener(DIALOG_SUBWAY));
-		    	subway_button.measure(viewWidth, viewHeight);
-		    	if (subway_button.getMeasuredWidth() + total_width_added > viewWidth) {
-		    		outer_layout.addView(current_row);
-		    		current_row = new LinearLayout(this);
-		    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-		    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-		        			LinearLayout.LayoutParams.FILL_PARENT,
-		        			LinearLayout.LayoutParams.WRAP_CONTENT));
-		    		total_width_added = 0;
-		    	}
-		    	total_width_added += subway_button.getMeasuredWidth();
-		    	current_row.addView(subway_button);
+	    		pushButton(subway_button);
 			}
 	        
 	        // Add inventory button
 	        LinearLayout inventory_button = makeButton(R.drawable.btn_translucent_gray,
 	        		R.drawable.backpack, "Coat", " ");
 	        inventory_button.setOnClickListener(new BasicDialogListener(DIALOG_INVENTORY));
-	        inventory_button.measure(viewWidth, viewHeight);
-	    	if (inventory_button.getMeasuredWidth() + total_width_added > viewWidth) {
-	    		outer_layout.addView(current_row);
-	    		current_row = new LinearLayout(this);
-	    		current_row.setOrientation(LinearLayout.HORIZONTAL);
-	    		current_row.setLayoutParams(new LinearLayout.LayoutParams(
-	        			LinearLayout.LayoutParams.FILL_PARENT,
-	        			LinearLayout.LayoutParams.WRAP_CONTENT));
-	    		total_width_added = 0;
-	    	}
-	    	total_width_added += inventory_button.getMeasuredWidth();
-	    	current_row.addView(inventory_button);
-	        if (total_width_added > 0) {
-	        	outer_layout.addView(current_row);
-	        }
+    		pushButton(inventory_button);
         }
+        if (total_width_added_ > 0) {
+        	outer_layout_.addView(current_row_);
+        }
+        
+        // Now display any messages that need to be shown
+        LinearLayout message_layout = (LinearLayout)findViewById(R.id.message_layout);
+        message_layout.removeAllViews();
+        Iterator<String> messages = game_info.messages_.keySet().iterator();
+        while (messages.hasNext()) {
+        	String message_text = messages.next();
+        	TextView next_message = new TextView(this);
+        	next_message.setLayoutParams(new LinearLayout.LayoutParams(
+        			LinearLayout.LayoutParams.WRAP_CONTENT,
+        			LinearLayout.LayoutParams.WRAP_CONTENT));
+        	next_message.setGravity(Gravity.CENTER);
+        	next_message.setTextColor(Color.GREEN);
+        	next_message.setText(message_text);
+        	message_layout.addView(next_message);
+        }
+        
         dealer_data_.close();
 	}
 	
@@ -727,6 +634,8 @@ public class DopeWarsGame extends Activity {
 		dealer_data_.open();
         CurrentGameInformation game_info = new CurrentGameInformation(
         		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
+        game_info.messages_.clear();
+        
 		int num_avail_drugs = game_information_.drugs_.size();
 		boolean[] drug_present = new boolean[num_avail_drugs];
     	for (int i = 0; i < num_avail_drugs; ++i) {
@@ -769,6 +678,9 @@ public class DopeWarsGame extends Activity {
     			Vector<String> price_and_messages = Global.chooseDrugPrice(
     					drug_name, game_information_.drugs_.get(drug_name));
     			game_info.location_inventory_.put(drug_name, Float.parseFloat(price_and_messages.elementAt(0)));
+    			for (int j = 1; j < price_and_messages.size(); ++j) {
+    				game_info.messages_.put(price_and_messages.elementAt(j), (float)1.0);
+    			}
     		}
     	}
     	
@@ -927,4 +839,11 @@ public class DopeWarsGame extends Activity {
 	}
 	
 	GameInformation game_information_;
+	
+	// TEMP VARIABLES UGLY CODE WARNING (but damn they're convenient)
+	int viewWidth_;
+    int viewHeight_;
+	LinearLayout outer_layout_;
+	LinearLayout current_row_;
+	int total_width_added_;
 }
