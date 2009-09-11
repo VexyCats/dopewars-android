@@ -3,15 +3,8 @@
 = Functional things =
 
   * end of game
-  * random messages
   * customization
   * score reporting
-
-== Random (and other) messages ==
-
-Really important, I haven't figured out how to handle it yet. Pop-up? Could be annoying. Scrolling marquee on the bottom? could be even worse waiting to read important info. Maybe random things could go in the background and more important things could come up front somehow?
-
-Maybe a stacking list of messages from the bottom, that can be tapped to make them disappear? That's probably where I'll start.
 
 == End of game ==
 
@@ -37,6 +30,9 @@ The score reporting server to start could just do mostly what the existing serve
   * display cash all the time
   * display space left on inventory/coat button
   * display the name somewhere? (is it needed?)
+  * split the messages into fight & drug messages
+  * make the messages disappear when they're tapped
+  * make the messages more pop-up-video instead of the stack at the bottom
 
 == Cash & space display ==
 
