@@ -5,6 +5,7 @@
   * end of game
   * customization
   * score reporting
+  * resume in-progress game
 
 == End of game ==
 
@@ -19,6 +20,10 @@ This also includes the mechanism by which custom game parameters are loaded from
 == Score reporting ==
 
 The score reporting server to start could just do mostly what the existing server does, just maintain a global score list by game type. Ultimately the goal is to include things like a "dealer of the day" and other superlatives, in addition to more of the custom messages that exist now.
+
+== Resume in-progress game ==
+
+This shouldn't be that hard, but will probably require an additional parameter with the game info about what style of game it is, and then just modify the title on the main screen to be Resume if that's available with like (hold for a new game) appended to the end.
 
 = Visual things =
 
@@ -44,6 +49,10 @@ Just a bug, can't figure out how to make it resize itself to the maximum before 
 == Scrollable container for buttons ==
 
 In widescreen mode, or on other phones, the buttons might not all fit, so the container should be scrollable somehow to accommodate that.
+
+== Orientation swapping ==
+
+Almost works, but needs to refresh the display.
 
 = Code =
 
