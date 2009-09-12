@@ -185,9 +185,9 @@ public class DopeWars extends Activity {
 	        game_information.bank_location_ = 0;
 	        game_information.loan_interest_rate_ = (float)0.1;
 	        game_information.bank_interest_rate_ = (float)0.05;
-	        game_information.coat_likelihood_ = (float)0.9;
-	        game_information.gun_likelihood_ = (float)0.9;
-	        game_information.cops_likelihood_ = (float)0.9;
+	        game_information.coat_likelihood_ = (float)0.3;
+	        game_information.gun_likelihood_ = (float)0.3;
+	        game_information.cops_likelihood_ = (float)0.1;
 	        
 	        dealer_data_.setGameStrings(game_information.serializeGameInformation());
 	        dealer_data_.close();

@@ -436,46 +436,78 @@ public class DopeWarsGame extends Activity {
         	// Determine how many of the drug the user could buy
 	        CurrentGameInformation game_info = new CurrentGameInformation(
 	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
+	        ((TextView)(drug_buy_dialog_.findViewById(R.id.drug_name))).setText("Buy " + dialog_drug_name_);
+	        float drug_price = game_info.location_inventory_.get(dialog_drug_name_);
+	        ((TextView)(drug_buy_dialog_.findViewById(R.id.drug_price))).setText("$" + Float.toString(drug_price));
 	        int max_num_drugs = (int)(game_info.cash_ / game_info.location_inventory_.get(dialog_drug_name_));
 	        max_num_drugs = Math.min(max_num_drugs, game_info.space_);
-	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setProgress(max_num_drugs);
 	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setMax(max_num_drugs);
-	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setIndeterminate(false);
+	        ((SeekBar)(drug_buy_dialog_.findViewById(R.id.drug_quantity_slide))).setProgress(max_num_drugs);
+	        ((TextView)(drug_buy_dialog_.findViewById(R.id.drug_quantity))).setText(Integer.toString(max_num_drugs));
+	        ((LinearLayout)drug_buy_dialog_.findViewById(R.id.drug_buy_layout)).setOnClickListener(new View.OnClickListener() {
+	        	public void onClick(View v) {
+	        		dismissDialog(DIALOG_DRUG_BUY);
+	        	}
+	        });
 	        ((ImageView)(drug_buy_dialog_.findViewById(R.id.drug_icon))).setOnClickListener(
 	        		new CompleteSaleListener(dialog_drug_name_));
+	        drug_buy_dialog_.findViewById(R.id.drug_quantity_slide).invalidate();
         } else if (id == DIALOG_DRUG_SELL) {
         	// Determine how many of the drug the user could sell
 	        CurrentGameInformation game_info = new CurrentGameInformation(
 	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
+	        ((TextView)(drug_sell_dialog_.findViewById(R.id.drug_name))).setText("Sell " + dialog_drug_name_);
+	        float drug_price = game_info.location_inventory_.get(dialog_drug_name_);
+	        ((TextView)(drug_sell_dialog_.findViewById(R.id.drug_price))).setText("$" + Float.toString(drug_price));
 	        int drug_quantity = game_info.dealer_inventory_.get(dialog_drug_name_).intValue();
-	        ((SeekBar)(drug_sell_dialog_.findViewById(R.id.drug_quantity_slide))).setProgress(drug_quantity);
 	        ((SeekBar)(drug_sell_dialog_.findViewById(R.id.drug_quantity_slide))).setMax(drug_quantity);
-	        ((SeekBar)(drug_sell_dialog_.findViewById(R.id.drug_quantity_slide))).setIndeterminate(false);
+	        ((SeekBar)(drug_sell_dialog_.findViewById(R.id.drug_quantity_slide))).setProgress(drug_quantity);
+	        ((TextView)(drug_sell_dialog_.findViewById(R.id.drug_quantity))).setText(Integer.toString(drug_quantity));
+	        ((LinearLayout)drug_sell_dialog_.findViewById(R.id.drug_sell_layout)).setOnClickListener(new View.OnClickListener() {
+	        	public void onClick(View v) {
+	        		dismissDialog(DIALOG_DRUG_SELL);
+	        	}
+	        });
 	        ((ImageView)(drug_sell_dialog_.findViewById(R.id.drug_icon))).setOnClickListener(
 	        		new CompleteBuyListener(dialog_drug_name_));
         } else if (id == DIALOG_LOAN_SHARK) {
 	        CurrentGameInformation game_info = new CurrentGameInformation(
 	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
         	int max_loan = Math.min(game_info.cash_, game_info.loan_);
-	        ((SeekBar)(loan_shark_dialog_.findViewById(R.id.loan_amount_slide))).setProgress(max_loan);
 	        ((SeekBar)(loan_shark_dialog_.findViewById(R.id.loan_amount_slide))).setMax(max_loan);
-	        ((SeekBar)(loan_shark_dialog_.findViewById(R.id.loan_amount_slide))).setIndeterminate(false);
+	        ((SeekBar)(loan_shark_dialog_.findViewById(R.id.loan_amount_slide))).setProgress(max_loan);
+	        ((TextView)(loan_shark_dialog_.findViewById(R.id.loan_amount))).setText(Integer.toString(max_loan));
+	        ((LinearLayout)loan_shark_dialog_.findViewById(R.id.loan_shark_layout)).setOnClickListener(new View.OnClickListener() {
+	        	public void onClick(View v) {
+	        		dismissDialog(DIALOG_LOAN_SHARK);
+	        	}
+	        });
 	        ((ImageView)(loan_shark_dialog_.findViewById(R.id.loan_icon))).setOnClickListener(
 	        		new CompleteLoanListener());
         } else if (id == DIALOG_BANK_DEPOSIT) {
 	        CurrentGameInformation game_info = new CurrentGameInformation(
 	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-	        ((SeekBar)(bank_deposit_dialog_.findViewById(R.id.bank_amount_slide))).setProgress(game_info.cash_);
 	        ((SeekBar)(bank_deposit_dialog_.findViewById(R.id.bank_amount_slide))).setMax(game_info.cash_);
-	        ((SeekBar)(bank_deposit_dialog_.findViewById(R.id.bank_amount_slide))).setIndeterminate(false);
+	        ((SeekBar)(bank_deposit_dialog_.findViewById(R.id.bank_amount_slide))).setProgress(game_info.cash_);
+	        ((TextView)(bank_deposit_dialog_.findViewById(R.id.bank_amount))).setText(Integer.toString(game_info.cash_));
+	        ((LinearLayout)bank_deposit_dialog_.findViewById(R.id.bank_deposit_layout)).setOnClickListener(new View.OnClickListener() {
+	        	public void onClick(View v) {
+	        		dismissDialog(DIALOG_BANK_DEPOSIT);
+	        	}
+	        });
 	        ((ImageView)(bank_deposit_dialog_.findViewById(R.id.bank_icon))).setOnClickListener(
 	        		new CompleteBankDepositListener());
         } else if (id == DIALOG_BANK_WITHDRAW) {
 	        CurrentGameInformation game_info = new CurrentGameInformation(
 	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-	        ((SeekBar)(bank_withdraw_dialog_.findViewById(R.id.bank_amount_slide))).setProgress(game_info.bank_);
 	        ((SeekBar)(bank_withdraw_dialog_.findViewById(R.id.bank_amount_slide))).setMax(game_info.bank_);
-	        ((SeekBar)(bank_withdraw_dialog_.findViewById(R.id.bank_amount_slide))).setIndeterminate(false);
+	        ((SeekBar)(bank_withdraw_dialog_.findViewById(R.id.bank_amount_slide))).setProgress(game_info.bank_);
+	        ((TextView)(bank_withdraw_dialog_.findViewById(R.id.bank_amount))).setText(Integer.toString(game_info.bank_));
+	        ((LinearLayout)bank_withdraw_dialog_.findViewById(R.id.bank_withdraw_layout)).setOnClickListener(new View.OnClickListener() {
+	        	public void onClick(View v) {
+	        		dismissDialog(DIALOG_BANK_WITHDRAW);
+	        	}
+	        });
 	        ((ImageView)(bank_withdraw_dialog_.findViewById(R.id.bank_icon))).setOnClickListener(
 	        		new CompleteBankWithdrawListener());
         }
