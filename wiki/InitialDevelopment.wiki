@@ -27,8 +27,9 @@ This shouldn't be that hard, but will probably require an additional parameter w
 
 = Visual things =
 
-  * inventory screen
   * progress bar display
+  * show drug name and price on buy/sell dialogs
+  * a nicer way to cancel the buy/sell dialog (other than pressing back)
   * graphics
   * orientation swapping
   * center all the buttons
@@ -38,10 +39,6 @@ This shouldn't be that hard, but will probably require an additional parameter w
   * scrollable container for buttons
   * customizable ui, like text/image sizes (thinking about other phones)
   * button sizing, they're just a little too big
-
-== Inventory screen ==
-
-Probably will go through a lot of tweaks but for a first pass, I'm thinking a tabular list of drugs and quantities, same list in a different color for guns and quantities, then the space left and overall space, cash on hand, cash in bank, and amount owed.
 
 == Progress bar display ==
 
