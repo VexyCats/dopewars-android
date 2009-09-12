@@ -326,6 +326,41 @@ public class DopeWarsGame extends Activity {
         return super.onCreateDialog(id);
     }
 	
+	private TextView constructTextView(int color, float size, int gravity, int width, int height,
+			float weight, String text) {
+		TextView t = new TextView(this);
+		t.setTextColor(color);
+		t.setTextSize(size);
+		t.setGravity(gravity);
+		t.setLayoutParams(new LinearLayout.LayoutParams(width, height, weight));
+		t.setText(text);
+		return t;
+	}
+	
+	private TextView makeInventoryHeader(String text) {
+		return constructTextView(Color.WHITE, (float)16.0, Gravity.CENTER,
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+    			LinearLayout.LayoutParams.WRAP_CONTENT, (float)1.0, text);
+	}
+	
+	private TextView makeInventoryText(int color, int gravity, String text) {
+		return constructTextView(color, (float)12.0, gravity,
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+    			LinearLayout.LayoutParams.WRAP_CONTENT, (float)1.0, text);
+	}
+	
+	private LinearLayout makeInventoryRow(int quantity_color, String item_text,
+			String quantity_text) {
+    	LinearLayout l = new LinearLayout(this);
+		l.setOrientation(LinearLayout.HORIZONTAL);
+		l.setLayoutParams(new LinearLayout.LayoutParams(
+    			LinearLayout.LayoutParams.FILL_PARENT,
+    			LinearLayout.LayoutParams.WRAP_CONTENT));
+		l.addView(makeInventoryText(Color.WHITE, Gravity.LEFT, item_text));
+		l.addView(makeInventoryText(quantity_color, Gravity.RIGHT, quantity_text));
+		return l;
+	}
+	
 	@Override
     protected void onPrepareDialog(int id, Dialog d) {
 		dealer_data_.open();
@@ -350,32 +385,53 @@ public class DopeWarsGame extends Activity {
         	dialog_params.width = WindowManager.LayoutParams.FILL_PARENT;
         	subway_dialog_.getWindow().setAttributes(dialog_params);
         } else if (id == DIALOG_INVENTORY) {
-        	LinearLayout l = (LinearLayout)inventory_dialog_.findViewById(R.id.main_layout);
+        	LinearLayout l = (LinearLayout)inventory_dialog_.findViewById(R.id.inventory_layout);
+        	l.setGravity(Gravity.CENTER);
         	l.removeAllViews();
+        	l.addView(makeInventoryHeader("drugs"));
 	        CurrentGameInformation game_info = new CurrentGameInformation(
 	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-	        Iterator<String> drug_names = game_info.dealer_inventory_.keySet().iterator();
-	        while (drug_names.hasNext()) {
-	        	String drug_string = drug_names.next();
-	        	LinearLayout next_drug = new LinearLayout(this);
-        		next_drug.setOrientation(LinearLayout.HORIZONTAL);
-        		next_drug.setLayoutParams(new LinearLayout.LayoutParams(
-            			LinearLayout.LayoutParams.WRAP_CONTENT,
-            			LinearLayout.LayoutParams.WRAP_CONTENT));
-        		TextView drug_name = new TextView(this);
-        		drug_name.setLayoutParams(new LinearLayout.LayoutParams(
-            			LinearLayout.LayoutParams.WRAP_CONTENT,
-            			LinearLayout.LayoutParams.WRAP_CONTENT));
-        		drug_name.setText(drug_string);
-        		next_drug.addView(drug_name);
-        		TextView drug_quantity = new TextView(this);
-        		drug_quantity.setLayoutParams(new LinearLayout.LayoutParams(
-            			LinearLayout.LayoutParams.WRAP_CONTENT,
-            			LinearLayout.LayoutParams.WRAP_CONTENT));
-        		drug_quantity.setText(game_info.dealer_inventory_.get(drug_string).toString());
-        		next_drug.addView(drug_quantity);
-        		l.addView(next_drug);
+	        if (game_info.dealer_inventory_.size() == 0) {
+	        	l.addView(makeInventoryText(Color.GRAY, Gravity.CENTER, "(none)"));
+	        } else {
+		        Iterator<String> drug_names = game_info.dealer_inventory_.keySet().iterator();
+		        while (drug_names.hasNext()) {
+		        	String drug_string = drug_names.next();
+		        	l.addView(makeInventoryRow(Color.BLUE, drug_string,
+		        			game_info.dealer_inventory_.get(drug_string).toString()));
+		        }
 	        }
+	        l.addView(makeInventoryHeader("guns"));
+        	if (game_info.dealer_guns_.size() == 0) {
+	        	l.addView(makeInventoryText(Color.GRAY, Gravity.CENTER, "(none)"));
+	        } else {
+		        Iterator<String> gun_names = game_info.dealer_guns_.keySet().iterator();
+		        while (gun_names.hasNext()) {
+		        	String gun_string = gun_names.next();
+		        	l.addView(makeInventoryRow(Color.RED, gun_string,
+		        			game_info.dealer_guns_.get(gun_string).toString()));
+		        }
+	        }
+	        l.addView(makeInventoryHeader("money"));
+	        l.addView(makeInventoryRow(Color.GREEN, "In hand",
+	        		Integer.toString(game_info.cash_)));
+	        l.addView(makeInventoryRow(Color.GREEN, "In bank",
+	        		Integer.toString(game_info.bank_)));
+	        l.addView(makeInventoryRow(Color.GREEN, "Owed",
+	        		"(" + Integer.toString(game_info.loan_) + ")"));
+	        l.addView(makeInventoryRow(Color.GREEN, "Total",
+	        		Integer.toString(game_info.cash_ + game_info.bank_ - game_info.loan_)));
+	        l.setOnClickListener(new View.OnClickListener() {
+	        	public void onClick(View v) {
+	    			dismissDialog(DIALOG_INVENTORY);
+	        	}
+	        });
+        	
+        	// this may not have to do anything other than the width setting
+        	WindowManager.LayoutParams dialog_params =
+        		inventory_dialog_.getWindow().getAttributes();
+        	dialog_params.width = WindowManager.LayoutParams.FILL_PARENT;
+        	inventory_dialog_.getWindow().setAttributes(dialog_params);
         } else if (id == DIALOG_DRUG_BUY) {
         	// Determine how many of the drug the user could buy
 	        CurrentGameInformation game_info = new CurrentGameInformation(
