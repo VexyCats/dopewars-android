@@ -6,6 +6,7 @@
   * customization
   * score reporting
   * resume in-progress game
+  * user-created data (messages in the old version)
 
 == End of game ==
 
@@ -13,9 +14,7 @@ On the last page just put an 'end game' button that will enact all the score rep
 
 == Customization ==
 
-Could parse xml or I could require that it be presented in the serialized format for the game information. One of the keys for customization is have a game key. The game key will have to be a public/private pair. The game key is used to encrypt score reports to the scoring server, which decrypts the score report.
-
-This also includes the mechanism by which custom game parameters are loaded from within the game.
+The game settings are easy enough to deal with, I have a dumb serialization format for storage in the database anyways, this could be used or a translation of this into xml would be equally effective. The tricky bit is to use the customization to restrict score reporting. The insecure way of course is to just use a game id. This is probably fine and if there's trouble I'll try to deal with it then.
 
 == Score reporting ==
 
@@ -25,11 +24,12 @@ The score reporting server to start could just do mostly what the existing serve
 
 This shouldn't be that hard, but will probably require an additional parameter with the game info about what style of game it is, and then just modify the title on the main screen to be Resume if that's available with like (hold for a new game) appended to the end.
 
+== User-created data ==
+
+I don't want to lose this. In fact it would be nice to expand it. One of the key old-school things was the songs, so it would be nice to expand that to user entry as well. And maybe the sayings could be a little more structured so they sound better in the game. What might be nice is to have responses somehow, maybe that's a future feature though. So for now I think I'll re-implement the random chance thing at the end of the game, ooo it can just be another button on the last screen if available, even.
+
 = Visual things =
 
-  * progress bar display
-  * show drug name and price on buy/sell dialogs
-  * a nicer way to cancel the buy/sell dialog (other than pressing back)
   * graphics
   * orientation swapping
   * center all the buttons
@@ -39,10 +39,6 @@ This shouldn't be that hard, but will probably require an additional parameter w
   * scrollable container for buttons
   * customizable ui, like text/image sizes (thinking about other phones)
   * button sizing, they're just a little too big
-
-== Progress bar display ==
-
-Just a bug, can't figure out how to make it resize itself to the maximum before display, just need some good old fashioned UI hackery.
 
 == Scrollable container for buttons ==
 
