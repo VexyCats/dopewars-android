@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -30,6 +31,7 @@ public class DopeWarsGame extends Activity {
 	public static final int DIALOG_LOAN_SHARK = 1006;
 	public static final int DIALOG_BANK_DEPOSIT = 1007;
 	public static final int DIALOG_BANK_WITHDRAW = 1008;
+	public static final int DIALOG_END_GAME = 1009;
 	
 	// Respond to a click that just opens a dialog with no additional information.
 	public class BasicDialogListener implements View.OnClickListener {
@@ -322,9 +324,11 @@ public class DopeWarsGame extends Activity {
 			return bank_deposit_dialog_;
 		case DIALOG_BANK_WITHDRAW:
 			return bank_withdraw_dialog_;
+		case DIALOG_END_GAME:
+			return end_game_dialog_;
 		}
         return super.onCreateDialog(id);
-    }
+	}
 	
 	private TextView constructTextView(int color, float size, int gravity, int width, int height,
 			float weight, String text) {
@@ -510,6 +514,19 @@ public class DopeWarsGame extends Activity {
 	        });
 	        ((ImageView)(bank_withdraw_dialog_.findViewById(R.id.bank_icon))).setOnClickListener(
 	        		new CompleteBankWithdrawListener());
+        } else if (id == DIALOG_END_GAME) {
+        	CurrentGameInformation game_info = new CurrentGameInformation(
+	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
+        	((TextView)(end_game_dialog_.findViewById(R.id.total_cash))).setText(
+        			"$" + Integer.toString(game_info.cash_ + game_info.bank_ - game_info.loan_));
+	        ((LinearLayout)end_game_dialog_.findViewById(R.id.end_of_game_layout)).setOnClickListener(new View.OnClickListener() {
+	        	public void onClick(View v) {
+	        		dismissDialog(DIALOG_END_GAME);
+	        		Intent i = new Intent();
+	        		setResult(RESULT_OK, i);
+	        		finish();
+	        	}
+	        });
         }
         dealer_data_.close();
     }
@@ -707,6 +724,14 @@ public class DopeWarsGame extends Activity {
 	        		human_readable_cash);
 	        inventory_button.setOnClickListener(new BasicDialogListener(DIALOG_INVENTORY));
     		pushButton(inventory_button);
+    		
+    		// Add end of game button
+    		if (game_info.days_left_ < 1) {
+    			LinearLayout end_of_game_button = makeButton(R.drawable.btn_translucent_green,
+    					R.drawable.backpack, "End Game", " ");
+    			end_of_game_button.setOnClickListener(new BasicDialogListener(DIALOG_END_GAME));
+    			pushButton(end_of_game_button);
+    		}
         }
         if (total_width_added_ > 0) {
         	outer_layout_.addView(current_row_);
@@ -824,7 +849,8 @@ public class DopeWarsGame extends Activity {
 	Dialog loan_shark_dialog_;
 	Dialog bank_deposit_dialog_;
 	Dialog bank_withdraw_dialog_;
-	
+	Dialog end_game_dialog_;
+
 	String dialog_drug_name_;
 	
 	DealerDataAdapter dealer_data_;
@@ -937,6 +963,11 @@ public class DopeWarsGame extends Activity {
     			public void onStopTrackingTouch(SeekBar seekBar) {}
             	
             });
+    	}
+    	if (end_game_dialog_ == null) {
+    		end_game_dialog_ = new Dialog(this);
+    		end_game_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    		end_game_dialog_.setContentView(R.layout.end_of_game_layout);
     	}
 	}
 	
