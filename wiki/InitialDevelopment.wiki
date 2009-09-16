@@ -2,15 +2,10 @@
 
 = Functional things =
 
-  * end of game
   * customization
   * score reporting
   * resume in-progress game
   * user-created data (messages in the old version)
-
-== End of game ==
-
-On the last page just put an 'end game' button that will enact all the score reporting features and head back to the main menu.
 
 == Customization ==
 
