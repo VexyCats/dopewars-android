@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
@@ -548,13 +549,13 @@ public class DopeWarsGame extends Activity {
     			LinearLayout.LayoutParams.WRAP_CONTENT));
 		new_button.setBackgroundResource(background_resource);
     	ImageView button_image = new ImageView(this);
-    	button_image.setLayoutParams(new LinearLayout.LayoutParams(48, 48));
+    	button_image.setLayoutParams(new LinearLayout.LayoutParams(44, 44));
     	button_image.setImageResource(image_resource);
     	button_image.setScaleType(ScaleType.FIT_CENTER);
     	new_button.addView(button_image);
     	TextView main_text = new TextView(this);
     	main_text.setLayoutParams(new LinearLayout.LayoutParams(
-    			48,
+    			44,
     			LinearLayout.LayoutParams.WRAP_CONTENT));
     	main_text.setGravity(Gravity.CENTER);
     	main_text.setHorizontallyScrolling(true);
@@ -563,8 +564,9 @@ public class DopeWarsGame extends Activity {
     	new_button.addView(main_text);
     	TextView secondary_text = new TextView(this);
     	secondary_text.setLayoutParams(new LinearLayout.LayoutParams(
-    			LinearLayout.LayoutParams.WRAP_CONTENT,
+    			44,
     			LinearLayout.LayoutParams.WRAP_CONTENT));
+    	secondary_text.setGravity(Gravity.CENTER);
     	secondary_text.setHorizontallyScrolling(true);
     	secondary_text.setTextColor(Color.GREEN);
     	secondary_text.setText(secondary_string);
