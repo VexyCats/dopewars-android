@@ -8,40 +8,40 @@ For the first pass at least, the game settings information will be retrievable a
 
 == All available parameters for game information ==
 
-*drugs*
-  _drug name_
-    *base_price*
-    *price_variance*
-    *icon*
-    *low_probability*
-    *low_multiplier*
-    *high_probability*
-    *high_multiplier*
-*coats*
-  _coat name_
-    *additional_space*
-    *base_price*
-    *price_variance*
-    *space_factor*
-*guns*
-  _gun name_
-    *firepower*
-    *base_price*
-    *price_variance*
-    *space*
-*locations*
-  _location name_
-    *base_drugs*
-    *drug_variance*
-    *map_x*
-    *map_y*
-    *has_bank*
-    *has_loan_shark*
-*loan_interest_rate*
-*bank_interest_rate*
-*coat_likelihood*
-*gun_likelihood*
-*cops_likelihood*
+  * *drugs*
+    * _drug name_
+      * *base_price*
+      * *price_variance*
+      * *icon*
+      * *low_probability*
+      * *low_multiplier*
+      * *high_probability*
+      * *high_multiplier*
+  * *coats*
+    * _coat name_
+      * *additional_space*
+      * *base_price*
+      * *price_variance*
+      * *space_factor*
+  * *guns*
+    * _gun name_
+      * *firepower*
+      * *base_price*
+      * *price_variance*
+      * *space*
+  * *locations*
+    * _location name_
+      * *base_drugs*
+      * *drug_variance*
+      * *map_x*
+      * *map_y*
+      * *has_bank*
+      * *has_loan_shark*
+  * *loan_interest_rate*
+  * *bank_interest_rate*
+  * *coat_likelihood*
+  * *gun_likelihood*
+  * *cops_likelihood*
 
 = Game ID Information =
 
