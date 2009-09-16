@@ -1,0 +1,48 @@
+#summary The design of Game Settings Customization for Dopewars 2 for Android.
+
+In Dopewars 2, there should be support for designing your own game settings. These should be hostable at a URL, from which they can be imported and used by the Android application. High score lists can be supported for any instance of game settings, but the high scores (and other statistics as warranted) should be kept separate for each game setting. This will get a little complicated and is described below.
+
+= Game Settings Information =
+
+For the first pass at least, the game settings information will be retrievable as a big hairy complicated string with weird delimiters. This string should be the contents of a text file that is available at some URL. See *TODO:insert URL here* for an example.
+
+== All available parameters for game information ==
+
+*drugs*
+  _drug name_
+    *base_price*
+    *price_variance*
+    *icon*
+    *low_probability*
+    *low_multiplier*
+    *high_probability*
+    *high_multiplier*
+*coats*
+  _coat name_
+    *additional_space*
+    *base_price*
+    *price_variance*
+    *space_factor*
+*guns*
+  _gun name_
+    *firepower*
+    *base_price*
+    *price_variance*
+    *space*
+*locations*
+  _location name_
+    *base_drugs*
+    *drug_variance*
+    *map_x*
+    *map_y*
+    *has_bank*
+    *has_loan_shark*
+*loan_interest_rate*
+*bank_interest_rate*
+*coat_likelihood*
+*gun_likelihood*
+*cops_likelihood*
+
+= Game ID Information =
+
+*TODO*
