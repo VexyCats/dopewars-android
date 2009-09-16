@@ -6,6 +6,7 @@ import java.util.Vector;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -305,6 +306,12 @@ public class DopeWarsGame extends Activity {
         setupLocation();
         refreshDisplay();
     }
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		refreshDisplay();
+		super.onConfigurationChanged(newConfig);
+	}
 	
 	@Override
     protected Dialog onCreateDialog(int id) {
