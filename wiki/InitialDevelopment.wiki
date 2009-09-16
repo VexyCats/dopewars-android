@@ -31,7 +31,6 @@ I don't want to lose this. In fact it would be nice to expand it. One of the key
   * make the messages more pop-up-video instead of the stack at the bottom
   * scrollable container for buttons
   * customizable ui, like text/image sizes (thinking about other phones)
-  * button sizing, they're just a little too big
 
 == Scrollable container for buttons ==
 
