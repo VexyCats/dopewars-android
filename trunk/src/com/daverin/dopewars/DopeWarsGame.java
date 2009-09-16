@@ -575,6 +575,7 @@ public class DopeWarsGame extends Activity {
     		current_row_.setLayoutParams(new LinearLayout.LayoutParams(
         			LinearLayout.LayoutParams.FILL_PARENT,
         			LinearLayout.LayoutParams.WRAP_CONTENT));
+    		current_row_.setGravity(Gravity.CENTER_HORIZONTAL);
     		total_width_added_ = 0;
 		}
     	total_width_added_ += button.getMeasuredWidth();
