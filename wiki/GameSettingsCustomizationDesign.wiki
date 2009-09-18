@@ -8,6 +8,7 @@ For the first pass at least, the game settings information will be retrievable a
 
 == All available parameters for game information ==
 
+  * *game_id*
   * *drugs*
     * _drug name_
       * *base_price*
@@ -42,6 +43,7 @@ For the first pass at least, the game settings information will be retrievable a
   * *coat_likelihood*
   * *gun_likelihood*
   * *cops_likelihood*
+  * *starting_game_info*
 
 = Game ID Information =
 
