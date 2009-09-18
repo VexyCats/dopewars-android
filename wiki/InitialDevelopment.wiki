@@ -13,6 +13,12 @@
   * dealer of the day and other superlatives
   * broadening of "score"
 
+= More end-of-game statistics =
+
+  * total units moved
+  * total cops killed
+  * date loan paid off
+
 = Resume in-progress game =
 
   * need to save the game type with current game info (need this for score reporting anyway)
