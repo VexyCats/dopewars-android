@@ -9,7 +9,7 @@
 
 == Customization ==
 
-The game settings are easy enough to deal with, I have a dumb serialization format for storage in the database anyways, this could be used or a translation of this into xml would be equally effective. The tricky bit is to use the customization to restrict score reporting. The insecure way of course is to just use a game id. This is probably fine and if there's trouble I'll try to deal with it then.
+Mostly done, just need to load new settings from a url.
 
 == Score reporting ==
 
