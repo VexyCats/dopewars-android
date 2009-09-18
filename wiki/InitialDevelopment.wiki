@@ -1,42 +1,62 @@
 #summary To do list for initial development.
 
-= Functional things =
 
-  * customization
-  * score reporting
-  * resume in-progress game
-  * user-created data (messages in the old version)
+= Customization =
 
-== Customization ==
+  * load new settings from a url and save them in the database
+  * list of "official" urls to get versions from
 
-Mostly done, just need to load new settings from a url.
+= Score reporting =
 
-== Score reporting ==
+  * url to check if a score is a high score
+  * url to submit a high score with comment and all that jazz, similar to existing setup
+  * dealer of the day and other superlatives
+  * broadening of "score"
 
-The score reporting server to start could just do mostly what the existing server does, just maintain a global score list by game type. Ultimately the goal is to include things like a "dealer of the day" and other superlatives, in addition to more of the custom messages that exist now.
+= Resume in-progress game =
 
-== Resume in-progress game ==
+  * need to save the game type with current game info (need this for score reporting anyway)
+  * then just check game type against the available types on the main menu and make a tap on that resume (hold to erase), pretty simple
 
-This shouldn't be that hard, but will probably require an additional parameter with the game info about what style of game it is, and then just modify the title on the main screen to be Resume if that's available with like (hold for a new game) appended to the end.
+= User-created data =
 
-== User-created data ==
+  * song entry
+  * saying entry
+  * maybe these could happen at random points during the game instead of at the end, and be buttons so you can skip 'em if you don't want them
+  * responses to user messages? this would require some server work, like a token and stuff, but would be uber-cool
 
-I don't want to lose this. In fact it would be nice to expand it. One of the key old-school things was the songs, so it would be nice to expand that to user entry as well. And maybe the sayings could be a little more structured so they sound better in the game. What might be nice is to have responses somehow, maybe that's a future feature though. So for now I think I'll re-implement the random chance thing at the end of the game, ooo it can just be another button on the last screen if available, even.
+= Graphics =
 
-= Visual things =
+  * make some less preliminary versions?
+  * backgrounds?
+  * background flipping
 
-  * graphics
-  * split the messages into fight & drug messages
-  * make the messages disappear when they're tapped
-  * make the messages more pop-up-video instead of the stack at the bottom
-  * scrollable container for buttons
-  * customizable ui, like text/image sizes (thinking about other phones)
+= Fight vs. Drug messages =
 
-== Scrollable container for buttons ==
+  * split into two classes so the drug messages don't show up during a fight
 
-In widescreen mode, or on other phones, the buttons might not all fit, so the container should be scrollable somehow to accommodate that.
+= Death =
 
-= Code =
+  * little details, forgot about this, shouldn't be too hard just during a fight only show end game and do end game as usual
+
+= Make messages disapear when tapped =
+
+  * pretty easy, low priority until they popup
+
+= Popup video messages =
+
+  * message will need x/y, what about size, maybe low priority this one too?
+
+= Scrollable container for buttons =
+
+  * not so important for g1 yet, but could be with more drugs.
+  * complicated ui things, scroll containers look tricky.
+
+= Customizable UI (thinking about other phones =
+
+  * let game info resize text and buttons so other phone ui's can be tweaked as necessary
+
+= Code cleanup =
 
   * subfunctionize the makebutton code more
   * comments a-plenty
