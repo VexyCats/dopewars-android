@@ -92,13 +92,11 @@ public class DopeWarsGame extends Activity {
 			dealer_data_.open();
 	        CurrentGameInformation game_info = new CurrentGameInformation(
 	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-	        GameInformation game_information = new GameInformation(
-	        		dealer_data_.getGameStrings());
 	        int total_dealer_firepower = 0;
 	        Iterator<String> gun_names = game_info.dealer_guns_.keySet().iterator();
 	        while (gun_names.hasNext()) {
 	        	String next_gun_name = gun_names.next();
-	        	total_dealer_firepower += game_information.guns_.get(next_gun_name).get("firepower") * game_info.dealer_guns_.get(next_gun_name);
+	        	total_dealer_firepower += game_information_.guns_.get(next_gun_name).get("firepower") * game_info.dealer_guns_.get(next_gun_name);
 	        }
 	        if (total_dealer_firepower > game_info.cops_health_) {
 	        	game_info.cops_health_ = 0;
@@ -134,13 +132,11 @@ public class DopeWarsGame extends Activity {
 			dealer_data_.open();
 	        CurrentGameInformation game_info = new CurrentGameInformation(
 	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-	        GameInformation game_information = new GameInformation(
-	        		dealer_data_.getGameStrings());
 	        String coat_name = game_info.coat_inventory_.keySet().iterator().next();
 	        int coat_price = game_info.coat_inventory_.get(coat_name).intValue();
 	        game_info.cash_ -= coat_price;
-	        game_info.max_space_ += game_information.coats_.get(coat_name).get("additional_space");
-	        game_info.space_ += game_information.coats_.get(coat_name).get("additional_space");
+	        game_info.max_space_ += game_information_.coats_.get(coat_name).get("additional_space");
+	        game_info.space_ += game_information_.coats_.get(coat_name).get("additional_space");
 	        game_info.coat_inventory_.clear();
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());
 	        dealer_data_.close();
@@ -153,12 +149,10 @@ public class DopeWarsGame extends Activity {
 			dealer_data_.open();
 	        CurrentGameInformation game_info = new CurrentGameInformation(
 	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-	        GameInformation game_information = new GameInformation(
-	        		dealer_data_.getGameStrings());
 	        String gun_name = game_info.gun_inventory_.keySet().iterator().next();
 	        int gun_price = game_info.gun_inventory_.get(gun_name).intValue();
 	        game_info.cash_ -= gun_price;
-	        game_info.space_ -= game_information.guns_.get(gun_name).get("space");
+	        game_info.space_ -= game_information_.guns_.get(gun_name).get("space");
 	        if (game_info.dealer_guns_.get(gun_name) != null) {
 	        	game_info.dealer_guns_.put(gun_name, game_info.dealer_guns_.get(gun_name) + 1);
 	        } else {
@@ -276,12 +270,10 @@ public class DopeWarsGame extends Activity {
 	        dealer_data_.open();
 	        CurrentGameInformation game_info = new CurrentGameInformation(
 	        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-	        GameInformation game_information = new GameInformation(
-	        		dealer_data_.getGameStrings());
 	        game_info.location_ = location_;
 	        game_info.days_left_ -= 1;
-	        game_info.loan_ += (int)((double)game_info.loan_ * game_information.loan_interest_rate_);
-	        game_info.bank_ += (int)((double)game_info.bank_ * game_information.bank_interest_rate_);
+	        game_info.loan_ += (int)((double)game_info.loan_ * game_information_.loan_interest_rate_);
+	        game_info.bank_ += (int)((double)game_info.bank_ * game_information_.bank_interest_rate_);
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());
 	        dealer_data_.close();
 			setupLocation();
@@ -297,7 +289,8 @@ public class DopeWarsGame extends Activity {
         
         dealer_data_ = new DealerDataAdapter(this);
         dealer_data_.open();
-        String game_info = dealer_data_.getGameStrings();
+        String game = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_ID);
+        String game_info = dealer_data_.getGameString(Integer.parseInt(game));
         dealer_data_.close();
         game_information_ = new GameInformation(game_info);
         
@@ -605,8 +598,6 @@ public class DopeWarsGame extends Activity {
         dealer_data_.open();
         CurrentGameInformation game_info = new CurrentGameInformation(
         		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-        GameInformation game_information = new GameInformation(
-        		dealer_data_.getGameStrings());
         
         // First check if there are cops. If there are cops don't show anything other than the
         // fight related buttons and info.
@@ -665,7 +656,8 @@ public class DopeWarsGame extends Activity {
 	        }
 			
 			// Add loan shark button
-	        if (game_info.location_ == game_information.loan_location_) {
+	    	String current_location = (String)game_information_.locations_.keySet().toArray()[game_info.location_];
+	    	if (game_information_.locations_.get(current_location).get("has_loan_shark") != null) {
 				LinearLayout loan_shark_button = makeButton(R.drawable.btn_translucent_gray,
 		    			R.drawable.loan_shark, "Shark", Integer.toString(game_info.loan_));
 			    loan_shark_button.setOnClickListener(new BasicDialogListener(DIALOG_LOAN_SHARK));
@@ -673,7 +665,7 @@ public class DopeWarsGame extends Activity {
 			}
 			
 			// Add bank button
-	        if (game_info.location_ == game_information.bank_location_) {
+	    	if (game_information_.locations_.get(current_location).get("has_bank") != null) {
 				LinearLayout bank_button = makeButton(R.drawable.btn_translucent_gray,
 		    			R.drawable.bank, "Bank", Integer.toString(game_info.bank_));
 				bank_button.setOnClickListener(new BasicDialogListener(DIALOG_BANK_DEPOSIT));

@@ -24,8 +24,8 @@
     android:layout_weight="1.0"
     >
 <Button
-    android:id="@+id/classic_mode"
-    android:text="Classic Mode"
+    android:id="@+id/game_mode_1"
+    android:text="mode 1"
     android:textColor="#fff"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -33,7 +33,8 @@
     android:background="@drawable/btn_translucent_blue"
     />
 <Button
-    android:text="Hustler Mode\n(unlimited loans)"
+    android:id="@+id/game_mode_2"
+    android:text="mode 2"
     android:textColor="#fff"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -48,7 +49,8 @@
     android:layout_weight="1.0"
     >
 <Button
-    android:text="Extended Mode\n(3 months)"
+    android:id="@+id/game_mode_3"
+    android:text="mode 3"
     android:textColor="#fff"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -56,7 +58,8 @@
     android:background="@drawable/btn_translucent_blue"
     />
 <Button
-    android:text="Extended Hustler Mode\n(unlimited loans)\n(3 months)"
+    android:id="@+id/game_mode_4"
+    android:text="mode 4"
     android:textColor="#fff"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
