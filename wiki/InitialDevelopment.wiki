@@ -19,11 +19,6 @@
   * total cops killed
   * date loan paid off
 
-= Resume in-progress game =
-
-  * need to save the game type with current game info (need this for score reporting anyway)
-  * then just check game type against the available types on the main menu and make a tap on that resume (hold to erase), pretty simple
-
 = User-created data =
 
   * song entry
@@ -36,6 +31,7 @@
   * make some less preliminary versions?
   * backgrounds?
   * background flipping
+  * consider forcing vertical mode?
 
 = Fight vs. Drug messages =
 
