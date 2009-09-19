@@ -291,13 +291,17 @@ public class DopeWarsGame extends Activity {
         dealer_data_.open();
         String game = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_ID);
         String game_info = dealer_data_.getGameString(Integer.parseInt(game));
+        String current_game = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
         dealer_data_.close();
         game_information_ = new GameInformation(game_info);
+        CurrentGameInformation current_game_info = new CurrentGameInformation(current_game);
         
         // Set up the main content of the view.
         setContentView(R.layout.main_game_screen);
         
-        setupLocation();
+        if (current_game_info.do_initial_setup_ == 1) {
+        	setupLocation();
+        }
         refreshDisplay();
     }
 	

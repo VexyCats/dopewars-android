@@ -21,6 +21,35 @@ public class DopeWars extends Activity {
 	// dialog to edit the current dealer.
 	public static final int DIALOG_EDIT_DEALER = 1001;
 	
+	
+	public class ResumeGameListener implements View.OnClickListener {
+		public void onClick(View v) {
+			dealer_data_.open();
+			String game_info = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
+			CurrentGameInformation current_game = new CurrentGameInformation(game_info);
+			current_game.do_initial_setup_ = 0;
+			dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
+					current_game.serializeCurrentGameInformation());
+			dealer_data_.close();
+			Global.loadIcons();
+			Intent i = new Intent(v.getContext(), DopeWarsGame.class);
+       		startActivityForResult(i, 0);
+		}
+	}
+	
+	public class ClearInProgressGameListener implements View.OnLongClickListener {
+
+		@Override
+		public boolean onLongClick(View v) {
+			dealer_data_.open();
+			dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_ID, Integer.toString(-1));
+			dealer_data_.close();
+			updateUserInterface();
+			return true;
+		}
+		
+	}
+	
 	// This listener is attached to the game start buttons. For now it's a
 	// hard-coded setup, eventually it should init from game settings from
 	// xml files and stuff.
@@ -32,15 +61,6 @@ public class DopeWars extends Activity {
 		public void onClick(View v) {
 	        // A check that the dealer name and avatar id is set
 			dealer_data_.open();
-	        String dealer_name = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_NAME);
-	        if (dealer_name.equals("")) {
-	        	dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_NAME, "Guest");
-	        }
-	        String avatar_id = dealer_data_.getDealerString(
-	        		DealerDataAdapter.KEY_DEALER_AVATAR_NAME);
-	        if (avatar_id.equals("")) {
-	        	dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_AVATAR_NAME, "0");
-	        }
 	        
 	        // Clear the inventory, start with a standard amount of cash
 	        // and debt. This stuff will eventually be determined by game settings.
@@ -48,6 +68,7 @@ public class DopeWars extends Activity {
 	        String game_info_string = game_information.serialized_starting_game_info_;
 	        game_info_string = game_info_string.replaceAll("##", "&&");
 	        CurrentGameInformation game_info = new CurrentGameInformation(game_info_string);
+	        game_info.do_initial_setup_ = 1;
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
 	        		game_info.serializeCurrentGameInformation());
 	        
@@ -136,23 +157,10 @@ public class DopeWars extends Activity {
         if (avatar_name.equals("")) {
         	dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_AVATAR_NAME, "0");
         }
-        String game_mode_1_name = new GameInformation(dealer_data_.getGameString(0)).game_id_;
-        String game_mode_2_name = new GameInformation(dealer_data_.getGameString(1)).game_id_;
-        String game_mode_3_name = new GameInformation(dealer_data_.getGameString(2)).game_id_;
-        String game_mode_4_name = new GameInformation(dealer_data_.getGameString(3)).game_id_;
         dealer_data_.close();
         
         // Set up the main content of the view.
         setContentView(R.layout.main_menu);
-        ((LinearLayout)findViewById(R.id.edit_dealer)).setOnClickListener(new EditListener());
-        ((Button)findViewById(R.id.game_mode_1)).setText(game_mode_1_name);
-        ((Button)findViewById(R.id.game_mode_1)).setOnClickListener(new GameStartListener(0));
-        ((Button)findViewById(R.id.game_mode_2)).setText(game_mode_2_name);
-        ((Button)findViewById(R.id.game_mode_2)).setOnClickListener(new GameStartListener(1));
-        ((Button)findViewById(R.id.game_mode_3)).setText(game_mode_3_name);
-        ((Button)findViewById(R.id.game_mode_3)).setOnClickListener(new GameStartListener(2));
-        ((Button)findViewById(R.id.game_mode_4)).setText(game_mode_4_name);
-        ((Button)findViewById(R.id.game_mode_4)).setOnClickListener(new GameStartListener(3));
 		updateUserInterface();
     }
 	
@@ -205,6 +213,14 @@ public class DopeWars extends Activity {
 		dealer_data_.open();
         String name = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_NAME);
         String avatar = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_AVATAR_NAME);
+        
+        String game_mode_1_name = new GameInformation(dealer_data_.getGameString(0)).game_id_;
+        String game_mode_2_name = new GameInformation(dealer_data_.getGameString(1)).game_id_;
+        String game_mode_3_name = new GameInformation(dealer_data_.getGameString(2)).game_id_;
+        String game_mode_4_name = new GameInformation(dealer_data_.getGameString(3)).game_id_;
+        
+        int in_progress_game_id = Integer.parseInt(
+        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_ID));
         dealer_data_.close();
 	    if (name.length() > 0 || avatar.length() > 0) {
 	    	((TextView)findViewById(R.id.dealer_name)).setText(name);
@@ -216,6 +232,40 @@ public class DopeWars extends Activity {
 				((ImageView)findViewById(R.id.avatar_image)).setImageResource(R.drawable.avatar1);
 			}
 	    }
+	    
+	    ((LinearLayout)findViewById(R.id.edit_dealer)).setOnClickListener(new EditListener());
+        if (in_progress_game_id == 0) {
+            ((Button)findViewById(R.id.game_mode_1)).setText(game_mode_1_name + "\ntap to continue\nhold to reset");
+            ((Button)findViewById(R.id.game_mode_1)).setOnClickListener(new ResumeGameListener());
+            ((Button)findViewById(R.id.game_mode_1)).setOnLongClickListener(new ClearInProgressGameListener());
+        } else {
+        	((Button)findViewById(R.id.game_mode_1)).setText(game_mode_1_name);
+            ((Button)findViewById(R.id.game_mode_1)).setOnClickListener(new GameStartListener(0));
+        }
+        if (in_progress_game_id == 1) {
+            ((Button)findViewById(R.id.game_mode_2)).setText(game_mode_2_name + "\ntap to continue\nhold to reset");
+            ((Button)findViewById(R.id.game_mode_2)).setOnClickListener(new ResumeGameListener());
+            ((Button)findViewById(R.id.game_mode_2)).setOnLongClickListener(new ClearInProgressGameListener());
+        } else {
+        	((Button)findViewById(R.id.game_mode_2)).setText(game_mode_2_name);
+            ((Button)findViewById(R.id.game_mode_2)).setOnClickListener(new GameStartListener(1));
+        }
+        if (in_progress_game_id == 2) {
+            ((Button)findViewById(R.id.game_mode_3)).setText(game_mode_3_name + "\ntap to continue\nhold to reset");
+            ((Button)findViewById(R.id.game_mode_3)).setOnClickListener(new ResumeGameListener());
+            ((Button)findViewById(R.id.game_mode_3)).setOnLongClickListener(new ClearInProgressGameListener());
+        } else {
+        	((Button)findViewById(R.id.game_mode_3)).setText(game_mode_3_name);
+            ((Button)findViewById(R.id.game_mode_3)).setOnClickListener(new GameStartListener(2));
+        }
+        if (in_progress_game_id == 3) {
+            ((Button)findViewById(R.id.game_mode_4)).setText(game_mode_4_name + "\ntap to continue\nhold to reset");
+            ((Button)findViewById(R.id.game_mode_4)).setOnClickListener(new ResumeGameListener());
+            ((Button)findViewById(R.id.game_mode_4)).setOnLongClickListener(new ClearInProgressGameListener());
+        } else {
+        	((Button)findViewById(R.id.game_mode_4)).setText(game_mode_4_name);
+            ((Button)findViewById(R.id.game_mode_4)).setOnClickListener(new GameStartListener(3));
+        }
 	}
 	
 	Dialog edit_dealer_dialog_;
