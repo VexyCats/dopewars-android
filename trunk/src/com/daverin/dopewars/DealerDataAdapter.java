@@ -107,7 +107,7 @@ public class DealerDataAdapter {
 		initial_dealer_info.put(KEY_DEALER_NAME, "");
 		initial_dealer_info.put(KEY_DEALER_AVATAR_NAME, "");
 		initial_dealer_info.put(KEY_DEALER_GAME_INFO, "");
-		initial_dealer_info.put(KEY_DEALER_GAME_ID, "0");
+		initial_dealer_info.put(KEY_DEALER_GAME_ID, "-1");
 		db.insert(DEALER_INFO_TABLE, null, initial_dealer_info);
 	}
 	

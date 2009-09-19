@@ -47,6 +47,8 @@ public class CurrentGameInformation {
 				gun_inventory_ = Global.deserializeAttributes(group[1]);
 			} else if (group[0].equals("messages")) {
 				messages_ = Global.deserializeAttributes(group[1]);
+			} else if (group[0].equals("do_initial_setup")) {
+				do_initial_setup_ = Integer.parseInt(group[1]);
 			} else {
 				Log.d("dopewars", "Unknown game info group");
 			}
@@ -69,7 +71,8 @@ public class CurrentGameInformation {
 			"location_inventory--" + Global.serializeAttributes(location_inventory_) + "&&" +
 			"coat_inventory--" + Global.serializeAttributes(coat_inventory_) + "&&" +
 			"gun_inventory--" + Global.serializeAttributes(gun_inventory_) + "&&" +
-			"messages--" + Global.serializeAttributes(messages_);
+			"messages--" + Global.serializeAttributes(messages_) + "&&" +
+			"do_initial_setup--" + Integer.toString(do_initial_setup_);
 		return serialized_game_info;
 	}
 	
@@ -88,4 +91,5 @@ public class CurrentGameInformation {
 	HashMap<String, Float> coat_inventory_;
 	HashMap<String, Float> gun_inventory_;
 	HashMap<String, Float> messages_;
+	public int do_initial_setup_;
 }
