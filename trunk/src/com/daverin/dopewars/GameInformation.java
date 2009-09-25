@@ -172,7 +172,7 @@ public class GameInformation {
 		         "max_space--100##" +
 		         "days_left--10##" +
 		         "bank--0##" +
-		         "dealer_health--100##";
+		         "dealer_health--100";
 	}
 	
 	public String game_id_;

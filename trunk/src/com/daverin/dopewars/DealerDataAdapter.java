@@ -24,7 +24,7 @@ public class DealerDataAdapter {
     private static final String DEALER_INFO_TABLE = "dealer_info";
     private static final String GAME_STRINGS_TABLE = "game_strings";
     
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     
     private static final String CREATE_DEALER_INFO_TABLE =
     	"create table " + DEALER_INFO_TABLE + " (" +
@@ -37,7 +37,7 @@ public class DealerDataAdapter {
     private static final String CREATE_GAME_STRINGS_TABLE =
     	"create table " + GAME_STRINGS_TABLE + " (" +
     	KEY_GAME_STRINGS_ID + " integer primary key, " +
-    	KEY_GAME_STRINGS_VALUES + " text not null);";
+    	KEY_GAME_STRINGS_VALUES + " text);";
     
     private final Context context;
     
@@ -200,11 +200,8 @@ public class DealerDataAdapter {
 				KEY_GAME_STRINGS_ID + " == " + Integer.toString(game),
 				null, null, null, null, null);
 		if (cursor != null) {
-			int i = cursor.getCount();
 			if (cursor.getCount() > 0) {
 				cursor.moveToFirst();
-				int j = cursor.getCount();
-				int k = cursor.getColumnCount();
 				return cursor.getString(1);
 			}
 		}
@@ -212,21 +209,8 @@ public class DealerDataAdapter {
 	}
 	public void setGameString(int game, String game_strings) {
 		initGameInfo();
-		// I don't know databases, get all the values and then put them back with the
-		// appropriate one replaced.
-		String key = "";
-		Cursor cursor = db.query(true, GAME_STRINGS_TABLE,
-				new String[] {KEY_GAME_STRINGS_ID, KEY_GAME_STRINGS_VALUES},
-				null, null, null, null, null, null);
-		if (cursor != null) {
-			if (cursor.getCount() > game) {
-				cursor.move(game);
-				key = cursor.getString(0);
-			}
-		}
 		ContentValues args = new ContentValues();
-		args.put(KEY_GAME_STRINGS_ID, key);
 		args.put(KEY_GAME_STRINGS_VALUES, game_strings);
-		db.update(GAME_STRINGS_TABLE, args, null, null);
+		db.update(GAME_STRINGS_TABLE, args, KEY_GAME_STRINGS_ID + " == " + Integer.toString(game), null);
 	}
 }
