@@ -1,5 +1,10 @@
 package com.daverin.dopewars;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -20,6 +25,7 @@ public class DopeWars extends Activity {
 	// The dialogs available from the main window, for now it's just the
 	// dialog to edit the current dealer.
 	public static final int DIALOG_EDIT_DEALER = 1001;
+	public static final int DIALOG_DOWNLOAD_GAME = 1002;
 	
 	
 	public class ResumeGameListener implements View.OnClickListener {
@@ -38,7 +44,6 @@ public class DopeWars extends Activity {
 	}
 	
 	public class ClearInProgressGameListener implements View.OnLongClickListener {
-
 		@Override
 		public boolean onLongClick(View v) {
 			dealer_data_.open();
@@ -47,7 +52,67 @@ public class DopeWars extends Activity {
 			updateUserInterface();
 			return true;
 		}
+	}
+	
+	public class LoadGameSettingsListener implements View.OnLongClickListener {
+		public LoadGameSettingsListener(int game) {
+			game_ = game;
+		}
 		
+		@Override
+		public boolean onLongClick(View v) {
+			dialog_game_ = game_;
+			showDialog(DIALOG_DOWNLOAD_GAME);
+			return true;
+		}
+		
+		int game_;
+	}
+	
+	public class DownloadGameListener implements View.OnClickListener {
+		public DownloadGameListener(int game, String game_type) {
+			game_ = game;
+			game_type_ = game_type;
+		}
+		
+		@Override
+		public void onClick(View v) {
+			try {
+				String new_game_settings_string;
+				if (game_type_.equals("classic mode")) {
+					new_game_settings_string = "http://dopewars-android-2.appspot.com/game-settings-g1";
+				} else if (game_type_.equals("extended mode")) {
+					new_game_settings_string = "http://dopewars-android-2.appspot.com/game-settings-g2";
+				} else {
+					new_game_settings_string = "";
+				}
+	    		HttpURLConnection conn =
+	    			(HttpURLConnection)(new URL(new_game_settings_string)).openConnection();
+	    		conn.setDoInput(true);
+	    		conn.setDoOutput(true);
+	    		conn.connect();
+	    		int response_code = conn.getResponseCode();
+	    		if (response_code != -1) {
+	    			if (conn.getInputStream() != null) {
+	    	          BufferedReader reader = new BufferedReader(new InputStreamReader(
+	    	        		conn.getInputStream()));
+	    	          String settings = reader.readLine();
+	    	          GameInformation g = new GameInformation(settings);
+	    	          dealer_data_.open();
+	    	          dealer_data_.setGameString(game_, settings);
+	    	          dealer_data_.close();
+	    	        }
+	    	    }
+	    	    conn.disconnect();
+	    	    updateUserInterface();
+    		} catch (IOException e) {
+    			String a = e.getMessage();
+    		}
+			dismissDialog(DIALOG_DOWNLOAD_GAME);
+		}
+		
+		int game_;
+		String game_type_;
 	}
 	
 	// This listener is attached to the game start buttons. For now it's a
@@ -179,6 +244,21 @@ public class DopeWars extends Activity {
         	}
         	
             return edit_dealer_dialog_;
+        } else if (id == DIALOG_DOWNLOAD_GAME) {
+        	if (download_game_dialog_ == null) {
+        		download_game_dialog_ = new Dialog(this);
+        		// Requesting no title has to happen before setting the content view.
+        		download_game_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        		download_game_dialog_.setContentView(R.layout.download_game_layout);
+        		classic_mode_button_ = new Button(this);
+        		classic_mode_button_.setText("Classic Mode");
+        		((LinearLayout)download_game_dialog_.findViewById(R.id.download_layout)).addView(classic_mode_button_);
+        		extended_mode_button_ = new Button(this);
+        		extended_mode_button_.setText("Extended Mode");
+        		((LinearLayout)download_game_dialog_.findViewById(R.id.download_layout)).addView(extended_mode_button_);
+        	}
+        	
+        	return download_game_dialog_;
         }
         return super.onCreateDialog(id);
     }
@@ -205,6 +285,13 @@ public class DopeWars extends Activity {
         		edit_dealer_dialog_.getWindow().getAttributes();
         	dialog_params.width = WindowManager.LayoutParams.FILL_PARENT;
         	edit_dealer_dialog_.getWindow().setAttributes(dialog_params);
+        } else if (id == DIALOG_DOWNLOAD_GAME) {
+    		classic_mode_button_.setOnClickListener(new DownloadGameListener(dialog_game_, "classic mode"));
+    		extended_mode_button_.setOnClickListener(new DownloadGameListener(dialog_game_, "extended mode"));
+    		WindowManager.LayoutParams dialog_params =
+        		download_game_dialog_.getWindow().getAttributes();
+        	dialog_params.width = WindowManager.LayoutParams.FILL_PARENT;
+        	download_game_dialog_.getWindow().setAttributes(dialog_params);
         }
     }
 	
@@ -241,6 +328,7 @@ public class DopeWars extends Activity {
         } else {
         	((Button)findViewById(R.id.game_mode_1)).setText(game_mode_1_name);
             ((Button)findViewById(R.id.game_mode_1)).setOnClickListener(new GameStartListener(0));
+            ((Button)findViewById(R.id.game_mode_1)).setOnLongClickListener(new LoadGameSettingsListener(0));
         }
         if (in_progress_game_id == 1) {
             ((Button)findViewById(R.id.game_mode_2)).setText(game_mode_2_name + "\ntap to continue\nhold to reset");
@@ -249,6 +337,7 @@ public class DopeWars extends Activity {
         } else {
         	((Button)findViewById(R.id.game_mode_2)).setText(game_mode_2_name);
             ((Button)findViewById(R.id.game_mode_2)).setOnClickListener(new GameStartListener(1));
+            ((Button)findViewById(R.id.game_mode_2)).setOnLongClickListener(new LoadGameSettingsListener(1));
         }
         if (in_progress_game_id == 2) {
             ((Button)findViewById(R.id.game_mode_3)).setText(game_mode_3_name + "\ntap to continue\nhold to reset");
@@ -257,6 +346,7 @@ public class DopeWars extends Activity {
         } else {
         	((Button)findViewById(R.id.game_mode_3)).setText(game_mode_3_name);
             ((Button)findViewById(R.id.game_mode_3)).setOnClickListener(new GameStartListener(2));
+            ((Button)findViewById(R.id.game_mode_3)).setOnLongClickListener(new LoadGameSettingsListener(2));
         }
         if (in_progress_game_id == 3) {
             ((Button)findViewById(R.id.game_mode_4)).setText(game_mode_4_name + "\ntap to continue\nhold to reset");
@@ -265,11 +355,16 @@ public class DopeWars extends Activity {
         } else {
         	((Button)findViewById(R.id.game_mode_4)).setText(game_mode_4_name);
             ((Button)findViewById(R.id.game_mode_4)).setOnClickListener(new GameStartListener(3));
+            ((Button)findViewById(R.id.game_mode_4)).setOnLongClickListener(new LoadGameSettingsListener(3));
         }
 	}
 	
 	Dialog edit_dealer_dialog_;
+	Dialog download_game_dialog_;
+	Button classic_mode_button_;
+	Button extended_mode_button_;
 	DealerDataAdapter dealer_data_;
+	int dialog_game_;
 }
 
 /*
