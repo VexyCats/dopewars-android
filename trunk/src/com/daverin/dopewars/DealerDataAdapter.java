@@ -104,8 +104,8 @@ public class DealerDataAdapter {
 		}
 		db.delete(DEALER_INFO_TABLE, null, null);
 		ContentValues initial_dealer_info = new ContentValues();
-		initial_dealer_info.put(KEY_DEALER_NAME, "");
-		initial_dealer_info.put(KEY_DEALER_AVATAR_NAME, "");
+		initial_dealer_info.put(KEY_DEALER_NAME, "Guest");
+		initial_dealer_info.put(KEY_DEALER_AVATAR_NAME, "0");
 		initial_dealer_info.put(KEY_DEALER_GAME_INFO, "");
 		initial_dealer_info.put(KEY_DEALER_GAME_ID, "-1");
 		db.insert(DEALER_INFO_TABLE, null, initial_dealer_info);

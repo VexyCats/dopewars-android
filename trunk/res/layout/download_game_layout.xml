@@ -5,4 +5,33 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+<Button
+    android:id="@+id/classic_mode_button"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="Classic Mode"
+    />
+<Button
+	android:id="@+id/extended_mode_button"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="Extended Mode"
+	/>
+<TextView
+    android:id="@+id/custom_text"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="Custom settings from URL:"
+    />
+<EditText
+    android:id="@+id/custom_url"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    />
+<Button
+    android:id="@+id/custom_mode_button"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="Custom URL"
+    />
 </LinearLayout>
