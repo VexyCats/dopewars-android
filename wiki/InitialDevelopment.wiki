@@ -48,11 +48,6 @@
 
   * message will need x/y, what about size, maybe low priority this one too?
 
-= Scrollable container for buttons =
-
-  * not so important for g1 yet, but could be with more drugs.
-  * complicated ui things, scroll containers look tricky.
-
 = Customizable UI (thinking about other phones =
 
   * let game info resize text and buttons so other phone ui's can be tweaked as necessary
