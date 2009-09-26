@@ -98,6 +98,36 @@ public class GameInformation {
 		           "icon:6|" +
 		           "low_probability:0.1|" +
 		           "low_multiplier:0.5__" +
+			     "Speed2==" +
+			       "base_price:110|" +
+			       "price_variance:30|" +
+			       "icon:6|" +
+			       "low_probability:0.1|" +
+			       "low_multiplier:0.5__" +
+			     "Speed3==" +
+			       "base_price:110|" +
+			       "price_variance:30|" +
+			       "icon:6|" +
+			       "low_probability:0.1|" +
+			       "low_multiplier:0.5__" +
+			     "Speed4==" +
+			       "base_price:110|" +
+			       "price_variance:30|" +
+			       "icon:6|" +
+			       "low_probability:0.1|" +
+			       "low_multiplier:0.5__" +
+			     "Speed5==" +
+			       "base_price:110|" +
+			       "price_variance:30|" +
+			       "icon:6|" +
+			       "low_probability:0.1|" +
+			       "low_multiplier:0.5__" +
+			     "Speed6==" +
+			       "base_price:110|" +
+			       "price_variance:30|" +
+			       "icon:6|" +
+			       "low_probability:0.1|" +
+			       "low_multiplier:0.5__" +
 		         "Hashish==" +
 		           "base_price:180|" +
 		           "price_variance:40|" +
@@ -128,7 +158,7 @@ public class GameInformation {
 		           "space:8__&&" +
 		       "locations--" +
 		         "Brooklyn==" +
-		           "base_drugs:6|" +
+		           "base_drugs:12|" +
 		           "drug_variance:1|" +
 		           "map_x:105|" +
 		           "map_y:220|" +
