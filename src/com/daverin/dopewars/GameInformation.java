@@ -158,7 +158,7 @@ public class GameInformation {
 		           "space:8__&&" +
 		       "locations--" +
 		         "Brooklyn==" +
-		           "base_drugs:12|" +
+		           "base_drugs:13|" +
 		           "drug_variance:1|" +
 		           "map_x:105|" +
 		           "map_y:220|" +
