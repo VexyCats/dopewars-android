@@ -30,7 +30,6 @@
   * make some less preliminary versions?
   * backgrounds?
   * background flipping
-  * consider forcing vertical mode?
 
 = Fight vs. Drug messages =
 
@@ -54,5 +53,5 @@
 
 = Code cleanup =
 
-  * subfunctionize the makebutton code more
-  * comments a-plenty
+  * main game activity needs commenting
+  * TODO's in the main menu activity
