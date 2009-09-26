@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/big_ol_scrollview"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:layout_weight="1"
+  >
+<RelativeLayout
   android:id="@+id/main_game_screen"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
@@ -9,7 +15,7 @@
 <LinearLayout
   android:id="@+id/outer_layout"
   android:orientation="vertical"
-  android:layout_width="wrap_content"
+  android:layout_width="fill_parent"
   android:layout_height="fill_parent"
   android:gravity="center_horizontal"
   >
@@ -24,3 +30,4 @@
   >
 </LinearLayout>
 </RelativeLayout>
+</ScrollView>

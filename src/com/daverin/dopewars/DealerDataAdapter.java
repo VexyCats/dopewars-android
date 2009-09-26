@@ -24,7 +24,7 @@ public class DealerDataAdapter {
     private static final String DEALER_INFO_TABLE = "dealer_info";
     private static final String GAME_STRINGS_TABLE = "game_strings";
     
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 2;
     
     private static final String CREATE_DEALER_INFO_TABLE =
     	"create table " + DEALER_INFO_TABLE + " (" +
