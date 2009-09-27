@@ -35,7 +35,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
@@ -57,9 +56,18 @@ public class DopeWarsGame extends Activity {
 	// TODO: use a strings object instead?
 	public static final String GUNS_FIREPOWER = "firepower";
 	public static final String GUNS_SPACE = "space";
+	public static final String GUNS_PRICE = "base_price";
+	public static final String GUNS_VARIANCE = "price_variance";
 	public static final String COATS_ADDITIONAL_SPACE = "additional_space";
 	public static final String LOCATION_X = "map_x";
 	public static final String LOCATION_Y = "may_y";
+	public static final String LOCATION_LOAN_SHARK = "has_loan_shark";
+	public static final String LOCATION_BANK = "has_bank";
+	public static final String LOCATION_DRUGS = "base_drugs";
+	public static final String LOCATION_VARIANCE = "drug_variance";
+	public static final String DRUGS_ICON = "icon";
+	public static final String COATS_PRICE = "base_price";
+	public static final String COATS_VARIANCE = "price_variance";
 	
 	public static final String INVENTORY_DRUGS = "drugs";
 	public static final String INVENTORY_GUNS = "guns";
@@ -824,58 +832,87 @@ public class DopeWarsGame extends Activity {
     				Integer.toString(game_info.dealer_health_));
 	    	run_button.setOnClickListener(new RunListener());
 	    	pushButton(run_button);
+
+	    // If there are no cops then add all the available drugs, coats, and guns as buttons
+	    // first, then add the bank and loan shark if available, and finally the ever-present
+	    // (unless the game is over) subway and inventory buttons.
         } else {
+        	// TODO: the order of these changes sometimes, it might be nicer if the order were
+        	//       more deterministic
 	        Iterator<String> drug_names = game_info.location_inventory_.keySet().iterator();
 	        while (drug_names.hasNext()) {
 	        	String drug_name = drug_names.next();
 	        	int drug_price = game_info.location_inventory_.get(drug_name).intValue();
-				int drug_picture = Global.drug_icons_.get(game_information_.drugs_.get(drug_name).get("icon").intValue());
+				int drug_picture = Global.drug_icons_.get(
+						game_information_.drugs_.get(drug_name).get(DRUGS_ICON).intValue());
 	        	LinearLayout next_drug = makeButton(R.drawable.btn_translucent_gray,
 	        			drug_picture, drug_name,
 	        			"$" + Integer.toString(drug_price));
-	        	// Can buy
-	        	if ((game_info.cash_ > drug_price) && (game_info.space_ > 0)) {
-	        		// Can also sell
-	        		if (game_info.dealer_inventory_.get(drug_name) != null) {
-	        		  next_drug.setBackgroundResource(R.drawable.btn_translucent_blue);
-	        		  next_drug.setOnLongClickListener(new SellDrugsLongClickListener(drug_name));
-	        		// Can only buy
-	        		} else {
-	        			next_drug.setBackgroundResource(R.drawable.btn_translucent_green);
-	        		}
-	        		next_drug.setOnClickListener(new DrugClickListener(drug_name, DIALOG_DRUG_BUY));
-	        	// Can only sell
-	        	} else if (game_info.dealer_inventory_.get(drug_name) != null) {
-	        	  next_drug.setBackgroundResource(R.drawable.btn_translucent_orange);
-	      		  next_drug.setOnClickListener(new DrugClickListener(drug_name, DIALOG_DRUG_SELL));
+	        	
+	        	// Check for the buyable/sellable status of the drug and set the colors and
+	        	// listeners appropriately.
+	        	// TODO: make the colors configurable?
+	        	boolean can_buy = ((game_info.cash_ > drug_price) && (game_info.space_ > 0));
+	        	boolean can_sell = (game_info.dealer_inventory_.get(drug_name) != null);
+	        	if (can_buy && can_sell) {
+	        		next_drug.setBackgroundResource(R.drawable.btn_translucent_blue);
+	        		next_drug.setOnClickListener(
+	        				new DrugClickListener(drug_name, DIALOG_DRUG_BUY));
+	        		next_drug.setOnLongClickListener(new SellDrugsLongClickListener(drug_name));
+	        	} else if (can_buy) {
+	        		next_drug.setBackgroundResource(R.drawable.btn_translucent_green);
+	        		next_drug.setOnClickListener(
+	        				new DrugClickListener(drug_name, DIALOG_DRUG_BUY));
+	        	} else if (can_sell) {
+	        		next_drug.setBackgroundResource(R.drawable.btn_translucent_green);
+	        		next_drug.setOnClickListener(
+	        				new DrugClickListener(drug_name, DIALOG_DRUG_SELL));
 	        	}
 	    		pushButton(next_drug);
 	        }
 			
-			// Add loan shark button
-	    	String current_location = (String)game_information_.locations_.keySet().toArray()[game_info.location_];
-	    	if (game_information_.locations_.get(current_location).get("has_loan_shark") != null) {
+			// If the current location has access to the loan shark, display the loan shark
+	        // button.
+	        // TODO: the location checking is broken, can't index the set array like this
+	        //       reliably
+	        // TODO: change the default color to yellow
+	        // TODO: make the color configurable?
+	        // TODO: make the name configurable
+	    	String current_location = 
+	    		(String)game_information_.locations_.keySet().toArray()[game_info.location_];
+	    	if (game_information_.locations_.get(current_location).get(
+	    			LOCATION_LOAN_SHARK) != null) {
 				LinearLayout loan_shark_button = makeButton(R.drawable.btn_translucent_gray,
 		    			R.drawable.loan_shark, "Shark", Integer.toString(game_info.loan_));
 			    loan_shark_button.setOnClickListener(new BasicDialogListener(DIALOG_LOAN_SHARK));
 	    		pushButton(loan_shark_button);
 			}
 			
-			// Add bank button
-	    	if (game_information_.locations_.get(current_location).get("has_bank") != null) {
+			// If the current location has access to the bank, display the bank button.
+	    	// TODO: the location checking is broken, can't index the set arrar like this
+	    	//       reliably
+	    	// TODO: change the default color to yellow
+	    	// TODO: make the color configurable?
+	    	// TODO: make the name configurable
+	    	if (game_information_.locations_.get(current_location).get(LOCATION_BANK) != null) {
 				LinearLayout bank_button = makeButton(R.drawable.btn_translucent_gray,
 		    			R.drawable.bank, "Bank", Integer.toString(game_info.bank_));
 				bank_button.setOnClickListener(new BasicDialogListener(DIALOG_BANK_DEPOSIT));
-				bank_button.setOnLongClickListener(new LongClickDialogListener(DIALOG_BANK_WITHDRAW));
+				bank_button.setOnLongClickListener(
+						new LongClickDialogListener(DIALOG_BANK_WITHDRAW));
 	    		pushButton(bank_button);
 			}
 	        
-	        // Add coat button
+	        // Add any coats that are available for purchase at the current location.
+	    	// TODO: support multiple coats being available at once.
+	    	// TODO: make the color configurable
 	        if (game_info.coat_inventory_.size() > 0) {
 	        	String coat_name = game_info.coat_inventory_.keySet().iterator().next();
 	        	int coat_price = game_info.coat_inventory_.get(coat_name).intValue();
 				LinearLayout coat_button = makeButton(R.drawable.btn_translucent_gray,
 		    			R.drawable.bank, coat_name, Integer.toString(coat_price));
+				
+				// Only indicate that it's buyable if the dealer can afford it.
 				if (coat_price <= game_info.cash_) {
 					coat_button.setOnClickListener(new BuyCoatListener(coat_name));
 					coat_button.setBackgroundResource(R.drawable.btn_translucent_green);
@@ -883,12 +920,16 @@ public class DopeWarsGame extends Activity {
 	    		pushButton(coat_button);
 			}
 	        
-	        // Add gun button
+	        // Add any guns that are available for purchase at the current location.
+	        // TODO: support multiple guns being available at once.
+	        // TODO: make the color configurable.
 	        if (game_info.gun_inventory_.size() > 0) {
 	        	String gun_name = game_info.gun_inventory_.keySet().iterator().next();
 	        	int gun_price = game_info.gun_inventory_.get(gun_name).intValue();
 				LinearLayout gun_button = makeButton(R.drawable.btn_translucent_gray,
 		    			R.drawable.bank, gun_name, Integer.toString(gun_price));
+				
+				// Only indicate that it's buyable if the dealer can afford it.
 				if (gun_price <= game_info.cash_) {
 					gun_button.setOnClickListener(new BuyGunListener(gun_name));
 					gun_button.setBackgroundResource(R.drawable.btn_translucent_green);
@@ -896,15 +937,21 @@ public class DopeWarsGame extends Activity {
 	    		pushButton(gun_button);
 			}
 	        
-			// Add subway button
+			// Unless the game is over the subway button is always included.
+	        // TODO: make the color configurable
+	        // TODO: make the name configurable
 			if (game_info.days_left_ > 0) {
 		    	LinearLayout subway_button = makeButton(R.drawable.btn_translucent_gray,
-		    			R.drawable.subway, "Subway", "[" + Integer.toString(game_info.days_left_) + "]");
+		    			R.drawable.subway, "Subway",
+		    			"[" + Integer.toString(game_info.days_left_) + "]");
 		    	subway_button.setOnClickListener(new BasicDialogListener(DIALOG_SUBWAY));
 	    		pushButton(subway_button);
 			}
 	        
-	        // Add inventory button
+	        // The inventory button is always available no matter what.
+			// TODO: factor out the human readability bit
+			// TODO: make the human readability bit configurable
+			// TODO: apply the human readability bit to other amounts?
 			float factor = (float)1.0;
 			String suffix = "";
 			if (game_info.cash_ > 1000000000) {
@@ -917,14 +964,19 @@ public class DopeWarsGame extends Activity {
 				factor = (float)1000.0;
 				suffix = " G's";
 			}
-			String human_readable_cash = "$" + (new Float(game_info.cash_ / factor)).intValue() + suffix;
+			String human_readable_cash =
+				"$" + (new Float(game_info.cash_ / factor)).intValue() + suffix;
+			
+			// TODO: make the color configurable
 	        LinearLayout inventory_button = makeButton(R.drawable.btn_translucent_gray,
 	        		R.drawable.backpack, "(" + Integer.toString(game_info.space_) + ")",
 	        		human_readable_cash);
 	        inventory_button.setOnClickListener(new BasicDialogListener(DIALOG_INVENTORY));
     		pushButton(inventory_button);
     		
-    		// Add end of game button
+    		// The end of game button is visible if there are no more moves left in the game.
+    		// TODO: make default color yellow
+    		// TODO: make color configurable
     		if (game_info.days_left_ < 1) {
     			LinearLayout end_of_game_button = makeButton(R.drawable.btn_translucent_green,
     					R.drawable.backpack, "End Game", " ");
@@ -932,11 +984,22 @@ public class DopeWarsGame extends Activity {
     			pushButton(end_of_game_button);
     		}
         }
+        
+        // TODO: a button to enter a new song for the server jukebox
+        // TODO: a button to enter a new bit of graffiti
+        // TODO: a button to enter a new message
+        
+        // Each time a button is added the current row is checked and if it's full it's added to
+        // the base layout, but if there are buttons added at the end that row hasn't been added
+        // to the base layout yet so make sure that happens here.
         if (total_width_added_ > 0) {
         	outer_layout_.addView(current_row_);
         }
         
-        // Now display any messages that need to be shown
+        // The message display should open those messages appropriate to the current mode (either
+        // fight or non-fight mode). Each message should be displayed at a random location on the
+        // screen.
+        // TODO: none of the above actually happens yet, lots of work to be done here.
         LinearLayout message_layout = (LinearLayout)findViewById(R.id.message_layout);
         message_layout.removeAllViews();
         Iterator<String> messages = game_info.messages_.keySet().iterator();
@@ -955,107 +1018,101 @@ public class DopeWarsGame extends Activity {
         dealer_data_.close();
 	}
 	
+	// When moving from one location to another (advancing one turn) this resets all the drugs
+	// that are available and processes all the random events that can happen on a turn-by-turn
+	// basis.
 	public void setupLocation() {
-		// Determine the number and type of drugs available at the current location.
 		dealer_data_.open();
         CurrentGameInformation game_info = new CurrentGameInformation(
         		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
         game_info.messages_.clear();
         
-		int num_avail_drugs = game_information_.drugs_.size();
-		boolean[] drug_present = new boolean[num_avail_drugs];
-    	for (int i = 0; i < num_avail_drugs; ++i) {
-    		drug_present[i] = false;
-    	}
-    	int num_drugs_left = num_avail_drugs;
-    	String current_location = (String)game_information_.locations_.keySet().toArray()[game_info.location_];
+        // First determine how many drugs are available at the current location.
+        // TODO: This is broken, the order doesn't work like this.
+        String current_location = 
+        	(String)game_information_.locations_.keySet().toArray()[game_info.location_];
     	int base_drugs_count = game_information_.locations_.get(current_location).
-    	    get("base_drugs").intValue();
+    	    get(LOCATION_DRUGS).intValue();
     	int drug_variance = game_information_.locations_.get(current_location).
-	        get("drug_variance").intValue();
+	        get(LOCATION_VARIANCE).intValue();
 		int num_drugs_present = base_drugs_count + Global.rand_gen_.nextInt(drug_variance + 1);
-		if (num_drugs_present > num_avail_drugs) {
-			num_drugs_present = num_avail_drugs;
-		}
 		if (num_drugs_present < 1) {
 			num_drugs_present = 1;
 		}
-    	while (num_drugs_left > num_avail_drugs - num_drugs_present) {
-    		int next_drug = Global.rand_gen_.nextInt(num_drugs_left);
-    		int drug_number = 0;
-    		int drugs_skipped = 0;
-    		while (drugs_skipped < next_drug) {
-    			if (!drug_present[drug_number]) {
-    				++drugs_skipped;
-    			}
-    			++drug_number;
-    		}
-    		while (drug_present[drug_number]) {
-    			++drug_number;
-    		}
-    		drug_present[drug_number] = true;
-    		--num_drugs_left;
+		
+        // Now determine which of the drugs are available by making a list including all the
+		// possible drugs and removing random elements until the limit is met.
+		int num_avail_drugs = game_information_.drugs_.size();
+		Vector<Integer> drugs_present = new Vector<Integer>();
+		for (int i = 0; i < num_avail_drugs; ++i) {
+			drugs_present.add(new Integer(i));
     	}
-    	
-    	game_info.location_inventory_.clear();
-    	for (int i = 0; i < num_avail_drugs; ++i) {
-    		if (drug_present[i]) {
-    			String drug_name = (String)(game_information_.drugs_.keySet().toArray()[i]);
-    			Vector<String> price_and_messages = Global.chooseDrugPrice(
-    					drug_name, game_information_.drugs_.get(drug_name));
-    			game_info.location_inventory_.put(drug_name, Float.parseFloat(price_and_messages.elementAt(0)));
-    			for (int j = 1; j < price_and_messages.size(); ++j) {
-    				game_info.messages_.put(price_and_messages.elementAt(j), (float)1.0);
-    			}
-    		}
+		while (drugs_present.size() > num_drugs_present) {
+			int drug_to_remove = Global.rand_gen_.nextInt(drugs_present.size());
+			drugs_present.removeElementAt(drug_to_remove);
     	}
-    	
+		
+		// Add the drugs to the location inventory.
+		game_info.location_inventory_.clear();
+		for (int i = 0; i < drugs_present.size(); ++i) {
+			// TODO: this probably works okay but is technically wrong, and since the problem
+			//       needs to be fixed many other places might as well fix it here too.
+			String drug_name = 
+				(String)(game_information_.drugs_.keySet().toArray()[drugs_present.elementAt(i)]);
+			
+			// This will set the price of the drug and also create messages that shown be shown
+			// relating to the drug.
+			Vector<String> price_and_messages = Global.chooseDrugPrice(
+					drug_name, game_information_.drugs_.get(drug_name));
+			game_info.location_inventory_.put(drug_name, Float.parseFloat(
+					price_and_messages.elementAt(0)));
+			for (int j = 1; j < price_and_messages.size(); ++j) {
+				game_info.messages_.put(price_and_messages.elementAt(j), (float)1.0);
+			}
+		}
+
+		// Determine if any coats are present and add them to the location inventory if they are.
+		// TODO: support multiple coats
+		// TODO: more price options
     	game_info.coat_inventory_.clear();
     	if (Global.rand_gen_.nextDouble() < game_information_.coat_likelihood_) {
     		int coat_number = Global.rand_gen_.nextInt(game_information_.coats_.size());
     		String coat_name = (String)game_information_.coats_.keySet().toArray()[coat_number];
-    		int coat_price = (int)(game_information_.coats_.get(coat_name).get("base_price") +
+    		int coat_price = (int)(game_information_.coats_.get(coat_name).get(COATS_PRICE) +
     				(Global.rand_gen_.nextDouble() - 0.5) *
-    				game_information_.coats_.get(coat_name).get("price_variance"));
+    				game_information_.coats_.get(coat_name).get(COATS_VARIANCE));
     		game_info.coat_inventory_.put(coat_name, (float)coat_price);
     	}
     	
+    	// Determine if any guns are present and add them to the location inventory if they are.
+    	// TODO: support multiple guns
+    	// TODO: more price options
     	game_info.gun_inventory_.clear();
     	if (Global.rand_gen_.nextDouble() < game_information_.gun_likelihood_) {
     		int gun_number = Global.rand_gen_.nextInt(game_information_.guns_.size());
     		String gun_name = (String)game_information_.guns_.keySet().toArray()[gun_number];
-    		int gun_price = (int)(game_information_.guns_.get(gun_name).get("base_price") +
+    		int gun_price = (int)(game_information_.guns_.get(gun_name).get(GUNS_PRICE) +
     				(Global.rand_gen_.nextDouble() - 0.5) *
-    				game_information_.guns_.get(gun_name).get("price_variance"));
+    				game_information_.guns_.get(gun_name).get(GUNS_VARIANCE));
     		game_info.gun_inventory_.put(gun_name, (float)gun_price);
     	}
     	
-    	// TODO: This is weak and needs more, but for now hardass has 10 health and each deputy has 1,
-    	// and Hardass has 1 firepower and each deputy has 1.
+    	// Determine if the cops are present and initialize their health and other attributes
+    	// if they are.
+    	// TODO: make health and firepower less deterministic
+    	// TODO: make health and firepower configurable
+    	// TODO: more options for cops that just Hardass
     	game_info.cops_health_ = 0;
     	if (Global.rand_gen_.nextDouble() < game_information_.cops_likelihood_) {
     		game_info.cops_health_ = 10 + Global.rand_gen_.nextInt(3);
     	}
     	
-        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, game_info.serializeCurrentGameInformation());
+    	// Save back all the information altered while setting up the new location.
+        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
+        		game_info.serializeCurrentGameInformation());
     	dealer_data_.close();
 	}
-	
-	Dialog subway_dialog_;
-	Dialog drug_buy_dialog_;
-	Dialog drug_sell_dialog_;
-	Dialog inventory_dialog_;
-	Dialog loan_shark_dialog_;
-	Dialog bank_deposit_dialog_;
-	Dialog bank_withdraw_dialog_;
-	Dialog end_game_dialog_;
 
-	String dialog_drug_name_;
-	
-	DealerDataAdapter dealer_data_;
-	
-	
-	
 	// A convenience function for creating a text view, since lots of text views get created
 	// when making buttons and inventory/statistics views.
 	// TODO: re-consider the design of these UI-helper functions.
@@ -1100,8 +1157,9 @@ public class DopeWarsGame extends Activity {
 		return l;
 	}
 
-	// This function is at the end because it's gross. There is lots of replicated stuff here for
-	// no good reason at all.
+	// Make sure all necessary dialogs exist, and set the base layout for all of them.
+	// This is done instead of checking each dialog for initialization separately.
+	// TODO: reconsider this function, maybe they should be handled more independently.
 	private void initDialogs() {
 		if (subway_dialog_ == null) {
 			subway_dialog_ = new Dialog(this);
@@ -1215,9 +1273,20 @@ public class DopeWarsGame extends Activity {
     	}
 	}
 	
+	Dialog subway_dialog_;
+	Dialog drug_buy_dialog_;
+	Dialog drug_sell_dialog_;
+	Dialog inventory_dialog_;
+	Dialog loan_shark_dialog_;
+	Dialog bank_deposit_dialog_;
+	Dialog bank_withdraw_dialog_;
+	Dialog end_game_dialog_;
+
+	String dialog_drug_name_;
+	
+	DealerDataAdapter dealer_data_;
 	GameInformation game_information_;
 	
-	// TEMP VARIABLES UGLY CODE WARNING (but damn they're convenient)
 	int viewWidth_;
     int viewHeight_;
 	LinearLayout outer_layout_;
