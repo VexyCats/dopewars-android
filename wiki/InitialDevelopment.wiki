@@ -1,5 +1,11 @@
 #summary To do list for initial development.
 
+= TODO's =
+  * DopeWars (10)
+  * DopeWarsGame (98)
+  * GameInformation (3)
+  * CurrentGameInformation (3)
+  * Global (5)
 
 = Customization =
 
@@ -12,17 +18,10 @@
   * dealer of the day and other superlatives
   * broadening of "score"
 
-= More end-of-game statistics =
-
-  * total units moved
-  * total cops killed
-  * date loan paid off
-
 = User-created data =
 
   * song entry
   * saying entry
-  * maybe these could happen at random points during the game instead of at the end, and be buttons so you can skip 'em if you don't want them
   * responses to user messages? this would require some server work, like a token and stuff, but would be uber-cool
 
 = Graphics =
@@ -31,27 +30,6 @@
   * backgrounds?
   * background flipping
 
-= Fight vs. Drug messages =
-
-  * split into two classes so the drug messages don't show up during a fight
-
 = Death =
 
   * little details, forgot about this, shouldn't be too hard just during a fight only show end game and do end game as usual
-
-= Make messages disapear when tapped =
-
-  * pretty easy, low priority until they popup
-
-= Popup video messages =
-
-  * message will need x/y, what about size, maybe low priority this one too?
-
-= Customizable UI (thinking about other phones =
-
-  * let game info resize text and buttons so other phone ui's can be tweaked as necessary
-
-= Code cleanup =
-
-  * main game activity needs commenting
-  * TODO's in the main menu activity
