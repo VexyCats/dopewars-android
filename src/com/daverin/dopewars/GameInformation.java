@@ -1,9 +1,21 @@
+/**
+ * This file, along with the CurrentGameInformation class, mostly facilitates the serialization of
+ * game settings for easy storage and retrieval from the database as a string. This has proved to
+ * be significantly easier and more efficient (unproven) than making many small database
+ * transactions in each function every time information about the game is needed.
+ * 
+ * TODO: static-ize all the string constants in here, or use a strings file or something
+ * TODO: better class name?
+ */
+
 package com.daverin.dopewars;
 
 import java.util.HashMap;
 import android.util.Log;
 
 public class GameInformation {
+	
+	// Initialize the game info with a serialized version.
 	public GameInformation(String serialized_game_info) {
 		drugs_ = new HashMap<String, HashMap<String, Float>>();
 		coats_ = new HashMap<String, HashMap<String, Float>>();
@@ -42,6 +54,9 @@ public class GameInformation {
 		}
 	}
 	
+	// Serializes all the information stored in this game information object in a very specialized
+	// and simple format.
+	// TODO: consider xml or something else standard
 	public String serializeGameInformation() {
 		String serialized_game_info = "";
 		serialized_game_info += "game_id--" + game_id_ + "&&" +
@@ -58,7 +73,8 @@ public class GameInformation {
 		return serialized_game_info;
 	}
 	
-
+    // An artificial default game string, useful if starting with no net access and for defaulting
+	// things to playable defaults.
 	public static String getDefaultGameString() {
 		return "game_id--default&&" +
 		       "drugs--" +
