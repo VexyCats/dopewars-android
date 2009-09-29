@@ -1,11 +1,9 @@
 #summary To do list for initial development.
 
 = TODO's =
-  * DopeWars (10)
+  * DopeWars (8)
   * DopeWarsGame (98)
   * GameInformation (3)
-  * CurrentGameInformation (3)
-  * Global (5)
 
 = Customization =
 
