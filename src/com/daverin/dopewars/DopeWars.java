@@ -62,15 +62,13 @@ public class DopeWars extends Activity {
 			// Set the special run-time-only flag to avoid doing initialization when starting the
 			// game.
 			dealer_data_.open();
-			CurrentGameInformation current_game = new CurrentGameInformation(
+			GameInformation game_info = new GameInformation("");
+			game_info.setCurrentGameInformation(
 					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-			current_game.do_initial_setup_ = 0;
+			game_info.do_initial_setup_ = 0;
 			dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-					current_game.serializeCurrentGameInformation());
+					game_info.getCurrentGameInformation());
 			dealer_data_.close();
-			
-			// TODO(jdaverin): Better place for this?
-			Global.loadIcons();
 			
 			// This activity represents the playable game.
 			Intent i = new Intent(v.getContext(), DopeWarsGame.class);
@@ -113,16 +111,13 @@ public class DopeWars extends Activity {
 	        		dealer_data_.getGameString(game_));
 	        String game_info_string = game_information.serialized_starting_game_info_;
 	        game_info_string = game_info_string.replaceAll("##", "&&");
-	        CurrentGameInformation game_info = new CurrentGameInformation(game_info_string);
-	        game_info.do_initial_setup_ = 1;
+	        game_information.setCurrentGameInformation(game_info_string);
+	        game_information.do_initial_setup_ = 1;
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		game_info.serializeCurrentGameInformation());
+	        		game_information.getCurrentGameInformation());
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_ID,
 	        		Integer.toString(game_));
 	        dealer_data_.close();
-
-			// TODO(jdaverin): Better place for this?
-	        Global.loadIcons();
 	        
 	        // This activity represents the playable game
     		Intent i = new Intent(v.getContext(), DopeWarsGame.class);
