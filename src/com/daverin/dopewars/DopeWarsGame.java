@@ -159,20 +159,40 @@ public class DopeWarsGame extends Activity {
 	        
 	        // If the cops are dead, the dealer has won, get some cash from the cops.
 	        // TODO: allow the cash amount to be parameterized by game settings
-	        // TODO: record cops deaths for game statistics
 	        // TODO: make the damage less deterministic
 	        // TODO: consider having the cops hit the dealer even if the dealer kills them all
 	        //       on that turn.
-	        // TODO: put the won cash into a message that gets displayed
+	        game_information_.fight_messages_.clear();
 	        if (total_dealer_firepower > game_information_.location_cops_) {
+	        	game_information_.dealer_deputies_killed_ +=
+	        		Math.max(0, game_information_.location_cops_ - 10);
+	        	game_information_.dealer_cops_killed_++;
 	        	game_information_.location_cops_ = 0;
+	        	int won_cash = rand_gen_.nextInt(5) + 1 * 1000;
+	        	game_information_.game_messages_.add("You found $" + Integer.toString(won_cash) +
+	        			" on the cops!");
 	        	game_information_.dealer_cash_ +=
 	        		rand_gen_.nextInt(5) + 1 * 1000;
 	        	
 	        // If the cops are still alive, have them hit the dealer.
 	        } else {
-	        	game_information_.dealer_health_ -=
-	        		6 + Math.max(0, (game_information_.location_cops_ - 10));
+	        	int dealer_damage = 6 + Math.max(0, (game_information_.location_cops_ - 10));
+	        	game_information_.dealer_health_ -= dealer_damage;
+	        	game_information_.fight_messages_.add("The cops hit you for " +
+	        			Integer.toString(dealer_damage) + " points of health");
+	        	game_information_.dealer_deputies_killed_ +=
+	        		Math.min(total_dealer_firepower, game_information_.location_cops_ - 10);
+	        	if (game_information_.location_cops_ > 10) {
+	        		game_information_.fight_messages_.add("You killed " +
+	        				Integer.toString(Math.min(total_dealer_firepower,
+	        						game_information_.location_cops_ - 10)) + " deputies!");
+	        	}
+	        	if (game_information_.location_cops_ - total_dealer_firepower < 10) {
+	        		game_information_.fight_messages_.add("You tagged Officer Hardass for " +
+	        				Integer.toString(total_dealer_firepower -
+	        						Math.max(0, game_information_.location_cops_ - 10)) + 
+	        						"points of damage!");
+	        	}
 	        	game_information_.location_cops_ -= total_dealer_firepower;
 	        }
 	        
@@ -193,19 +213,23 @@ public class DopeWarsGame extends Activity {
 	        
 	        // If the dealer gets away, he will drop some cash. If not, the cops will hit him.
 	        // TODO: Parameterize the run away success rate in game settings
-	        // TODO: Parameterize the cash lost amoutn in game settings
+	        // TODO: Parameterize the cash lost amount in game settings
 	        // TODO: Also possibly lose guns (parameterized loss rate)
-	        // TODO: Messages about lost cash and guns
-	        // TODO: Stats about money and guns lost running from cops, how many times the dealer
-	        //       ran, how many times unsuccessful
+			game_information_.dealer_run_attempts_++;
 	        if (rand_gen_.nextDouble() < 0.5) {
-	        	game_information_.dealer_cash_ =
-	        		Math.max(0, game_information_.dealer_cash_ -
-	        				rand_gen_.nextInt(5) + 1 * 1000);
+	        	int lost_cash = Math.min(game_information_.dealer_cash_,
+	        			rand_gen_.nextInt(5) + 1 * 1000);
+	        	game_information_.dealer_cash_ -= lost_cash;
+	        	game_information_.game_messages_.add("You got away but lost $" +
+	        			Integer.toString(lost_cash) + " while running");
 	        	game_information_.location_cops_ = 0;
+	        	game_information_.dealer_successful_runs_++;
 	        } else {
-	        	game_information_.dealer_health_ -=
-	        		6 + Math.max(0, (game_information_.location_cops_ - 10));
+	        	int dealer_damage = 6 + Math.max(0, (game_information_.location_cops_ - 10));
+	        	game_information_.dealer_health_ -= dealer_damage;
+	        	game_information_.fight_messages_.clear();
+	        	game_information_.fight_messages_.add("You couldn't get away, and got hit for " +
+	        			Integer.toString(dealer_damage) + " points of damage");
 	        }
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
 	        		game_information_.getCurrentGameInformation());
@@ -723,6 +747,14 @@ public class DopeWarsGame extends Activity {
         			"$" + Integer.toString(game_information_.dealer_cash_ + 
         					game_information_.dealer_bank_ - 
         					game_information_.dealer_loan_));
+
+			((TextView)(end_game_dialog_.findViewById(R.id.total_deputies_killed))).setText(
+        			Integer.toString(game_information_.dealer_deputies_killed_));
+			((TextView)(end_game_dialog_.findViewById(R.id.total_cops_killed))).setText(
+        			Integer.toString(game_information_.dealer_cops_killed_));
+			((TextView)(end_game_dialog_.findViewById(R.id.running_stats))).setText(
+        			Integer.toString(game_information_.dealer_successful_runs_) + " / " +
+        			Integer.toString(game_information_.dealer_run_attempts_));
 			
 			// A click on the dialog will make it disappear.
 	        ((LinearLayout)end_game_dialog_.findViewById(R.id.end_of_game_layout)).
@@ -1051,15 +1083,28 @@ public class DopeWarsGame extends Activity {
         // TODO: none of the above actually happens yet, lots of work to be done here.
         LinearLayout message_layout = (LinearLayout)findViewById(R.id.message_layout);
         message_layout.removeAllViews();
-        for (int i = 0; i < game_information_.game_messages_.size(); ++i) {
-        	TextView next_message = new TextView(this);
-        	next_message.setLayoutParams(new LinearLayout.LayoutParams(
-        			LinearLayout.LayoutParams.WRAP_CONTENT,
-        			LinearLayout.LayoutParams.WRAP_CONTENT));
-        	next_message.setGravity(Gravity.CENTER);
-        	next_message.setTextColor(Color.GREEN);
-        	next_message.setText(game_information_.game_messages_.elementAt(i));
-        	message_layout.addView(next_message);
+        if (game_information_.location_cops_ > 0) {
+        	for (int i = 0; i < game_information_.fight_messages_.size(); ++i) {
+            	TextView next_message = new TextView(this);
+            	next_message.setLayoutParams(new LinearLayout.LayoutParams(
+            			LinearLayout.LayoutParams.WRAP_CONTENT,
+            			LinearLayout.LayoutParams.WRAP_CONTENT));
+            	next_message.setGravity(Gravity.CENTER);
+            	next_message.setTextColor(Color.GREEN);
+            	next_message.setText(game_information_.fight_messages_.elementAt(i));
+            	message_layout.addView(next_message);
+        	}
+        } else {
+	        for (int i = 0; i < game_information_.game_messages_.size(); ++i) {
+	        	TextView next_message = new TextView(this);
+	        	next_message.setLayoutParams(new LinearLayout.LayoutParams(
+	        			LinearLayout.LayoutParams.WRAP_CONTENT,
+	        			LinearLayout.LayoutParams.WRAP_CONTENT));
+	        	next_message.setGravity(Gravity.CENTER);
+	        	next_message.setTextColor(Color.GREEN);
+	        	next_message.setText(game_information_.game_messages_.elementAt(i));
+	        	message_layout.addView(next_message);
+	        }
         }
         
         dealer_data_.close();
@@ -1073,6 +1118,7 @@ public class DopeWarsGame extends Activity {
 		game_information_.setCurrentGameInformation(
 				dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
         game_information_.game_messages_.clear();
+        game_information_.fight_messages_.clear();
         
         // First determine how many drugs are available at the current location.
         // TODO: This is broken, the order doesn't work like this.
@@ -1151,9 +1197,17 @@ public class DopeWarsGame extends Activity {
     	// TODO: make health and firepower less deterministic
     	// TODO: make health and firepower configurable
     	// TODO: more options for cops that just Hardass
+    	// TODO: better (and non-deterministic, and configurable) messaging
     	game_information_.location_cops_ = 0;
     	if (rand_gen_.nextDouble() < game_information_.cops_likelihood_) {
     		game_information_.location_cops_ = 10 + rand_gen_.nextInt(3);
+    		String fight_message = "Officer Hardass ";
+    		if (game_information_.location_cops_ > 10) {
+    			fight_message += "and " + 
+    				Integer.toString(game_information_.location_cops_ - 10) + " deputies ";
+    		}
+    		fight_message += "found you!";
+    		game_information_.fight_messages_.add(fight_message);
     	}
     	
     	// Save back all the information altered while setting up the new location.

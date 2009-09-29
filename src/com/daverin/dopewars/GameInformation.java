@@ -40,6 +40,12 @@ public class GameInformation {
 	public static String LOCATION_COATS = "coat_inventory";
 	public static String LOCATION_GUNS = "gun_inventory";
 	public static String LOCATION_MESSAGES = "messages";
+	public static String FIGHT_MESSAGES = "fight_messages";
+	
+	public static String DEALER_COPS_KILLED = "cops_killed";
+	public static String DEALER_DEPUTIES_KILLED = "deputies_killed";
+	public static String DEALER_SUCCESSFUL_RUNS = "times_ran";
+	public static String DEALER_RUN_ATTEMPTS = "run_attempts";
 	
 	public static String GAME_ID = "game_id";
     public static String GAME_DRUGS = "drugs";
@@ -62,6 +68,7 @@ public class GameInformation {
 		location_coats_ = new HashMap<String, Integer>();
 		location_guns_ = new HashMap<String, Integer>();
 		game_messages_ = new Vector<String>();
+		fight_messages_ = new Vector<String>();
 		
 		String[] string_groups = serialized_current_game_info.split(DELIMITER_1);
 		for (int i = 0; i < string_groups.length; ++i) {
@@ -98,6 +105,16 @@ public class GameInformation {
 				location_guns_ = parseStringToIntMap(group[1]);
 			} else if (group[0].equals(LOCATION_MESSAGES)) {
 				game_messages_ = parseStringVector(group[1]);
+			} else if (group[0].equals(FIGHT_MESSAGES)) {
+				fight_messages_ = parseStringVector(group[1]);
+			} else if (group[0].equals(DEALER_COPS_KILLED)) {
+				dealer_cops_killed_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_DEPUTIES_KILLED)) {
+				dealer_deputies_killed_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_SUCCESSFUL_RUNS)) {
+				dealer_successful_runs_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_RUN_ATTEMPTS)) {
+				dealer_run_attempts_ = Integer.parseInt(group[1]);
 			} else if (group[0].equals(GAME_DO_INITIALIZE)) {
 				do_initial_setup_ = Integer.parseInt(group[1]);
 			} else {
@@ -131,6 +148,15 @@ public class GameInformation {
 			LOCATION_GUNS + DELIMITER_2 + serializeStringToIntMap(location_guns_) +
 			DELIMITER_1 +
 			LOCATION_MESSAGES + DELIMITER_2 + serializeStringVector(game_messages_) + DELIMITER_1 +
+			FIGHT_MESSAGES + DELIMITER_2 + serializeStringVector(fight_messages_) + DELIMITER_1 +
+			DEALER_COPS_KILLED + DELIMITER_2 + Integer.toString(dealer_cops_killed_) +
+			DELIMITER_1 +
+			DEALER_DEPUTIES_KILLED + DELIMITER_2 + Integer.toString(dealer_deputies_killed_) +
+			DELIMITER_1 +
+			DEALER_SUCCESSFUL_RUNS + DELIMITER_2 + Integer.toString(dealer_successful_runs_) +
+			DELIMITER_1 +
+			DEALER_RUN_ATTEMPTS + DELIMITER_2 + Integer.toString(dealer_run_attempts_) +
+			DELIMITER_1 +
 			GAME_DO_INITIALIZE + DELIMITER_2 + Integer.toString(do_initial_setup_);
 		return serialized_game_info;
 	}
@@ -471,7 +497,7 @@ public class GameInformation {
 	public float gun_likelihood_;
 	public float cops_likelihood_;
 	
-	// Current game information, theis information is mutable within a game.
+	// Current game information, this information is mutable within a game.
 	public int dealer_cash_;
 	public int dealer_space_;
 	public int dealer_max_space_;
@@ -487,6 +513,14 @@ public class GameInformation {
 	public HashMap<String, Integer> location_coats_;
 	public HashMap<String, Integer> location_guns_;
 	public Vector<String> game_messages_;
+	public Vector<String> fight_messages_;
+	
+	// Statistics information for display at the end of the game.
+	public int dealer_cops_killed_;
+	public int dealer_deputies_killed_;
+	public int dealer_successful_runs_;
+	public int dealer_run_attempts_;
+	
 	public int do_initial_setup_;
 	
 	public String serialized_starting_game_info_;
