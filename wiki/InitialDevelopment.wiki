@@ -2,12 +2,8 @@
 
 = TODO's =
   * DopeWars (8)
-  * DopeWarsGame (98)
+  * DopeWarsGame (94)
   * GameInformation (3)
-
-= Customization =
-
-  * include totally customized settings from a raw url
 
 = Score reporting =
 
