@@ -33,15 +33,14 @@
   android:gravity="center_horizontal"
   >
 </LinearLayout>
-<LinearLayout
+<RelativeLayout
   android:id="@+id/message_layout"
-  android:orientation="vertical"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
   android:layout_alignBottom="@id/outer_layout"
   android:gravity="center"
   >
-</LinearLayout>
+</RelativeLayout>
 </RelativeLayout>
 </ScrollView>
 </RelativeLayout>

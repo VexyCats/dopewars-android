@@ -33,6 +33,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -79,6 +80,29 @@ public class DopeWarsGame extends Activity {
 	// TODO: For BasicDialogListener, LongClickDialogListener, DrugClickListener, and
 	// DrugLongClickListener, is avoiding some simple code repetition worth the added
 	// complexity? A few more better-named listeners could be significantly more self-documenting.
+	
+	// This listener, when activated, just sets the visiblity of the view to gone, but it also
+	// removes the target message from the queue of messages. It does not redraw immediately
+	// when removing because the way messages are handled would make any existing messages hop
+	// around the screen as they were being cleared.
+	public class HideMessageListener implements View.OnClickListener {
+		public HideMessageListener(String message) {
+			message_ = message;
+		}
+		public void onClick(View v) {
+			v.setVisibility(View.GONE);
+			
+			dealer_data_.open();
+			game_information_.setCurrentGameInformation(
+					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
+			game_information_.fight_messages_.remove(message_);
+			game_information_.game_messages_.remove(message_);
+	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
+	        		game_information_.getCurrentGameInformation());
+	        dealer_data_.close();
+		}
+		String message_;
+	}
 	
 	// A simple listener that just opens a particular dialog is used in a couple different
 	// situations.
@@ -1081,28 +1105,38 @@ public class DopeWarsGame extends Activity {
         // fight or non-fight mode). Each message should be displayed at a random location on the
         // screen.
         // TODO: none of the above actually happens yet, lots of work to be done here.
-        LinearLayout message_layout = (LinearLayout)findViewById(R.id.message_layout);
+        RelativeLayout message_layout = (RelativeLayout)findViewById(R.id.message_layout);
         message_layout.removeAllViews();
         if (game_information_.location_cops_ > 0) {
         	for (int i = 0; i < game_information_.fight_messages_.size(); ++i) {
             	TextView next_message = new TextView(this);
-            	next_message.setLayoutParams(new LinearLayout.LayoutParams(
-            			LinearLayout.LayoutParams.WRAP_CONTENT,
-            			LinearLayout.LayoutParams.WRAP_CONTENT));
+            	RelativeLayout.LayoutParams layout_params =
+            		new RelativeLayout.LayoutParams(150,
+            			RelativeLayout.LayoutParams.WRAP_CONTENT);
+            	next_message.setBackgroundResource(R.drawable.message_background);
+            	layout_params.setMargins(rand_gen_.nextInt(100), rand_gen_.nextInt(100), 0, 0);
+            	next_message.setLayoutParams(layout_params);
             	next_message.setGravity(Gravity.CENTER);
-            	next_message.setTextColor(Color.GREEN);
+            	next_message.setTextColor(Color.WHITE);
             	next_message.setText(game_information_.fight_messages_.elementAt(i));
+            	next_message.setOnClickListener(
+            			new HideMessageListener(game_information_.fight_messages_.elementAt(i)));
             	message_layout.addView(next_message);
         	}
         } else {
 	        for (int i = 0; i < game_information_.game_messages_.size(); ++i) {
 	        	TextView next_message = new TextView(this);
-	        	next_message.setLayoutParams(new LinearLayout.LayoutParams(
-	        			LinearLayout.LayoutParams.WRAP_CONTENT,
-	        			LinearLayout.LayoutParams.WRAP_CONTENT));
+            	RelativeLayout.LayoutParams layout_params =
+            		new RelativeLayout.LayoutParams(150,
+            			RelativeLayout.LayoutParams.WRAP_CONTENT);
+            	next_message.setBackgroundResource(R.drawable.message_background);
+            	layout_params.setMargins(rand_gen_.nextInt(100), rand_gen_.nextInt(100), 0, 0);
+	        	next_message.setLayoutParams(layout_params);
 	        	next_message.setGravity(Gravity.CENTER);
-	        	next_message.setTextColor(Color.GREEN);
+	        	next_message.setTextColor(Color.WHITE);
 	        	next_message.setText(game_information_.game_messages_.elementAt(i));
+            	next_message.setOnClickListener(
+            			new HideMessageListener(game_information_.game_messages_.elementAt(i)));
 	        	message_layout.addView(next_message);
 	        }
         }
