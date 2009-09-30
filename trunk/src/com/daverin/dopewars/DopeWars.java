@@ -48,10 +48,10 @@ public class DopeWars extends Activity {
 	// These are strings used to identify options.
 	public static final String CLASSIC_MODE = "Classic Mode";
 	public static final String CLASSIC_MODE_LOCATION =
-		"http://dopewars-android-2.appspot.com/game-settings-g1";
+		"http://dopewars-android-2.appspot.com/game-settings-g1-classic";
 	public static final String EXTENDED_MODE = "Extended Mode";
 	public static final String EXTENDED_MODE_LOCATION =
-		"http://dopewars-android-2.appspot.com/game-settings-g2";
+		"http://dopewars-android-2.appspot.com/game-settings-g1-extended";
 	
 	// When the currently saved game was started from a button, a click on the button will be sent
 	// to this handler, which resumes the saved game without any of the initialization that
