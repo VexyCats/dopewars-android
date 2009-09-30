@@ -33,7 +33,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -77,11 +76,7 @@ public class DopeWarsGame extends Activity {
 	public static final String INVENTORY_MONEY = "money";
 	public static final String INVENTORY_EMPTY = "(none)";
 	
-	// TODO: For BasicDialogListener, LongClickDialogListener, DrugClickListener, and
-	// DrugLongClickListener, is avoiding some simple code repetition worth the added
-	// complexity? A few more better-named listeners could be significantly more self-documenting.
-	
-	// This listener, when activated, just sets the visiblity of the view to gone, but it also
+	// This listener, when activated, just sets the visibility of the view to gone, but it also
 	// removes the target message from the queue of messages. It does not redraw immediately
 	// when removing because the way messages are handled would make any existing messages hop
 	// around the screen as they were being cleared.
@@ -959,7 +954,7 @@ public class DopeWarsGame extends Activity {
 	        		next_drug.setOnClickListener(
 	        				new DrugClickListener(drug_name, DIALOG_DRUG_BUY));
 	        	} else if (can_sell) {
-	        		next_drug.setBackgroundResource(R.drawable.btn_translucent_green);
+	        		next_drug.setBackgroundResource(R.drawable.btn_translucent_orange);
 	        		next_drug.setOnClickListener(
 	        				new DrugClickListener(drug_name, DIALOG_DRUG_SELL));
 	        	}
