@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/big_ol_scrollview"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:layout_weight="1"
+  >
+<LinearLayout
     android:id="@+id/end_of_game_layout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
@@ -74,7 +80,6 @@
     android:gravity="left"
     />
 </LinearLayout>
-
 <LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
@@ -98,4 +103,286 @@
     android:gravity="left"
     />
 </LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Coats bought:"
+    android:gravity="right"
+    />
+<TextView
+    android:id="@+id/coats_bought"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#2f2"
+    android:text="0"
+    android:gravity="left"
+    />
 </LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Coat size added:"
+    android:gravity="right"
+    />
+<TextView
+    android:id="@+id/coats_added_size"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#2f2"
+    android:text="0"
+    android:gravity="left"
+    />
+</LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Money spent on coats:"
+    android:gravity="right"
+    />
+<TextView
+    android:id="@+id/money_spent_on_coats"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#2f2"
+    android:text="0"
+    android:gravity="left"
+    />
+</LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Guns bought:"
+    android:gravity="right"
+    />
+<TextView
+    android:id="@+id/guns_bought"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#2f2"
+    android:text="0"
+    android:gravity="left"
+    />
+</LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Money spent on guns:"
+    android:gravity="right"
+    />
+<TextView
+    android:id="@+id/money_spent_on_guns"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#2f2"
+    android:text="0"
+    android:gravity="left"
+    />
+</LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Highest firepower:"
+    android:gravity="right"
+    />
+<TextView
+    android:id="@+id/max_firepower"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#2f2"
+    android:text="0"
+    android:gravity="left"
+    />
+</LinearLayout>
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Drugs bought (for amount):"
+    />
+<LinearLayout
+    android:id="@+id/drug_bought_list"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+</LinearLayout>
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Drugs sold (for amount):"
+    />
+<LinearLayout
+    android:id="@+id/drug_sold_list"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+</LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Money paid to loan shark:"
+    android:gravity="right"
+    />
+<TextView
+    android:id="@+id/money_paid_to_loan_shark"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#2f2"
+    android:text="0"
+    android:gravity="left"
+    />
+</LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Loan interest charged:"
+    android:gravity="right"
+    />
+<TextView
+    android:id="@+id/loan_interest"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#2f2"
+    android:text="0"
+    android:gravity="left"
+    />
+</LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Days to pay off loan:"
+    android:gravity="right"
+    />
+<TextView
+    android:id="@+id/days_to_pay_off_loan"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#2f2"
+    android:text="0"
+    android:gravity="left"
+    />
+</LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Money invested in bank:"
+    android:gravity="right"
+    />
+<TextView
+    android:id="@+id/money_invested_in_bank"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#2f2"
+    android:text="0"
+    android:gravity="left"
+    />
+</LinearLayout>
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#fff"
+    android:text="Bank interest paid:"
+    android:gravity="right"
+    />
+<TextView
+    android:id="@+id/bank_interest"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1.0"
+    android:textColor="#2f2"
+    android:text="0"
+    android:gravity="left"
+    />
+</LinearLayout>
+</LinearLayout>
+</ScrollView>
