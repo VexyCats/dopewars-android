@@ -2,8 +2,8 @@
 
 = TODO's =
   * DopeWars (8)
-  * DopeWarsGame (94)
-  * GameInformation (3)
+  * DopeWarsGame (95)
+  * GameInformation (6)
 
 = Score reporting =
 
@@ -27,3 +27,10 @@
 = Death =
 
   * little details, forgot about this, shouldn't be too hard just during a fight only show end game and do end game as usual
+
+= Known Bugs =
+
+  * Bank withdraw doesn't hide the right dialog
+  * End game doesn't clear the current game (maybe have two end buttons, one with saving?)
+  * Sometimes the cops message doesn't show up, seemingly after clearing fight response messages from the fight screen
+  * The layout that the messages are being displayed on during fighting isn't big enough
