@@ -277,8 +277,7 @@ public class DopeWarsGame extends Activity {
 	        float new_space = game_information_.coats_.get(coat_name_).get(COATS_ADDITIONAL_SPACE);
 	        game_information_.dealer_max_space_ += new_space;
 	        game_information_.dealer_space_ += new_space;
-	        game_information_.location_coats_.remove(
-	        		game_information_.location_coats_.get(coat_name_));
+	        game_information_.location_coats_.remove(coat_name_);
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
 	        		game_information_.getCurrentGameInformation());
 	        dealer_data_.close();
@@ -311,8 +310,7 @@ public class DopeWarsGame extends Activity {
 	        	num_guns += game_information_.dealer_guns_.get(gun_name_);
 	        }
 	        game_information_.dealer_guns_.put(gun_name_, num_guns);
-	        game_information_.location_guns_.remove(
-	        		game_information_.location_guns_.get(gun_name_));
+	        game_information_.location_guns_.remove(gun_name_);
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, 
 	        		game_information_.getCurrentGameInformation());
 	        dealer_data_.close();
@@ -881,41 +879,37 @@ public class DopeWarsGame extends Activity {
         // First check if there are cops. If there are cops don't show anything other than the
         // fight related buttons and info.
         if (game_information_.location_cops_ > 0) {
-        	// TODO: add the cops image_id
         	// TODO: make the name configurable
         	// TODO: make the health a parameter
         	// TODO: multiple base cops
         	LinearLayout hardass_button = makeButton(R.drawable.btn_translucent_gray,
-        			R.drawable.loan_shark, "Hardass",
+        			R.drawable.head_cop, "Hardass",
         			Integer.toString(Math.min(10, 
         					game_information_.location_cops_)));
         	pushButton(hardass_button);
 	    	
-        	// TODO: add the deputies image_id
         	// TODO: make the name configurable
 	    	if (game_information_.location_cops_ > 10) {
 	    		LinearLayout deputies_button = makeButton(R.drawable.btn_translucent_gray,
-	    				R.drawable.loan_shark, "Deputies",
+	    				R.drawable.deputies, "Deputies",
 	    				Integer.toString(game_information_.location_cops_ - 10));
 	    		pushButton(deputies_button);
 	    	}
 	    	
-	    	// TODO: add the fight image_id
 	    	// TODO: make the name configurable
 	    	// TODO: change the color?
 	    	if (game_information_.dealer_guns_.size() > 0) {
 	    		LinearLayout fight_button = makeButton(R.drawable.btn_translucent_green,
-	    				R.drawable.loan_shark, "Fight",
+	    				R.drawable.fight, "Fight",
 	    				Integer.toString(game_information_.dealer_health_));
 	    		fight_button.setOnClickListener(new FightListener());
 	    		pushButton(fight_button);
 	    	}
 	    	
-	    	// TODO: add the run image_id
 	    	// TODO: make the name configurable
 	    	// TODO: change the color?
 	    	LinearLayout run_button = makeButton(R.drawable.btn_translucent_green,
-    				R.drawable.loan_shark, "Run",
+    				R.drawable.run, "Run",
     				Integer.toString(game_information_.dealer_health_));
 	    	run_button.setOnClickListener(new RunListener());
 	    	pushButton(run_button);
@@ -981,7 +975,7 @@ public class DopeWarsGame extends Activity {
 			}
 			
 			// If the current location has access to the bank, display the bank button.
-	    	// TODO: the location checking is broken, can't index the set arrar like this
+	    	// TODO: the location checking is broken, can't index the set array like this
 	    	//       reliably
 	    	// TODO: change the default color to yellow
 	    	// TODO: make the color configurable?
