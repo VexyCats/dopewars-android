@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import android.util.Log;
+import android.widget.TextView;
 
 public class GameInformation {
 	
@@ -46,7 +47,22 @@ public class GameInformation {
 	public static String DEALER_DEPUTIES_KILLED = "deputies_killed";
 	public static String DEALER_SUCCESSFUL_RUNS = "times_ran";
 	public static String DEALER_RUN_ATTEMPTS = "run_attempts";
-	
+	public static String DEALER_COATS_BOUGHT = "coats_bought";
+	public static String DEALER_COATS_ADDED_SIZE = "coats_added_size";
+	public static String DEALER_MONEY_SPENT_ON_COATS = "money_spent_on_coats";
+	public static String DEALER_GUNS_BOUGHT = "guns_bought";
+	public static String DEALER_MONEY_SPENT_ON_GUNS = "money_spent_on_guns";
+	public static String DEALER_MAX_DEALER_FIREPOWER = "max_dealer_firepower";
+	public static String DEALER_NUM_DRUGS_BOUGHT = "num_drugs_bought";
+	public static String DEALER_AMOUNT_DRUGS_BOUGHT = "amount_drugs_bought";
+	public static String DEALER_NUM_DRUGS_SOLD = "num_drugs_sold";
+	public static String DEALER_AMOUNT_DRUGS_SOLD = "amount_drugs_sold";
+	public static String DEALER_MONEY_PAID_TO_LOAN_SHARK = "money_paid_to_loan_shark";
+	public static String DEALER_LOAN_INTEREST = "loan_interest";
+	public static String DEALER_DAYS_TO_PAY_OFF_LOAN = "days_to_pay_off_loan";
+	public static String DEALER_MONEY_INVESTED_IN_BANK = "money_invested";
+	public static String DEALER_BANK_INTEREST = "bank_interest";
+			
 	public static String GAME_ID = "game_id";
     public static String GAME_DRUGS = "drugs";
 	public static String GAME_COATS = "coats";
@@ -69,6 +85,11 @@ public class GameInformation {
 		location_guns_ = new HashMap<String, Integer>();
 		game_messages_ = new Vector<String>();
 		fight_messages_ = new Vector<String>();
+		
+		num_drugs_bought_ = new HashMap<String, Integer>();
+		amount_drugs_bought_ = new HashMap<String, Integer>();
+		num_drugs_sold_ = new HashMap<String, Integer>();
+		amount_drugs_sold_ = new HashMap<String, Integer>();
 		
 		String[] string_groups = serialized_current_game_info.split(DELIMITER_1);
 		for (int i = 0; i < string_groups.length; ++i) {
@@ -115,6 +136,36 @@ public class GameInformation {
 				dealer_successful_runs_ = Integer.parseInt(group[1]);
 			} else if (group[0].equals(DEALER_RUN_ATTEMPTS)) {
 				dealer_run_attempts_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_COATS_BOUGHT)) {
+				coats_bought_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_COATS_ADDED_SIZE)) {
+				coats_added_size_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_MONEY_SPENT_ON_COATS)) {
+				money_spent_on_coat_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_GUNS_BOUGHT)) {
+				guns_bought_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_MONEY_SPENT_ON_GUNS)) {
+				money_spent_on_guns_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_MAX_DEALER_FIREPOWER)) {
+				max_dealer_firepower_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_NUM_DRUGS_BOUGHT)) {
+				num_drugs_bought_ = parseStringToIntMap(group[1]);
+			} else if (group[0].equals(DEALER_AMOUNT_DRUGS_BOUGHT)) {
+				amount_drugs_bought_ = parseStringToIntMap(group[1]);
+			} else if (group[0].equals(DEALER_NUM_DRUGS_SOLD)) {
+				num_drugs_sold_ = parseStringToIntMap(group[1]);
+			} else if (group[0].equals(DEALER_AMOUNT_DRUGS_SOLD)) {
+				amount_drugs_sold_ = parseStringToIntMap(group[1]);
+			} else if (group[0].equals(DEALER_MONEY_PAID_TO_LOAN_SHARK)) {
+				money_paid_to_loan_shark_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_LOAN_INTEREST)) {
+				loan_interest_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_DAYS_TO_PAY_OFF_LOAN)) {
+				days_to_pay_off_loan_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_MONEY_INVESTED_IN_BANK)) {
+				money_invested_in_bank_ = Integer.parseInt(group[1]);
+			} else if (group[0].equals(DEALER_BANK_INTEREST)) {
+				bank_interest_ = Integer.parseInt(group[1]);
 			} else if (group[0].equals(GAME_DO_INITIALIZE)) {
 				do_initial_setup_ = Integer.parseInt(group[1]);
 			} else {
@@ -157,6 +208,35 @@ public class GameInformation {
 			DELIMITER_1 +
 			DEALER_RUN_ATTEMPTS + DELIMITER_2 + Integer.toString(dealer_run_attempts_) +
 			DELIMITER_1 +
+			DEALER_COATS_BOUGHT + DELIMITER_2 + Integer.toString(coats_bought_) +
+			DELIMITER_1 +
+			DEALER_COATS_ADDED_SIZE + DELIMITER_2 + Integer.toString(coats_added_size_) +
+			DELIMITER_1 +
+			DEALER_MONEY_SPENT_ON_COATS + DELIMITER_2 + Integer.toString(money_spent_on_coat_) +
+			DELIMITER_1 +
+			DEALER_GUNS_BOUGHT + DELIMITER_2 + Integer.toString(guns_bought_) +
+			DELIMITER_1 +
+			DEALER_MONEY_SPENT_ON_GUNS + DELIMITER_2 + Integer.toString(money_spent_on_guns_) +
+			DELIMITER_1 +
+			DEALER_MAX_DEALER_FIREPOWER + DELIMITER_2 + Integer.toString(max_dealer_firepower_) +
+			DELIMITER_1 +
+			DEALER_NUM_DRUGS_BOUGHT + DELIMITER_2 + serializeStringToIntMap(num_drugs_bought_) +
+			DELIMITER_1 +
+			DEALER_AMOUNT_DRUGS_BOUGHT + DELIMITER_2 + serializeStringToIntMap(amount_drugs_bought_) +
+			DELIMITER_1 +
+			DEALER_NUM_DRUGS_SOLD + DELIMITER_2 + serializeStringToIntMap(num_drugs_sold_) +
+			DELIMITER_1 +
+			DEALER_AMOUNT_DRUGS_SOLD + DELIMITER_2 + serializeStringToIntMap(amount_drugs_sold_) +
+			DELIMITER_1 +
+			DEALER_MONEY_PAID_TO_LOAN_SHARK + DELIMITER_2 +
+			Integer.toString(money_paid_to_loan_shark_) + DELIMITER_1 +
+			DEALER_LOAN_INTEREST + DELIMITER_2 + Integer.toString(loan_interest_) +
+			DELIMITER_1 +
+			DEALER_DAYS_TO_PAY_OFF_LOAN + DELIMITER_2 + Integer.toString(days_to_pay_off_loan_) +
+			DELIMITER_1 +
+			DEALER_MONEY_INVESTED_IN_BANK + DELIMITER_2 +
+			Integer.toString(money_invested_in_bank_) +	DELIMITER_1 +
+			DEALER_BANK_INTEREST + DELIMITER_2 + Integer.toString(bank_interest_) + DELIMITER_1 +
 			GAME_DO_INITIALIZE + DELIMITER_2 + Integer.toString(do_initial_setup_);
 		return serialized_game_info;
 	}
@@ -520,6 +600,21 @@ public class GameInformation {
 	public int dealer_deputies_killed_;
 	public int dealer_successful_runs_;
 	public int dealer_run_attempts_;
+	public int coats_bought_;
+	public int coats_added_size_;
+	public int money_spent_on_coat_;
+    public int guns_bought_;
+	public int money_spent_on_guns_;
+	public int max_dealer_firepower_;
+	public HashMap<String, Integer> num_drugs_bought_;
+	public HashMap<String, Integer> amount_drugs_bought_;
+	public HashMap<String, Integer> num_drugs_sold_;
+	public HashMap<String, Integer> amount_drugs_sold_;
+	public int money_paid_to_loan_shark_;
+	public int loan_interest_;
+	public int days_to_pay_off_loan_;
+	public int money_invested_in_bank_;
+	public int bank_interest_;
 	
 	public int do_initial_setup_;
 	
