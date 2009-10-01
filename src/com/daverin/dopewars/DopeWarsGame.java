@@ -471,7 +471,7 @@ public class DopeWarsGame extends Activity {
 	        		game_information_.getCurrentGameInformation());
 			dealer_data_.close();
 			refreshDisplay();
-			dismissDialog(DIALOG_BANK_DEPOSIT);
+			dismissDialog(DIALOG_BANK_WITHDRAW);
 		}
 	}
 	
