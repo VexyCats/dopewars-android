@@ -23,6 +23,8 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
 
+import com.daverin.dopewars.GameInformation.Drug;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
@@ -53,54 +55,32 @@ public class DopeWarsGame extends Activity {
 	public static final int DIALOG_BANK_DEPOSIT = 2007;
 	public static final int DIALOG_BANK_WITHDRAW = 2008;
 	public static final int DIALOG_END_GAME = 2009;
-	
-	// Strings identify the properties of most objects in the game. Define them here.
-	// TODO: use a strings object instead?
-	public static final String GUNS_FIREPOWER = "firepower";
-	public static final String GUNS_SPACE = "space";
-	public static final String GUNS_PRICE = "base_price";
-	public static final String GUNS_VARIANCE = "price_variance";
-	public static final String COATS_ADDITIONAL_SPACE = "additional_space";
-	public static final String LOCATION_X = "map_x";
-	public static final String LOCATION_Y = "map_y";
-	public static final String LOCATION_LOAN_SHARK = "has_loan_shark";
-	public static final String LOCATION_BANK = "has_bank";
-	public static final String LOCATION_DRUGS = "base_drugs";
-	public static final String LOCATION_VARIANCE = "drug_variance";
-	public static final String DRUGS_ICON = "icon";
-	public static final String COATS_PRICE = "base_price";
-	public static final String COATS_VARIANCE = "price_variance";
-	
-	public static final String INVENTORY_DRUGS = "drugs";
-	public static final String INVENTORY_GUNS = "guns";
-	public static final String INVENTORY_MONEY = "money";
+
+	// Common identifier for an empty set (drugs, guns, etc).
 	public static final String INVENTORY_EMPTY = "(none)";
 	
 	// This listener, when activated, just sets the visibility of the view to gone, but it also
 	// removes the target message from the queue of messages. It does not redraw immediately
 	// when removing because the way messages are handled would make any existing messages hop
 	// around the screen as they were being cleared.
+	// TODO: they seem to jump sometimes anyway?
+	// TODO: hold click removes all messages of a particular type
 	public class HideMessageListener implements View.OnClickListener {
 		public HideMessageListener(String message) {
 			message_ = message;
 		}
 		public void onClick(View v) {
 			v.setVisibility(View.GONE);
-			
-			dealer_data_.open();
-			game_information_.setCurrentGameInformation(
-					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
 			game_information_.fight_messages_.remove(message_);
 			game_information_.game_messages_.remove(message_);
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		game_information_.getCurrentGameInformation());
-	        dealer_data_.close();
 		}
 		String message_;
 	}
 	
 	// A simple listener that just opens a particular dialog is used in a couple different
 	// situations.
+	// TODO: Is the code savings worth the complexity? Better named listeners could be more
+	// self-documenting.
 	public class BasicDialogListener implements View.OnClickListener {
 		public BasicDialogListener(int dialog_id) {
 			dialog_id_ = dialog_id;
@@ -112,8 +92,6 @@ public class DopeWarsGame extends Activity {
 	}
 	
 	// A simple long-click listener that just opens a particular dialog is used in a couple
-	// different situations.
-	// A simple long click listener that just opens a particular dialog is used in a couple
 	// different situations.
 	// TODO: Is the code savings worth the complexity? Better named listeners could be more
 	// self-documenting.
@@ -162,17 +140,12 @@ public class DopeWarsGame extends Activity {
 	// whatever's left of the cops hitting the dealer.
 	public class FightListener implements View.OnClickListener {
 		public void onClick(View v) {
-			dealer_data_.open();
-			
 			// Total up the dealer's firepower.
-			game_information_.setCurrentGameInformation(
-					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
 	        int total_dealer_firepower = 0;
 	        Iterator<String> gun_names = game_information_.dealer_guns_.keySet().iterator();
 	        while (gun_names.hasNext()) {
 	        	String next_gun_name = gun_names.next();
-	        	total_dealer_firepower +=
-	        		game_information_.guns_.get(next_gun_name).get(GUNS_FIREPOWER) * 
+	        	total_dealer_firepower += game_information_.guns_.get(next_gun_name).firepower_ *
 	        		game_information_.dealer_guns_.get(next_gun_name);
 	        }
 	        
@@ -214,10 +187,6 @@ public class DopeWarsGame extends Activity {
 	        	}
 	        	game_information_.location_cops_ -= total_dealer_firepower;
 	        }
-	        
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		game_information_.getCurrentGameInformation());
-	        dealer_data_.close();
 	        refreshDisplay();
 		}
 	}
@@ -226,10 +195,6 @@ public class DopeWarsGame extends Activity {
 	// consequences.
 	public class RunListener implements View.OnClickListener {
 		public void onClick(View v) {
-			dealer_data_.open();
-			game_information_.setCurrentGameInformation(
-					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-	        
 	        // If the dealer gets away, he will drop some cash. If not, the cops will hit him.
 	        // TODO: Parameterize the run away success rate in game settings
 	        // TODO: Parameterize the cash lost amount in game settings
@@ -250,9 +215,6 @@ public class DopeWarsGame extends Activity {
 	        	game_information_.fight_messages_.add("You couldn't get away, and got hit for " +
 	        			Integer.toString(dealer_damage) + " points of damage");
 	        }
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		game_information_.getCurrentGameInformation());
-	        dealer_data_.close();
 	        refreshDisplay();
 		}
 	}
@@ -267,13 +229,9 @@ public class DopeWarsGame extends Activity {
 		}
 		
 		public void onClick(View v) {
-			dealer_data_.open();
-			
-			game_information_.setCurrentGameInformation(
-					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
 			game_information_.dealer_cash_ -=
 				game_information_.location_coats_.get(coat_name_).intValue();
-	        float new_space = game_information_.coats_.get(coat_name_).get(COATS_ADDITIONAL_SPACE);
+	        float new_space = game_information_.coats_.get(coat_name_).additional_space_;
 			game_information_.coats_bought_ += 1;
 			game_information_.coats_added_size_ += new_space;
 			game_information_.money_spent_on_coat_ +=
@@ -281,9 +239,6 @@ public class DopeWarsGame extends Activity {
 	        game_information_.dealer_max_space_ += new_space;
 	        game_information_.dealer_space_ += new_space;
 	        game_information_.location_coats_.remove(coat_name_);
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		game_information_.getCurrentGameInformation());
-	        dealer_data_.close();
 	        refreshDisplay();
 		}
 		
@@ -299,14 +254,9 @@ public class DopeWarsGame extends Activity {
 		}
 		
 		public void onClick(View v) {
-			dealer_data_.open();
-			game_information_.setCurrentGameInformation(
-					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-
 			game_information_.dealer_cash_ -=
 				game_information_.location_guns_.get(gun_name_).intValue();
-			game_information_.dealer_space_ -=
-				game_information_.guns_.get(gun_name_).get(GUNS_SPACE);
+			game_information_.dealer_space_ -= game_information_.guns_.get(gun_name_).space_;
 	        int num_guns = 1;
 	        if (game_information_.dealer_guns_.get(gun_name_) != null) {
 	        	num_guns += game_information_.dealer_guns_.get(gun_name_);
@@ -319,16 +269,12 @@ public class DopeWarsGame extends Activity {
 	        Iterator<String> gun_names = game_information_.dealer_guns_.keySet().iterator();
 	        while (gun_names.hasNext()) {
 	        	String next_gun_name = gun_names.next();
-	        	total_dealer_firepower +=
-	        		game_information_.guns_.get(next_gun_name).get(GUNS_FIREPOWER) * 
+	        	total_dealer_firepower += game_information_.guns_.get(next_gun_name).firepower_ *
 	        		game_information_.dealer_guns_.get(next_gun_name);
 	        }
 	        game_information_.max_dealer_firepower_ =
 	        	Math.max(game_information_.max_dealer_firepower_, total_dealer_firepower);
 	        game_information_.location_guns_.remove(gun_name_);
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, 
-	        		game_information_.getCurrentGameInformation());
-	        dealer_data_.close();
 	        refreshDisplay();
 		}
 		
@@ -339,10 +285,6 @@ public class DopeWarsGame extends Activity {
 	// pressed) this listener manages the inventory transaction.
 	public class BuyDrugsListener implements View.OnClickListener {
 		public void onClick(View v) {
-			// TODO: tabulate quantities of drugs that are moved for statistics
-	        dealer_data_.open();
-			game_information_.setCurrentGameInformation(
-					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
 	        int drug_price = game_information_.location_drugs_.get(dialog_drug_name_).intValue();
 	        int drug_quantity = Integer.parseInt(((TextView)drug_buy_dialog_.findViewById(
 	        		R.id.drug_quantity)).getText().toString());
@@ -363,9 +305,6 @@ public class DopeWarsGame extends Activity {
 	        	new_amount += game_information_.amount_drugs_bought_.get(dialog_drug_name_);
 	        }
 	        game_information_.amount_drugs_bought_.put(dialog_drug_name_, new_amount);
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO, 
-	        		game_information_.getCurrentGameInformation());
-	        dealer_data_.close();
 	        refreshDisplay();
 			dismissDialog(DIALOG_DRUG_BUY);
 		}
@@ -375,10 +314,6 @@ public class DopeWarsGame extends Activity {
 	// this listener manages the inventory transaction.
 	public class SellDrugsListener implements View.OnClickListener {
 		public void onClick(View v) {
-			// TODO: tabulate quantities of drugs that are moved for statistics
-	        dealer_data_.open();
-			game_information_.setCurrentGameInformation(
-					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
 	        int drug_price = game_information_.location_drugs_.get(
 	        		dialog_drug_name_).intValue();
 	        int drug_quantity = Integer.parseInt(((TextView)drug_sell_dialog_.findViewById(
@@ -402,9 +337,6 @@ public class DopeWarsGame extends Activity {
 	        	new_amount += game_information_.amount_drugs_sold_.get(dialog_drug_name_);
 	        }
 	        game_information_.amount_drugs_sold_.put(dialog_drug_name_, new_amount);
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		game_information_.getCurrentGameInformation());
-	        dealer_data_.close();
 	        refreshDisplay();
 			dismissDialog(DIALOG_DRUG_SELL);
 		}
@@ -413,25 +345,15 @@ public class DopeWarsGame extends Activity {
 	// When a loan payment is made this listener handles the money transaction.
 	public class CompleteLoanListener implements View.OnClickListener {
 		public void onClick(View v) {
-			dealer_data_.open();
-			game_information_.setCurrentGameInformation(
-					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
 	        int loan_payment = Integer.parseInt(((TextView)loan_shark_dialog_.findViewById(
 	        		R.id.loan_amount)).getText().toString());
 	        game_information_.dealer_loan_ -= loan_payment;
 	        game_information_.dealer_cash_ -= loan_payment;
 	        game_information_.money_paid_to_loan_shark_ += loan_payment;
 	        if (game_information_.dealer_loan_ == 0) {
-	        	GameInformation tmp = new GameInformation(game_information_.serializeGameInformation());
-	        	String game_info_string = game_information_.serialized_starting_game_info_;
-		        game_info_string = game_info_string.replaceAll("##", "&&");
-		        tmp.setCurrentGameInformation(game_info_string);
 	        	game_information_.days_to_pay_off_loan_ =
-	        		tmp.game_days_left_ - game_information_.game_days_left_;
+	        		game_information_.total_days_ - game_information_.game_days_left_;
 	        }
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		game_information_.getCurrentGameInformation());
-			dealer_data_.close();
 			refreshDisplay();
 			dismissDialog(DIALOG_LOAN_SHARK);
 		}
@@ -440,17 +362,11 @@ public class DopeWarsGame extends Activity {
 	// When a bank deposit is made this listener handles the money transaction.
 	public class CompleteBankDepositListener implements View.OnClickListener {
 		public void onClick(View v) {
-			dealer_data_.open();
-			game_information_.setCurrentGameInformation(
-					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
 	        int bank_deposit = Integer.parseInt(((TextView)bank_deposit_dialog_.findViewById(
 	        		R.id.bank_amount)).getText().toString());
 	        game_information_.dealer_bank_ += bank_deposit;
 	        game_information_.dealer_cash_ -= bank_deposit;
 	        game_information_.money_invested_in_bank_ += bank_deposit;
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		game_information_.getCurrentGameInformation());
-			dealer_data_.close();
 			refreshDisplay();
 			dismissDialog(DIALOG_BANK_DEPOSIT);
 		}
@@ -459,17 +375,11 @@ public class DopeWarsGame extends Activity {
 	// When a bank withdrawal is made this listener handles the money transaction.
 	public class CompleteBankWithdrawListener implements View.OnClickListener {
 		public void onClick(View v) {
-			dealer_data_.open();
-			game_information_.setCurrentGameInformation(
-					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
 	        int bank_withdrawal = Integer.parseInt(((TextView)bank_withdraw_dialog_.findViewById(
 	        		R.id.bank_amount)).getText().toString());
 	        game_information_.dealer_bank_ -= bank_withdrawal;
 	        game_information_.dealer_cash_ += bank_withdrawal;
 	        game_information_.money_invested_in_bank_ -= bank_withdrawal;
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		game_information_.getCurrentGameInformation());
-			dealer_data_.close();
 			refreshDisplay();
 			dismissDialog(DIALOG_BANK_WITHDRAW);
 		}
@@ -482,9 +392,6 @@ public class DopeWarsGame extends Activity {
 			location_ = new_location;
 		}
 		public void onClick(View v) {
-	        dealer_data_.open();
-			game_information_.setCurrentGameInformation(
-					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
 	        game_information_.location_ = location_;
 	        game_information_.game_days_left_ -= 1;
 	        
@@ -498,10 +405,6 @@ public class DopeWarsGame extends Activity {
 	        game_information_.dealer_bank_ +=
 	        	(int)((double)game_information_.dealer_bank_ *
 	        			game_information_.bank_interest_rate_);
-	        
-	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		game_information_.getCurrentGameInformation());
-	        dealer_data_.close();
 			setupLocation();
 			refreshDisplay();
 			dismissDialog(DIALOG_SUBWAY);
@@ -514,28 +417,37 @@ public class DopeWarsGame extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		loadIcons();
-		
-        dealer_data_ = new DealerDataAdapter(this);
+    }
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		dealer_data_ = new DealerDataAdapter(this);
         dealer_data_.open();
-        
-        // Initialize the static game information.
-        String game = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_ID);
-        String game_info = dealer_data_.getGameString(Integer.parseInt(game));
-        game_information_ = new GameInformation(game_info);
-       
-        // Get the current game information just to see if the initial setup needs to happen.
-        String current_game = dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO);
-		game_information_.setCurrentGameInformation(current_game);
-        dealer_data_.close();
+        game_information_ = new GameInformation(
+        		dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
         
         // Set up the main content of the view.
         setContentView(R.layout.main_game_screen);
         
         if (game_information_.do_initial_setup_ == 1) {
         	setupLocation();
+        	game_information_.do_initial_setup_ = 0;
         }
+        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
+        		game_information_.serializeGameInformation());
+        dealer_data_.close();
         refreshDisplay();
-    }
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		dealer_data_.open();
+        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
+        		game_information_.serializeGameInformation());
+        dealer_data_.close();
+	}
 	
 	// When the configuration is changed (e.g. orientation changing) the display needs to be
 	// re-calculated so the rows of buttons expand/contract to the right width.
@@ -579,11 +491,9 @@ public class DopeWarsGame extends Activity {
 	//       sub-fns for some?
 	@Override
     protected void onPrepareDialog(int id, Dialog d) {
-		dealer_data_.open();
-		game_information_.setCurrentGameInformation(
-				dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
 		Dialog dialog_to_expand = null;
 		switch(id) {
+		// TODO: this dialog needs some figuring about how to handle orientation switching
 		case DIALOG_SUBWAY:
 			dialog_to_expand = subway_dialog_;
 			RelativeLayout subway_buttons_layout =
@@ -598,10 +508,8 @@ public class DopeWarsGame extends Activity {
 	        	// TODO: make the button size configuration by game parameters
 	        	RelativeLayout.LayoutParams layout_params =
 	        		new RelativeLayout.LayoutParams(90, 30);
-	        	layout_params.leftMargin =
-	        		game_information_.locations_.get(location_name).get(LOCATION_X).intValue();
-	        	layout_params.topMargin =
-	        		game_information_.locations_.get(location_name).get(LOCATION_Y).intValue();
+	        	layout_params.leftMargin = game_information_.locations_.get(location_name).map_x_;
+	        	layout_params.topMargin = game_information_.locations_.get(location_name).map_y_;
 	        	b.setLayoutParams(layout_params);
 	        	b.setText(location_name);
 	        	b.setOnClickListener(new ChangeLocationListener(i));
@@ -610,57 +518,54 @@ public class DopeWarsGame extends Activity {
 	        break;
 		case DIALOG_INVENTORY:
 			dialog_to_expand = inventory_dialog_;
-			LinearLayout inventory_layout =
-				(LinearLayout)inventory_dialog_.findViewById(R.id.inventory_layout);
-			inventory_layout.setGravity(Gravity.CENTER);
-			inventory_layout.removeAllViews();
-			// TODO: these major headers could probably be static parts of the layout
-        	inventory_layout.addView(makeInventoryHeader(INVENTORY_DRUGS));
+			LinearLayout drug_inventory_layout =
+				(LinearLayout)inventory_dialog_.findViewById(R.id.inventory_drugs_layout);
+			drug_inventory_layout.removeAllViews();
 	        if (game_information_.dealer_drugs_.size() == 0) {
-	        	// TODO: make colors configurable
-	        	inventory_layout.addView(
+	        	drug_inventory_layout.addView(
 	        			makeInventoryText(Color.GRAY, Gravity.CENTER, INVENTORY_EMPTY));
 	        } else {
 		        Iterator<String> drug_names =
 		        	game_information_.dealer_drugs_.keySet().iterator();
 		        while (drug_names.hasNext()) {
 		        	String drug_string = drug_names.next();
-		        	// TODO: make colors configurable
-		        	inventory_layout.addView(makeInventoryRow(Color.BLUE, drug_string,
+		        	drug_inventory_layout.addView(makeInventoryRow(Color.BLUE, drug_string,
 		        			game_information_.dealer_drugs_.get(
 		        					drug_string).toString()));
 		        }
 	        }
-	        inventory_layout.addView(makeInventoryHeader(INVENTORY_GUNS));
+			LinearLayout gun_inventory_layout =
+				(LinearLayout)inventory_dialog_.findViewById(R.id.inventory_guns_layout);
+			gun_inventory_layout.removeAllViews();
         	if (game_information_.dealer_guns_.size() == 0) {
-        		// TODO: make colors configurable
-        		inventory_layout.addView(
+        		gun_inventory_layout.addView(
         				makeInventoryText(Color.GRAY, Gravity.CENTER, INVENTORY_EMPTY));
 	        } else {
 		        Iterator<String> gun_names = game_information_.dealer_guns_.keySet().iterator();
 		        while (gun_names.hasNext()) {
 		        	String gun_string = gun_names.next();
-		        	// TODO: make colors configurable
-		        	inventory_layout.addView(makeInventoryRow(Color.RED, gun_string,
+		        	gun_inventory_layout.addView(makeInventoryRow(Color.RED, gun_string,
 		        			game_information_.dealer_guns_.get(
 		        					gun_string).toString()));
 		        }
 	        }
-        	inventory_layout.addView(makeInventoryHeader(INVENTORY_MONEY));
-        	
-        	// TODO: staticize all this stuff or better put it in the layout
-        	inventory_layout.addView(makeInventoryRow(Color.GREEN, "In hand",
-	        		Integer.toString(game_information_.dealer_cash_)));
-        	inventory_layout.addView(makeInventoryRow(Color.GREEN, "In bank",
-	        		Integer.toString(game_information_.dealer_bank_)));
-        	inventory_layout.addView(makeInventoryRow(Color.GREEN, "Owed",
+			LinearLayout money_inventory_layout =
+				(LinearLayout)inventory_dialog_.findViewById(R.id.inventory_money_layout);
+			money_inventory_layout.removeAllViews();
+			money_inventory_layout.addView(makeInventoryRow(Color.GREEN,
+					"Cash in hand", Integer.toString(game_information_.dealer_cash_)));
+			money_inventory_layout.addView(makeInventoryRow(Color.GREEN,
+					"Bank", Integer.toString(game_information_.dealer_bank_)));
+			money_inventory_layout.addView(makeInventoryRow(Color.GREEN, "Loan",
 	        		"(" + Integer.toString(game_information_.dealer_loan_) + ")"));
-        	inventory_layout.addView(makeInventoryRow(Color.GREEN, "Total",
+			money_inventory_layout.addView(makeInventoryRow(Color.GREEN, "Total",
 	        		Integer.toString(game_information_.dealer_cash_ +
 	        				game_information_.dealer_bank_ -
 	        				game_information_.dealer_loan_)));
         	
         	// A click should make the dialog disappear.
+			LinearLayout inventory_layout =
+				(LinearLayout)inventory_dialog_.findViewById(R.id.inventory_layout);
         	inventory_layout.setOnClickListener(new View.OnClickListener() {
 	        	public void onClick(View v) {
 	    			dismissDialog(DIALOG_INVENTORY);
@@ -802,10 +707,13 @@ public class DopeWarsGame extends Activity {
 	        ((ImageView)(bank_withdraw_dialog_.findViewById(R.id.bank_icon))).setOnClickListener(
 	        		new CompleteBankWithdrawListener());
 	        break;
+	        
+	    // TODO: Add an alternate version that clears the game info when returning to the main menu
+	    // TODO: Make the drugs bought and sold part of this prettier
+	    // TODO: Put the main layout inside a scrollview
 		case DIALOG_END_GAME:
 			dialog_to_expand = end_game_dialog_;
 			
-			// TODO: Add lots of statistics about the game.
 			((TextView)(end_game_dialog_.findViewById(R.id.total_cash))).setText(
         			"$" + Integer.toString(game_information_.dealer_cash_ + 
         					game_information_.dealer_bank_ - 
@@ -840,7 +748,6 @@ public class DopeWarsGame extends Activity {
 	        			LinearLayout.LayoutParams.WRAP_CONTENT));
 	        	drug_display.setOrientation(LinearLayout.HORIZONTAL);
 	        	String drug_string = bought_drug_names.next();
-	        	// TODO: make these UI elements look prettier
 	        	TextView drug_header = new TextView(this);
 	        	drug_header.setLayoutParams(new LinearLayout.LayoutParams(
 	        			LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -922,7 +829,6 @@ public class DopeWarsGame extends Activity {
 			dialog_params.width = WindowManager.LayoutParams.FILL_PARENT;
 			dialog_to_expand.getWindow().setAttributes(dialog_params);
 		}
-        dealer_data_.close();
     }
 	
 	// Convenience function for making a button on the main screen of rows of buttons. A button
@@ -1003,10 +909,7 @@ public class DopeWarsGame extends Activity {
     			LinearLayout.LayoutParams.WRAP_CONTENT));
 		outer_layout_.removeAllViews();
 		total_width_added_ = 0;
-        dealer_data_.open();
-		game_information_.setCurrentGameInformation(
-				dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
-        
+		
         // First check if there are cops. If there are cops don't show anything other than the
         // fight related buttons and info.
         if (game_information_.location_cops_ > 0) {
@@ -1057,8 +960,7 @@ public class DopeWarsGame extends Activity {
 	        	String drug_name = drug_names.next();
 	        	int drug_price = game_information_.location_drugs_.get(
 	        			drug_name).intValue();
-				int drug_picture = drug_icons_.get(
-						game_information_.drugs_.get(drug_name).get(DRUGS_ICON).intValue());
+				int drug_picture = drug_icons_.get(game_information_.drugs_.get(drug_name).icon_);
 	        	LinearLayout next_drug = makeButton(R.drawable.btn_translucent_gray,
 	        			drug_picture, drug_name,
 	        			"$" + Integer.toString(drug_price));
@@ -1096,8 +998,7 @@ public class DopeWarsGame extends Activity {
 	    	String current_location = 
 	    		(String)game_information_.locations_.keySet().
 	    		toArray()[game_information_.location_];
-	    	if (game_information_.locations_.get(current_location).get(
-	    			LOCATION_LOAN_SHARK) != null) {
+	    	if (game_information_.locations_.get(current_location).has_loan_shark_) {
 				LinearLayout loan_shark_button = makeButton(R.drawable.btn_translucent_gray,
 		    			R.drawable.loan_shark, "Shark", Integer.toString(
 		    					game_information_.dealer_loan_));
@@ -1111,7 +1012,7 @@ public class DopeWarsGame extends Activity {
 	    	// TODO: change the default color to yellow
 	    	// TODO: make the color configurable?
 	    	// TODO: make the name configurable
-	    	if (game_information_.locations_.get(current_location).get(LOCATION_BANK) != null) {
+	    	if (game_information_.locations_.get(current_location).has_bank_) {
 				LinearLayout bank_button = makeButton(R.drawable.btn_translucent_gray,
 		    			R.drawable.bank, "Bank",
 		    			Integer.toString(game_information_.dealer_bank_));
@@ -1261,16 +1162,12 @@ public class DopeWarsGame extends Activity {
 	        }
         }
         
-        dealer_data_.close();
 	}
 	
 	// When moving from one location to another (advancing one turn) this resets all the drugs
 	// that are available and processes all the random events that can happen on a turn-by-turn
 	// basis.
 	public void setupLocation() {
-		dealer_data_.open();
-		game_information_.setCurrentGameInformation(
-				dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
         game_information_.game_messages_.clear();
         game_information_.fight_messages_.clear();
         
@@ -1279,10 +1176,8 @@ public class DopeWarsGame extends Activity {
         String current_location = 
         	(String)game_information_.locations_.keySet().
         	toArray()[game_information_.location_];
-    	int base_drugs_count = game_information_.locations_.get(current_location).
-    	    get(LOCATION_DRUGS).intValue();
-    	int drug_variance = game_information_.locations_.get(current_location).
-	        get(LOCATION_VARIANCE).intValue();
+    	int base_drugs_count = game_information_.locations_.get(current_location).base_drugs_;
+    	int drug_variance = game_information_.locations_.get(current_location).drug_variance_;
 		int num_drugs_present = base_drugs_count + rand_gen_.nextInt(drug_variance + 1);
 		if (num_drugs_present < 1) {
 			num_drugs_present = 1;
@@ -1327,9 +1222,9 @@ public class DopeWarsGame extends Activity {
     	if (rand_gen_.nextDouble() < game_information_.coat_likelihood_) {
     		int coat_number = rand_gen_.nextInt(game_information_.coats_.size());
     		String coat_name = (String)game_information_.coats_.keySet().toArray()[coat_number];
-    		int coat_price = (int)(game_information_.coats_.get(coat_name).get(COATS_PRICE) +
+    		int coat_price = (int)(game_information_.coats_.get(coat_name).base_price_ +
     				(rand_gen_.nextDouble() - 0.5) *
-    				game_information_.coats_.get(coat_name).get(COATS_VARIANCE));
+    				game_information_.coats_.get(coat_name).price_variance_);
     		game_information_.location_coats_.put(coat_name, coat_price);
     	}
     	
@@ -1340,9 +1235,9 @@ public class DopeWarsGame extends Activity {
     	if (rand_gen_.nextDouble() < game_information_.gun_likelihood_) {
     		int gun_number = rand_gen_.nextInt(game_information_.guns_.size());
     		String gun_name = (String)game_information_.guns_.keySet().toArray()[gun_number];
-    		int gun_price = (int)(game_information_.guns_.get(gun_name).get(GUNS_PRICE) +
+    		int gun_price = (int)(game_information_.guns_.get(gun_name).base_price_ + 
     				(rand_gen_.nextDouble() - 0.5) *
-    				game_information_.guns_.get(gun_name).get(GUNS_VARIANCE));
+    				game_information_.guns_.get(gun_name).price_variance_);
     		game_information_.location_guns_.put(gun_name, gun_price);
     	}
     	
@@ -1363,38 +1258,25 @@ public class DopeWarsGame extends Activity {
     		fight_message += "found you!";
     		game_information_.fight_messages_.add(fight_message);
     	}
-    	
-    	// Save back all the information altered while setting up the new location.
-        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-        		game_information_.getCurrentGameInformation());
-    	dealer_data_.close();
 	}
 
 	// Given a set of drug attributes this will determine a random price within the parameters
 	// of that drug. It will return a price and also other messages about the price (notification
 	// messages that the drug price is unusually high or low).
-	public Vector<String> chooseDrugPrice(
-			String name, HashMap<String, Float> drug_attributes) {
+	// TODO: handle custom messages for drugs
+	public Vector<String> chooseDrugPrice(String name, Drug drug) {
 		Vector<String> price_and_messages = new Vector<String>();
-		int base_price = drug_attributes.get("base_price").intValue();
-		int price_variance = drug_attributes.get("price_variance").intValue();
+		int base_price = drug.base_price_;
+		int price_variance = drug.price_variance_;
 		int price = (int)(base_price - price_variance / 2.0 +
 				rand_gen_.nextDouble() * price_variance);
 		// Check for price jumps
-		if (drug_attributes.get("low_probability") != null) {
-			float low_probability = drug_attributes.get("low_probability");
-			if (rand_gen_.nextFloat() < low_probability) {
-				float multiplier = drug_attributes.get("low_multiplier");
-				price = (int)(price * multiplier);
-				price_and_messages.add(name + " is being sold at very low prices!");
-			}
-		} else if (drug_attributes.get("high_probability") != null) {
-			float high_probability = drug_attributes.get("high_probability");
-			if (rand_gen_.nextFloat() < high_probability) {
-				float multiplier = drug_attributes.get("high_multiplier");
-				price = (int)(price * multiplier);
-				price_and_messages.add(name + " is being sold at very high prices!");
-			}
+		if (rand_gen_.nextFloat() < drug.low_probability_) {
+			price = (int)(price * drug.low_multiplier_);
+			price_and_messages.add(name + " is being sold at very low prices!");
+		} else if (rand_gen_.nextFloat() < drug.high_probability_) {
+			price = (int)(price * drug.high_multiplier_);
+			price_and_messages.add(name + " is being sold at very high prices!");
 		}
 		price_and_messages.insertElementAt(Integer.toString(price), 0);
 		return price_and_messages;
@@ -1412,14 +1294,6 @@ public class DopeWarsGame extends Activity {
 		t.setLayoutParams(new LinearLayout.LayoutParams(width, height, weight));
 		t.setText(text);
 		return t;
-	}
-	
-	// Special convenience function for a part of the inventory dialog.
-	// TODO: make parameters customizable?
-	private TextView makeInventoryHeader(String text) {
-		return constructTextView(Color.WHITE, (float)16.0, Gravity.CENTER,
-				LinearLayout.LayoutParams.WRAP_CONTENT,
-    			LinearLayout.LayoutParams.WRAP_CONTENT, (float)1.0, text);
 	}
 	
 	// Special convenience function for a part of the inventory dialog.
