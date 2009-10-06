@@ -62,12 +62,11 @@ public class DopeWars extends Activity {
 			// Set the special run-time-only flag to avoid doing initialization when starting the
 			// game.
 			dealer_data_.open();
-			GameInformation game_info = new GameInformation("");
-			game_info.setCurrentGameInformation(
+			GameInformation game_info = new GameInformation(
 					dealer_data_.getDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO));
 			game_info.do_initial_setup_ = 0;
 			dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-					game_info.getCurrentGameInformation());
+					game_info.serializeGameInformation());
 			dealer_data_.close();
 			
 			// This activity represents the playable game.
@@ -109,12 +108,9 @@ public class DopeWars extends Activity {
 			dealer_data_.open();
 	        GameInformation game_information = new GameInformation(
 	        		dealer_data_.getGameString(game_));
-	        String game_info_string = game_information.serialized_starting_game_info_;
-	        game_info_string = game_info_string.replaceAll("##", "&&");
-	        game_information.setCurrentGameInformation(game_info_string);
 	        game_information.do_initial_setup_ = 1;
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_INFO,
-	        		game_information.getCurrentGameInformation());
+	        		game_information.serializeGameInformation());
 	        dealer_data_.setDealerString(DealerDataAdapter.KEY_DEALER_GAME_ID,
 	        		Integer.toString(game_));
 	        dealer_data_.close();
@@ -168,7 +164,8 @@ public class DopeWars extends Activity {
 						.getText().toString();
 				}
 				
-				// TODO: revisit these settings to tweak this connection to act nice.
+				// TODO: revisit these settings to tweak this connection to act nice,
+				//       particularly when the connection is not present or spotty.
 	    		
 				HttpURLConnection conn =
 	    			(HttpURLConnection)(new URL(new_game_settings_string)).openConnection();

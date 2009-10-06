@@ -4,80 +4,317 @@
  * be significantly easier and more efficient (unproven) than making many small database
  * transactions in each function every time information about the game is needed.
  * 
- * TODO: static-ize all the string constants in here, or use a strings file or something
- * TODO: better class name?
+ * TODO: it'd be nice if these were protobufs but I don't think there's a nice Eclipse plugin for
+ *       that yet.
  */
 
 package com.daverin.dopewars;
 
+import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
 import android.util.Log;
-import android.widget.TextView;
 
 public class GameInformation {
-	
-	public static String DELIMITER_1 = "&&";
-	public static String DELIMITER_2 = "--";
-	public static String DELIMITER_3 = "__";
-	public static String DELIMITER_3a = "==";
-	public static String DELIMITER_4 = "%%";
-	public static String DELIMITER_5 = "::";
-	
-	public static String DEALER_CASH = "cash";
-	public static String DEALER_SPACE = "space";
-	public static String DEALER_MAX_SPACE = "max_space";
-	public static String DEALER_LOAN = "loan";
-	public static String DEALER_BANK = "bank";
-	public static String DEALER_LOCATION = "location";
-	public static String DEALER_DAYS_LEFT = "days_left";
-	public static String DEALER_HEALTH = "dealer_health";
-	public static String DEALER_COPS = "cops_health";
-	public static String DEALER_INVENTORY = "dealer_inventory";
+
+	// Ths strings used in serializing the game information.
+	public static String ADDITIONAL_SPACE = "additional_space";
+	public static String AMOUNT_DRUGS_BOUGHT = "amount_drugs_bought";
+	public static String AMOUNT_DRUGS_SOLD = "amount_drugs_sold";
+	public static String BANK = "bank";
+	public static String BANK_INTEREST = "bank_interest";
+	public static String BANK_INTEREST_RATE = "bank_interest_rate";
+	public static String BASE_DRUGS = "base_drugs";
+	public static String BASE_PRICE = "base_price";
+	public static String CASH = "cash";
+	public static String COAT = "coat";
+	public static String COAT_LIKELIHOOD = "coat_likelihood";
+	public static String COATS_ADDED_SIZE = "coats_added_size";
+	public static String COATS_BOUGHT = "coats_bought";
+	public static String COPS = "cops_health";
+	public static String COPS_KILLED = "cops_killed";
+	public static String COPS_LIKELIHOOD = "cops_likelihood";
+	public static String CUSTOM_MESSAGE = "message";
+	public static String DAYS_LEFT = "days_left";
+	public static String DAYS_TO_PAY_OFF_LOAN = "days_to_pay_off_loan";
 	public static String DEALER_GUNS = "dealer_guns";
-	public static String LOCATION_DRUGS = "location_inventory";
+	public static String DEALER_LOCATION = "dealer_location";
+	public static String DEPUTIES_KILLED = "deputies_killed";
+	public static String DO_INITIALIZE = "do_initial_setup";
+	public static String DRUG = "drug";
+	public static String DRUG_VARIANCE = "drug_variance";
+	public static String FIGHT_MESSAGES = "fight_messages";
+	public static String GAME_ID = "game_id";
+	public static String GUN = "gun";
+	public static String GUN_LIKELIHOOD = "gun_likelihood";
+	public static String GUNS_BOUGHT = "guns_bought";
+	public static String HAS_BANK = "has_bank";
+	public static String HAS_LOAN_SHARK = "has_loan_shark";
+	public static String HEALTH = "dealer_health";
+	public static String HIGH_MULTIPLIER = "high_multiplier";
+	public static String HIGH_PROBABILITY = "high_probability";
+	public static String ICON = "icon";
+	public static String INVENTORY = "dealer_inventory";
+	public static String LOAN = "loan";
+	public static String LOAN_INTEREST = "loan_interest";
+	public static String LOAN_INTEREST_RATE = "loan_interest_rate";
+	public static String LOCATION = "location";
 	public static String LOCATION_COATS = "coat_inventory";
+	public static String LOCATION_DRUGS = "location_inventory";
 	public static String LOCATION_GUNS = "gun_inventory";
 	public static String LOCATION_MESSAGES = "messages";
-	public static String FIGHT_MESSAGES = "fight_messages";
+	public static String LOW_MULTIPLIER = "low_multiplier";
+	public static String LOW_PROBABILITY = "low_probability";
+	public static String MAP_X = "map_x";
+	public static String MAP_Y = "map_y";
+	public static String MAX_FIREPOWER = "max_dealer_firepower";
+	public static String MAX_SPACE = "max_space";
+	public static String MONEY_INVESTED_IN_BANK = "money_invested";
+	public static String MONEY_PAID_TO_LOAN_SHARK = "money_paid_to_loan_shark";
+	public static String MONEY_SPENT_ON_COATS = "money_spent_on_coats";
+	public static String MONEY_SPENT_ON_GUNS = "money_spent_on_guns";
+	public static String NAME = "name";
+	public static String NUM_DRUGS_BOUGHT = "num_drugs_bought";
+	public static String NUM_DRUGS_SOLD = "num_drugs_sold";
+	public static String PRICE_VARIANCE = "price_variance";
+	public static String RUN_ATTEMPTS = "run_attempts";
+	public static String SPACE = "space";
+	public static String SUCCESSFUL_RUNS = "times_ran";
+	public static String TOTAL_DAYS = "total_days";
 	
-	public static String DEALER_COPS_KILLED = "cops_killed";
-	public static String DEALER_DEPUTIES_KILLED = "deputies_killed";
-	public static String DEALER_SUCCESSFUL_RUNS = "times_ran";
-	public static String DEALER_RUN_ATTEMPTS = "run_attempts";
-	public static String DEALER_COATS_BOUGHT = "coats_bought";
-	public static String DEALER_COATS_ADDED_SIZE = "coats_added_size";
-	public static String DEALER_MONEY_SPENT_ON_COATS = "money_spent_on_coats";
-	public static String DEALER_GUNS_BOUGHT = "guns_bought";
-	public static String DEALER_MONEY_SPENT_ON_GUNS = "money_spent_on_guns";
-	public static String DEALER_MAX_DEALER_FIREPOWER = "max_dealer_firepower";
-	public static String DEALER_NUM_DRUGS_BOUGHT = "num_drugs_bought";
-	public static String DEALER_AMOUNT_DRUGS_BOUGHT = "amount_drugs_bought";
-	public static String DEALER_NUM_DRUGS_SOLD = "num_drugs_sold";
-	public static String DEALER_AMOUNT_DRUGS_SOLD = "amount_drugs_sold";
-	public static String DEALER_MONEY_PAID_TO_LOAN_SHARK = "money_paid_to_loan_shark";
-	public static String DEALER_LOAN_INTEREST = "loan_interest";
-	public static String DEALER_DAYS_TO_PAY_OFF_LOAN = "days_to_pay_off_loan";
-	public static String DEALER_MONEY_INVESTED_IN_BANK = "money_invested";
-	public static String DEALER_BANK_INTEREST = "bank_interest";
-			
-	public static String GAME_ID = "game_id";
-    public static String GAME_DRUGS = "drugs";
-	public static String GAME_COATS = "coats";
-	public static String GAME_GUNS = "guns";
-	public static String GAME_LOCATIONS = "locations";
-	public static String GAME_LOAN_INTEREST_RATE = "loan_interest_rate";
-	public static String GAME_BANK_INTEREST_RATE = "bank_interest_rate";
-	public static String GAME_COAT_LIKELIHOOD = "coat_likelihood";
-	public static String GAME_GUN_LIKELIHOOD = "gun_likelihood";
-	public static String GAME_COPS_LIKELIHOOD = "cops_likelihood";
-	public static String GAME_STARTING_GAME_INFO = "starting_game_info";
+	// Inner class representing a single drug.
+	public class Drug {
+		public String name_ = "";
+		public int base_price_;
+		public int icon_;
+		public double high_multiplier_;
+		public double high_probability_;
+		public double low_multiplier_;
+		public double low_probability_;
+		public String custom_message_ = "";
+		public int price_variance_;
+
+		public Drug(String input_string) {
+			parseDrug(input_string);
+		}
+		
+		public void parseDrug(String input_string) {
+			StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(input_string));
+			tokenizer.wordChars('_', '_');
+			tokenizer.wordChars(':', ':');
+			tokenizer.wordChars('&', '&');
+			tokenizer.eolIsSignificant(false);
+			try {
+				while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
+					String[] next_attribute = tokenizer.sval.split(":", 2);
+					if (next_attribute.length != 2) {
+						Log.d("dopewars", "Invalid attribute: " + tokenizer.sval);
+					} else if (next_attribute[0].equals(NAME)) {
+						name_ = next_attribute[1];
+					} else if (next_attribute[0].equals(BASE_PRICE)) {
+						base_price_ = Integer.parseInt(next_attribute[1]);
+					} else if (next_attribute[0].equals(CUSTOM_MESSAGE)) {
+						custom_message_ = next_attribute[1];
+					} else if (next_attribute[0].equals(ICON)) {
+						icon_ = Integer.parseInt(next_attribute[1]);
+					} else if (next_attribute[0].equals(HIGH_MULTIPLIER)) {
+						high_multiplier_ = Double.parseDouble(next_attribute[1]);
+					} else if (next_attribute[0].equals(HIGH_PROBABILITY)) {
+						high_probability_ = Double.parseDouble(next_attribute[1]);
+					} else if (next_attribute[0].equals(LOW_MULTIPLIER)) {
+						low_multiplier_ = Double.parseDouble(next_attribute[1]);
+					} else if (next_attribute[0].equals(LOW_PROBABILITY)) {
+						low_probability_ = Double.parseDouble(next_attribute[1]);
+					} else if (next_attribute[0].equals(PRICE_VARIANCE)) {
+						price_variance_ = Integer.parseInt(next_attribute[1]);
+					} else {
+						Log.d("dopewars", "Valid but unrecognized attribute: " + tokenizer.sval);
+					}
+				}
+			} catch (IOException e) {
+				Log.d("dopewars", "Exception reading input string: " + input_string);
+			}
+		}
+		
+		public String serializeDrug() {
+			return stringParam(NAME, name_) + integerParam(BASE_PRICE, base_price_) +
+				stringParam(CUSTOM_MESSAGE, custom_message_) +
+				integerParam(ICON, icon_) + doubleParam(HIGH_MULTIPLIER, high_multiplier_) +
+				doubleParam(HIGH_MULTIPLIER, high_multiplier_) +
+				doubleParam(HIGH_PROBABILITY, high_probability_) +
+				doubleParam(LOW_MULTIPLIER, low_multiplier_) +
+				doubleParam(LOW_PROBABILITY, low_probability_) +
+				integerParam(PRICE_VARIANCE, price_variance_);
+		}
+	}
 	
-	public static String GAME_DO_INITIALIZE = "do_initial_setup";
+	// Inner class representing a single coat.
+	public class Coat {
+		public String name_ = "";
+		public int base_price_;
+		public int price_variance_;
+		public int additional_space_;
+
+		public Coat(String input_string) {
+			parseCoat(input_string);
+		}
+		
+		public void parseCoat(String input_string) {
+			StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(input_string));
+			tokenizer.wordChars('_', '_');
+			tokenizer.wordChars(':', ':');
+			tokenizer.wordChars('&', '&');
+			tokenizer.eolIsSignificant(false);
+			try {
+				while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
+					String[] next_attribute = tokenizer.sval.split(":", 2);
+					if (next_attribute.length != 2) {
+						Log.d("dopewars", "Invalid attribute: " + tokenizer.sval);
+					} else if (next_attribute[0].equals(NAME)) {
+						name_ = next_attribute[1];
+					} else if (next_attribute[0].equals(BASE_PRICE)) {
+						base_price_ = Integer.parseInt(next_attribute[1]);
+					} else if (next_attribute[0].equals(ADDITIONAL_SPACE)) {
+						additional_space_ = Integer.parseInt(next_attribute[1]);
+					} else if (next_attribute[0].equals(PRICE_VARIANCE)) {
+						price_variance_ = Integer.parseInt(next_attribute[1]);
+					} else {
+						Log.d("dopewars", "Valid but unrecognized attribute: " + tokenizer.sval);
+					}
+				}
+			} catch (IOException e) {
+				Log.d("dopewars", "Exception reading input string: " + input_string);
+			}
+		}
+		
+		public String serializeCoat() {
+			return stringParam(NAME, name_) + integerParam(BASE_PRICE, base_price_) +
+				integerParam(ADDITIONAL_SPACE, additional_space_) +
+				integerParam(PRICE_VARIANCE, price_variance_);
+		}
+	}
+
+	// Inner class representing a single gun.
+	public class Gun {
+		public String name_ = "";
+		public int base_price_;
+		public int price_variance_;
+		public int space_;
+		public int firepower_;
+
+		public Gun(String input_string) {
+			parseGun(input_string);
+		}
+		
+		public void parseGun(String input_string) {
+			StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(input_string));
+			tokenizer.wordChars('_', '_');
+			tokenizer.wordChars(':', ':');
+			tokenizer.wordChars('&', '&');
+			tokenizer.eolIsSignificant(false);
+			try {
+				while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
+					String[] next_attribute = tokenizer.sval.split(":", 2);
+					if (next_attribute.length != 2) {
+						Log.d("dopewars", "Invalid attribute: " + tokenizer.sval);
+					} else if (next_attribute[0].equals(NAME)) {
+						name_ = next_attribute[1];
+					} else if (next_attribute[0].equals(BASE_PRICE)) {
+						base_price_ = Integer.parseInt(next_attribute[1]);
+					} else if (next_attribute[0].equals(SPACE)) {
+						space_ = Integer.parseInt(next_attribute[1]);
+					} else if (next_attribute[0].equals(PRICE_VARIANCE)) {
+						price_variance_ = Integer.parseInt(next_attribute[1]);
+					} else {
+						Log.d("dopewars", "Valid but unrecognized attribute: " +
+								tokenizer.sval);
+					}
+				}
+			} catch (IOException e) {
+				Log.d("dopewars", "Exception reading input string: " + input_string);
+			}
+		}
+		
+		public String serializeGun() {
+			return stringParam(NAME, name_) + integerParam(BASE_PRICE, base_price_) +
+				integerParam(SPACE, space_) + integerParam(PRICE_VARIANCE, price_variance_);
+		}	
+	}
 	
-	public void setCurrentGameInformation(String serialized_current_game_info) {
+	// Inner class representing a single location.
+	public class Location {
+		public String name_ = "";
+		public boolean has_bank_;
+		public int base_drugs_;
+		public int drug_variance_;
+		public boolean has_loan_shark_;
+		public int map_x_;
+		public int map_y_;
+		
+		public Location(String input_string) {
+			parseLocation(input_string);
+		}
+		
+		public void parseLocation(String input_string) {
+			StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(input_string));
+			tokenizer.wordChars('_', '_');
+			tokenizer.wordChars(':', ':');
+			tokenizer.wordChars('&', '&');
+			tokenizer.eolIsSignificant(false);
+			try {
+				while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
+					String[] next_attribute = tokenizer.sval.split(":", 2);
+					if (next_attribute.length != 2) {
+						Log.d("dopewars", "Invalid attribute: " + tokenizer.sval);
+					} else if (next_attribute[0].equals(NAME)) {
+						name_ = next_attribute[1];
+					} else if (next_attribute[0].equals(HAS_BANK)) {
+						has_bank_ = Boolean.parseBoolean(next_attribute[1]);
+					} else if (next_attribute[0].equals(BASE_DRUGS)) {
+						base_drugs_ = Integer.parseInt(next_attribute[1]);
+					} else if (next_attribute[0].equals(DRUG_VARIANCE)) {
+						drug_variance_ = Integer.parseInt(next_attribute[1]);
+					} else if (next_attribute[0].equals(HAS_LOAN_SHARK)) {
+						has_loan_shark_ = Boolean.parseBoolean(next_attribute[1]);
+					} else if (next_attribute[0].equals(MAP_X)) {
+						map_x_ = Integer.parseInt(next_attribute[1]);
+					} else if (next_attribute[0].equals(MAP_Y)) {
+						map_y_ = Integer.parseInt(next_attribute[1]);
+					} else {
+						Log.d("dopewars", "Valid but unrecognized attribute: " +
+								tokenizer.sval);
+					}
+				}
+			} catch (IOException e) {
+				Log.d("dopewars", "Exception reading input string: " + input_string);
+			}
+		}
+		
+		public String serializeLocation() {
+			return stringParam(NAME, name_) + booleanParam(HAS_BANK, has_bank_) +
+				integerParam(BASE_DRUGS, base_drugs_) +
+				integerParam(DRUG_VARIANCE, drug_variance_) +
+				booleanParam(HAS_LOAN_SHARK, has_loan_shark_) +
+				integerParam(MAP_X, map_x_) + integerParam(MAP_Y, map_y_);
+		}	
+	}
+	
+	// Initialize the game info with a serialized version.
+	public GameInformation(String serialized_game_info) {
+		parseGameInformation(serialized_game_info);
+	}
+	
+	// Take a serialized version of the game information and populate this object with its
+	// contents.
+	public void parseGameInformation(String serialized_game_information) {
+		drugs_ = new HashMap<String, Drug>();
+		coats_ = new HashMap<String, Coat>();
+		guns_ = new HashMap<String, Gun>();
+		locations_ = new HashMap<String, Location>();
 		dealer_drugs_ = new HashMap<String, Integer>();
 		dealer_guns_ = new HashMap<String, Integer>();
 		location_drugs_ = new HashMap<String, Integer>();
@@ -85,200 +322,127 @@ public class GameInformation {
 		location_guns_ = new HashMap<String, Integer>();
 		game_messages_ = new Vector<String>();
 		fight_messages_ = new Vector<String>();
-		
 		num_drugs_bought_ = new HashMap<String, Integer>();
 		amount_drugs_bought_ = new HashMap<String, Integer>();
 		num_drugs_sold_ = new HashMap<String, Integer>();
 		amount_drugs_sold_ = new HashMap<String, Integer>();
 		
-		String[] string_groups = serialized_current_game_info.split(DELIMITER_1);
-		for (int i = 0; i < string_groups.length; ++i) {
-			String[] group = string_groups[i].split(DELIMITER_2);
-			if (group.length != 2) {
-				Log.d("dopewars", "Invalid game info group: " + string_groups[i]);
-			} else if (group[0].equals(DEALER_CASH)) {
-				dealer_cash_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_SPACE)) {
-				dealer_space_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_MAX_SPACE)) {
-				dealer_max_space_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_LOAN)) {
-				dealer_loan_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_BANK)) {
-				dealer_bank_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_LOCATION)) {
-				location_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_DAYS_LEFT)) {
-				game_days_left_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_HEALTH)) {
-				dealer_health_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_COPS)) {
-				location_cops_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_INVENTORY)) {
-				dealer_drugs_ = parseStringToIntMap(group[1]);
-			} else if (group[0].equals(DEALER_GUNS)) {
-				dealer_guns_ = parseStringToIntMap(group[1]);
-			} else if (group[0].equals(LOCATION_DRUGS)) {
-				location_drugs_ = parseStringToIntMap(group[1]);
-			} else if (group[0].equals(LOCATION_COATS)) {
-				location_coats_ = parseStringToIntMap(group[1]);
-			} else if (group[0].equals(LOCATION_GUNS)) {
-				location_guns_ = parseStringToIntMap(group[1]);
-			} else if (group[0].equals(LOCATION_MESSAGES)) {
-				game_messages_ = parseStringVector(group[1]);
-			} else if (group[0].equals(FIGHT_MESSAGES)) {
-				fight_messages_ = parseStringVector(group[1]);
-			} else if (group[0].equals(DEALER_COPS_KILLED)) {
-				dealer_cops_killed_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_DEPUTIES_KILLED)) {
-				dealer_deputies_killed_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_SUCCESSFUL_RUNS)) {
-				dealer_successful_runs_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_RUN_ATTEMPTS)) {
-				dealer_run_attempts_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_COATS_BOUGHT)) {
-				coats_bought_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_COATS_ADDED_SIZE)) {
-				coats_added_size_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_MONEY_SPENT_ON_COATS)) {
-				money_spent_on_coat_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_GUNS_BOUGHT)) {
-				guns_bought_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_MONEY_SPENT_ON_GUNS)) {
-				money_spent_on_guns_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_MAX_DEALER_FIREPOWER)) {
-				max_dealer_firepower_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_NUM_DRUGS_BOUGHT)) {
-				num_drugs_bought_ = parseStringToIntMap(group[1]);
-			} else if (group[0].equals(DEALER_AMOUNT_DRUGS_BOUGHT)) {
-				amount_drugs_bought_ = parseStringToIntMap(group[1]);
-			} else if (group[0].equals(DEALER_NUM_DRUGS_SOLD)) {
-				num_drugs_sold_ = parseStringToIntMap(group[1]);
-			} else if (group[0].equals(DEALER_AMOUNT_DRUGS_SOLD)) {
-				amount_drugs_sold_ = parseStringToIntMap(group[1]);
-			} else if (group[0].equals(DEALER_MONEY_PAID_TO_LOAN_SHARK)) {
-				money_paid_to_loan_shark_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_LOAN_INTEREST)) {
-				loan_interest_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_DAYS_TO_PAY_OFF_LOAN)) {
-				days_to_pay_off_loan_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_MONEY_INVESTED_IN_BANK)) {
-				money_invested_in_bank_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(DEALER_BANK_INTEREST)) {
-				bank_interest_ = Integer.parseInt(group[1]);
-			} else if (group[0].equals(GAME_DO_INITIALIZE)) {
-				do_initial_setup_ = Integer.parseInt(group[1]);
-			} else {
-				Log.d("dopewars", "Unknown game info group");
+		StreamTokenizer tokenizer =
+			new StreamTokenizer(new StringReader(serialized_game_information));
+		tokenizer.quoteChar('#');
+		tokenizer.wordChars('_', '_');
+		tokenizer.wordChars(':', ':');
+		tokenizer.wordChars('&', '&');
+		tokenizer.eolIsSignificant(false);
+		try {
+			while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
+				String[] group = tokenizer.sval.split(":", 2);
+				if (group.length != 2) {
+					Log.d("dopewars", "Invalid game info group: " + tokenizer.sval);
+				} else if (group[0].equals(GAME_ID)) {
+					game_id_ = group[1];
+				} else if (group[0].equals(DRUG)) {
+					Drug d = new Drug(group[1]);
+					drugs_.put(d.name_, d);
+				} else if (group[0].equals(COAT)) {
+					Coat c = new Coat(group[1]);
+					coats_.put(c.name_, c);
+				} else if (group[0].equals(GUN)) {
+					Gun g = new Gun(group[1]);
+					guns_.put(g.name_, g);
+				} else if (group[0].equals(LOCATION)) {
+					Location l = new Location(group[1]);
+					locations_.put(l.name_, l);
+				} else if (group[0].equals(LOAN_INTEREST_RATE)) {
+					loan_interest_rate_ = Double.parseDouble(group[1]);
+				} else if (group[0].equals(BANK_INTEREST_RATE)) {
+					bank_interest_rate_ = Double.parseDouble(group[1]);
+				} else if (group[0].equals(COAT_LIKELIHOOD)) {
+					coat_likelihood_ = Double.parseDouble(group[1]);
+				} else if (group[0].equals(GUN_LIKELIHOOD)) {
+					gun_likelihood_ = Double.parseDouble(group[1]);
+				} else if (group[0].equals(COPS_LIKELIHOOD)) {
+					cops_likelihood_ = Double.parseDouble(group[1]);
+				} else if (group[0].equals(CASH)) {
+					dealer_cash_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(SPACE)) {
+					dealer_space_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(MAX_SPACE)) {
+					dealer_max_space_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(LOAN)) {
+					dealer_loan_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(BANK)) {
+					dealer_bank_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(DEALER_LOCATION)) {
+					location_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(DAYS_LEFT)) {
+					game_days_left_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(TOTAL_DAYS)) {
+					total_days_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(HEALTH)) {
+					dealer_health_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(COPS)) {
+					location_cops_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(INVENTORY)) {
+					dealer_drugs_ = parseStringToIntParam(group[1]);
+				} else if (group[0].equals(DEALER_GUNS)) {
+					dealer_guns_ = parseStringToIntParam(group[1]);
+				} else if (group[0].equals(LOCATION_DRUGS)) {
+					location_drugs_ = parseStringToIntParam(group[1]);
+				} else if (group[0].equals(LOCATION_COATS)) {
+					location_coats_ = parseStringToIntParam(group[1]);
+				} else if (group[0].equals(LOCATION_GUNS)) {
+					location_guns_ = parseStringToIntParam(group[1]);
+				} else if (group[0].equals(LOCATION_MESSAGES)) {
+					game_messages_ = parseStringVectorParam(group[1]);
+				} else if (group[0].equals(FIGHT_MESSAGES)) {
+					fight_messages_ = parseStringVectorParam(group[1]);
+				} else if (group[0].equals(COPS_KILLED)) {
+					dealer_cops_killed_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(DEPUTIES_KILLED)) {
+					dealer_deputies_killed_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(SUCCESSFUL_RUNS)) {
+					dealer_successful_runs_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(RUN_ATTEMPTS)) {
+					dealer_run_attempts_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(COATS_BOUGHT)) {
+					coats_bought_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(COATS_ADDED_SIZE)) {
+					coats_added_size_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(MONEY_SPENT_ON_COATS)) {
+					money_spent_on_coat_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(GUNS_BOUGHT)) {
+					guns_bought_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(MONEY_SPENT_ON_GUNS)) {
+					money_spent_on_guns_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(MAX_FIREPOWER)) {
+					max_dealer_firepower_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(NUM_DRUGS_BOUGHT)) {
+					num_drugs_bought_ = parseStringToIntParam(group[1]);
+				} else if (group[0].equals(AMOUNT_DRUGS_BOUGHT)) {
+					amount_drugs_bought_ = parseStringToIntParam(group[1]);
+				} else if (group[0].equals(NUM_DRUGS_SOLD)) {
+					num_drugs_sold_ = parseStringToIntParam(group[1]);
+				} else if (group[0].equals(AMOUNT_DRUGS_SOLD)) {
+					amount_drugs_sold_ = parseStringToIntParam(group[1]);
+				} else if (group[0].equals(MONEY_PAID_TO_LOAN_SHARK)) {
+					money_paid_to_loan_shark_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(LOAN_INTEREST)) {
+					loan_interest_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(DAYS_TO_PAY_OFF_LOAN)) {
+					days_to_pay_off_loan_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(MONEY_INVESTED_IN_BANK)) {
+					money_invested_in_bank_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(BANK_INTEREST)) {
+					bank_interest_ = Integer.parseInt(group[1]);
+				} else if (group[0].equals(DO_INITIALIZE)) {
+					do_initial_setup_ = Integer.parseInt(group[1]);
+				} else {
+					Log.d("dopewars", "Unknown game info group");
+				}
 			}
-		}
-	}
-	
-	// Serializes all the information stored in this game information object in a very specialized
-	// and simple format.
-	// TODO: consider xml or something else standard
-	public String getCurrentGameInformation() {
-		String serialized_game_info = "";
-		serialized_game_info +=
-			DEALER_CASH + DELIMITER_2 + Integer.toString(dealer_cash_) + DELIMITER_1 +
-			DEALER_SPACE + DELIMITER_2 + Integer.toString(dealer_space_) + DELIMITER_1 +
-			DEALER_MAX_SPACE + DELIMITER_2 + Integer.toString(dealer_max_space_) + DELIMITER_1 +
-			DEALER_LOAN + DELIMITER_2 + Integer.toString(dealer_loan_) + DELIMITER_1 +
-			DEALER_BANK + DELIMITER_2 + Integer.toString(dealer_bank_) + DELIMITER_1 +
-			DEALER_LOCATION + DELIMITER_2 + Integer.toString(location_) + DELIMITER_1 +
-			DEALER_DAYS_LEFT + DELIMITER_2 + Integer.toString(game_days_left_) + DELIMITER_1 +
-			DEALER_HEALTH + DELIMITER_2 + Integer.toString(dealer_health_) + DELIMITER_1 +
-			DEALER_COPS + DELIMITER_2 + Integer.toString(location_cops_) + DELIMITER_1 +
-			DEALER_INVENTORY + DELIMITER_2 + serializeStringToIntMap(dealer_drugs_) +
-			DELIMITER_1 +
-			DEALER_GUNS + DELIMITER_2 + serializeStringToIntMap(dealer_guns_) + DELIMITER_1 +
-			LOCATION_DRUGS + DELIMITER_2 + serializeStringToIntMap(location_drugs_) +
-			DELIMITER_1 +
-			LOCATION_COATS + DELIMITER_2 + serializeStringToIntMap(location_coats_) +
-			DELIMITER_1 +
-			LOCATION_GUNS + DELIMITER_2 + serializeStringToIntMap(location_guns_) +
-			DELIMITER_1 +
-			LOCATION_MESSAGES + DELIMITER_2 + serializeStringVector(game_messages_) + DELIMITER_1 +
-			FIGHT_MESSAGES + DELIMITER_2 + serializeStringVector(fight_messages_) + DELIMITER_1 +
-			DEALER_COPS_KILLED + DELIMITER_2 + Integer.toString(dealer_cops_killed_) +
-			DELIMITER_1 +
-			DEALER_DEPUTIES_KILLED + DELIMITER_2 + Integer.toString(dealer_deputies_killed_) +
-			DELIMITER_1 +
-			DEALER_SUCCESSFUL_RUNS + DELIMITER_2 + Integer.toString(dealer_successful_runs_) +
-			DELIMITER_1 +
-			DEALER_RUN_ATTEMPTS + DELIMITER_2 + Integer.toString(dealer_run_attempts_) +
-			DELIMITER_1 +
-			DEALER_COATS_BOUGHT + DELIMITER_2 + Integer.toString(coats_bought_) +
-			DELIMITER_1 +
-			DEALER_COATS_ADDED_SIZE + DELIMITER_2 + Integer.toString(coats_added_size_) +
-			DELIMITER_1 +
-			DEALER_MONEY_SPENT_ON_COATS + DELIMITER_2 + Integer.toString(money_spent_on_coat_) +
-			DELIMITER_1 +
-			DEALER_GUNS_BOUGHT + DELIMITER_2 + Integer.toString(guns_bought_) +
-			DELIMITER_1 +
-			DEALER_MONEY_SPENT_ON_GUNS + DELIMITER_2 + Integer.toString(money_spent_on_guns_) +
-			DELIMITER_1 +
-			DEALER_MAX_DEALER_FIREPOWER + DELIMITER_2 + Integer.toString(max_dealer_firepower_) +
-			DELIMITER_1 +
-			DEALER_NUM_DRUGS_BOUGHT + DELIMITER_2 + serializeStringToIntMap(num_drugs_bought_) +
-			DELIMITER_1 +
-			DEALER_AMOUNT_DRUGS_BOUGHT + DELIMITER_2 + serializeStringToIntMap(amount_drugs_bought_) +
-			DELIMITER_1 +
-			DEALER_NUM_DRUGS_SOLD + DELIMITER_2 + serializeStringToIntMap(num_drugs_sold_) +
-			DELIMITER_1 +
-			DEALER_AMOUNT_DRUGS_SOLD + DELIMITER_2 + serializeStringToIntMap(amount_drugs_sold_) +
-			DELIMITER_1 +
-			DEALER_MONEY_PAID_TO_LOAN_SHARK + DELIMITER_2 +
-			Integer.toString(money_paid_to_loan_shark_) + DELIMITER_1 +
-			DEALER_LOAN_INTEREST + DELIMITER_2 + Integer.toString(loan_interest_) +
-			DELIMITER_1 +
-			DEALER_DAYS_TO_PAY_OFF_LOAN + DELIMITER_2 + Integer.toString(days_to_pay_off_loan_) +
-			DELIMITER_1 +
-			DEALER_MONEY_INVESTED_IN_BANK + DELIMITER_2 +
-			Integer.toString(money_invested_in_bank_) +	DELIMITER_1 +
-			DEALER_BANK_INTEREST + DELIMITER_2 + Integer.toString(bank_interest_) + DELIMITER_1 +
-			GAME_DO_INITIALIZE + DELIMITER_2 + Integer.toString(do_initial_setup_);
-		return serialized_game_info;
-	}
-	
-	// Initialize the game info with a serialized version.
-	public GameInformation(String serialized_game_info) {
-		setCurrentGameInformation("");
-		
-		drugs_ = new HashMap<String, HashMap<String, Float>>();
-		coats_ = new HashMap<String, HashMap<String, Float>>();
-		guns_ = new HashMap<String, HashMap<String, Float>>();
-		locations_ = new HashMap<String, HashMap<String, Float>>();
-		String[] string_groups = serialized_game_info.split(DELIMITER_1);
-		for (int i = 0; i < string_groups.length; ++i) {
-			String[] group = string_groups[i].split(DELIMITER_2, 2);
-			if (group.length != 2) {
-				Log.d("dopewars", "Invalid game info group: " + string_groups[i]);
-			} else if (group[0].equals(GAME_ID)) {
-				game_id_ = group[1];
-			} else if (group[0].equals(GAME_DRUGS)) {
-				drugs_ = parseStringToStringToFloatMap(group[1]);
-			} else if (group[0].equals(GAME_COATS)) {
-				coats_ = parseStringToStringToFloatMap(group[1]);
-			} else if (group[0].equals(GAME_GUNS)) {
-				guns_ = parseStringToStringToFloatMap(group[1]);
-			} else if (group[0].equals(GAME_LOCATIONS)) {
-				locations_ = parseStringToStringToFloatMap(group[1]);
-			} else if (group[0].equals(GAME_LOAN_INTEREST_RATE)) {
-				loan_interest_rate_ = Float.parseFloat(group[1]);
-			} else if (group[0].equals(GAME_BANK_INTEREST_RATE)) {
-				bank_interest_rate_ = Float.parseFloat(group[1]);
-			} else if (group[0].equals(GAME_COAT_LIKELIHOOD)) {
-				coat_likelihood_ = Float.parseFloat(group[1]);
-			} else if (group[0].equals(GAME_GUN_LIKELIHOOD)) {
-				gun_likelihood_ = Float.parseFloat(group[1]);
-			} else if (group[0].equals(GAME_COPS_LIKELIHOOD)) {
-				cops_likelihood_ = Float.parseFloat(group[1]);
-			} else if (group[0].equals(GAME_STARTING_GAME_INFO)) {
-				serialized_starting_game_info_ = group[1];
-			} else {
-				Log.d("dopewars", "Unknown game info group");
-			}
+		} catch (IOException e) {
+			Log.d("dopewars", "IOException parsing game information.");
 		}
 	}
 	
@@ -286,296 +450,195 @@ public class GameInformation {
 	// and simple format.
 	// TODO: consider xml or something else standard
 	public String serializeGameInformation() {
-		String serialized_game_info = "";
-		serialized_game_info += GAME_ID + DELIMITER_2 + game_id_ + DELIMITER_1 +
-			GAME_DRUGS + DELIMITER_2 + serializeStringToStringToFloatMap(drugs_) + DELIMITER_1 +
-			GAME_COATS + DELIMITER_2 + serializeStringToStringToFloatMap(coats_) + DELIMITER_1 +
-			GAME_GUNS + DELIMITER_2 + serializeStringToStringToFloatMap(guns_) + DELIMITER_1 +
-			GAME_LOCATIONS + DELIMITER_2 + serializeStringToStringToFloatMap(locations_) + DELIMITER_1 +
-			GAME_LOAN_INTEREST_RATE + DELIMITER_2 + Float.toString(loan_interest_rate_) + DELIMITER_1 +
-			GAME_BANK_INTEREST_RATE + DELIMITER_2 + Float.toString(bank_interest_rate_) + DELIMITER_1 +
-			GAME_COAT_LIKELIHOOD + DELIMITER_2 + Float.toString(coat_likelihood_) + DELIMITER_1 +
-			GAME_GUN_LIKELIHOOD + DELIMITER_2 + Float.toString(gun_likelihood_) + DELIMITER_1 +
-			GAME_COPS_LIKELIHOOD + DELIMITER_2 + Float.toString(cops_likelihood_) + DELIMITER_1 +
-			GAME_STARTING_GAME_INFO + DELIMITER_2 + serialized_starting_game_info_;
-		return serialized_game_info;
+		String serialized_game = stringParam(GAME_ID, game_id_) +
+			doubleParam(LOAN_INTEREST_RATE, loan_interest_rate_) +
+			doubleParam(BANK_INTEREST_RATE, bank_interest_rate_) +
+			doubleParam(COAT_LIKELIHOOD, coat_likelihood_) +
+			doubleParam(GUN_LIKELIHOOD, gun_likelihood_) +
+			doubleParam(COPS_LIKELIHOOD, cops_likelihood_);
+		
+		Iterator<String> elements = drugs_.keySet().iterator();
+		while (elements.hasNext()) {
+			String next_element = elements.next();
+			serialized_game += "#" + DRUG + ":" + drugs_.get(next_element).serializeDrug() + "# ";
+		}
+		elements = coats_.keySet().iterator();
+		while (elements.hasNext()) {
+			String next_element = elements.next();
+			serialized_game += "#" + COAT + ":" + coats_.get(next_element).serializeCoat() + "# ";
+		}
+		elements = guns_.keySet().iterator();
+		while (elements.hasNext()) {
+			String next_element = elements.next();
+			serialized_game += "#" + GUN + ":" + guns_.get(next_element).serializeGun() + "# ";
+		}
+		elements = locations_.keySet().iterator();
+		while (elements.hasNext()) {
+			String next_element = elements.next();
+			serialized_game += "#" + LOCATION + ":" + 
+					locations_.get(next_element).serializeLocation() + "# ";
+		}
+		
+		serialized_game += integerParam(CASH, dealer_cash_) +
+			integerParam(SPACE, dealer_space_) + integerParam(MAX_SPACE, dealer_max_space_) +
+			integerParam(LOAN, dealer_loan_) + integerParam(BANK, dealer_bank_) +
+			integerParam(DEALER_LOCATION, location_) + integerParam(DAYS_LEFT, game_days_left_) +
+			integerParam(TOTAL_DAYS, total_days_) +
+			integerParam(HEALTH, dealer_health_) + integerParam(COPS, location_cops_) +
+			stringToIntParam(INVENTORY, dealer_drugs_) +
+			stringToIntParam(DEALER_GUNS, dealer_guns_) +
+			stringToIntParam(LOCATION_DRUGS, location_drugs_) +
+			stringToIntParam(LOCATION_COATS, location_coats_) +
+			stringToIntParam(LOCATION_GUNS, location_guns_) +
+			stringVectorParam(LOCATION_MESSAGES, game_messages_) +
+			stringVectorParam(FIGHT_MESSAGES, fight_messages_) +
+			integerParam(COPS_KILLED, dealer_cops_killed_) +
+			integerParam(DEPUTIES_KILLED, dealer_deputies_killed_) +
+			integerParam(SUCCESSFUL_RUNS, dealer_successful_runs_) +
+			integerParam(RUN_ATTEMPTS, dealer_run_attempts_) +
+			integerParam(COATS_BOUGHT, coats_bought_) +
+			integerParam(COATS_ADDED_SIZE, coats_added_size_) +
+			integerParam(MONEY_SPENT_ON_COATS, money_spent_on_coat_) +
+			integerParam(GUNS_BOUGHT, guns_bought_) +
+			integerParam(MONEY_SPENT_ON_GUNS, money_spent_on_guns_) +
+			integerParam(MAX_FIREPOWER, max_dealer_firepower_) +
+			stringToIntParam(NUM_DRUGS_BOUGHT, num_drugs_bought_) +
+			stringToIntParam(AMOUNT_DRUGS_BOUGHT, amount_drugs_bought_) +
+			stringToIntParam(NUM_DRUGS_SOLD, num_drugs_sold_) +
+			stringToIntParam(AMOUNT_DRUGS_SOLD, amount_drugs_sold_) +
+			integerParam(MONEY_PAID_TO_LOAN_SHARK, money_paid_to_loan_shark_) +
+			integerParam(LOAN_INTEREST, loan_interest_) +
+			integerParam(DAYS_TO_PAY_OFF_LOAN, days_to_pay_off_loan_) +
+			integerParam(MONEY_INVESTED_IN_BANK, money_invested_in_bank_) +
+			integerParam(BANK_INTEREST, bank_interest_) +
+			integerParam(DO_INITIALIZE, do_initial_setup_);
+		
+		return serialized_game;
 	}
-
+	
+    // Convenience methods for serializing a couple different types that are used a lot.
+	
+	public String stringParam(String header, String param) {
+		return "\"" + header + ":" + param + "\" ";
+	}
+	public String integerParam(String header, int param) {
+		return header + ":" + Integer.toString(param) + " ";
+	}
+	public String doubleParam(String header, double param) {
+		return header + ":" + Double.toString(param) + " ";
+	}
+	public String booleanParam(String header, boolean param) {
+		return header + ":" + Boolean.toString(param) + " ";
+	}
+	public String stringVectorParam(String header, Vector<String> param) {
+		String serializedVector = "#" + header;
+		for (int i = 0; i < param.size(); ++i) {
+			serializedVector += param.elementAt(i) + " ";
+		}
+		serializedVector += "# ";
+		return serializedVector;
+	}
+	public String stringToIntParam(String header, HashMap<String, Integer> param) {
+		String serializedParam = "#" + header + ":";
+		Iterator<String> names = param.keySet().iterator();
+		while (names.hasNext()) {
+			String next_param = names.next();
+			serializedParam += "\"" + next_param + ":" + Integer.toString(param.get(next_param)) + "\" ";
+		}
+		serializedParam += "# ";
+		return serializedParam;
+	}
+	
+	// Convenience methods for de-serializing a coupld different types that are used a lot.
+	
+	private Vector<String> parseStringVectorParam(String param_string) {
+		Vector<String> param = new Vector<String>();
+		StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(param_string));
+		tokenizer.quoteChar('"');
+		tokenizer.eolIsSignificant(false);
+		try {
+			while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
+				param.add(tokenizer.sval);
+			}
+		} catch (IOException e) {
+			Log.d("dopewars", "Parsing error on a string vector map.");
+		}
+		return param;
+	}
+	private HashMap<String, Integer> parseStringToIntParam(String param_string) {
+		HashMap<String, Integer> param = new HashMap<String, Integer>();
+		StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(param_string));
+		tokenizer.quoteChar('"');
+		tokenizer.eolIsSignificant(false);
+		try {
+			while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
+				String[] group = tokenizer.sval.split(":", 2);
+				if (group.length != 2) {
+					Log.d("dopewars", "Invalid game info group: " + tokenizer.sval);
+				} else {
+					param.put(group[0], Integer.parseInt(group[1]));
+				}
+			}
+		} catch (IOException e) {
+			Log.d("dopewars", "Parsing error on a string to int map.");
+		}
+		return param;
+	}
+	
     // An artificial default game string, useful if starting with no net access and for defaulting
 	// things to playable defaults.
 	// TODO: this more or less works but isn't a good playable default, i'm not going to waste time
 	//       polishing it until it makes sense to have a good playable default
 	public static String getDefaultGameString() {
-		return GAME_ID + DELIMITER_2 + "default" + DELIMITER_1 +
-			GAME_DRUGS + DELIMITER_2 +
-		    	"Weed" + DELIMITER_3a +
-		        	"base_price" + DELIMITER_5 + "400" + DELIMITER_4 + 
-		            "price_variance" + DELIMITER_5 + "200" + DELIMITER_4 +
-		            "icon" + DELIMITER_5 + "0" + DELIMITER_4 +
-		            "low_probability" + DELIMITER_5 + "0.1" + DELIMITER_4 +
-		            "low_multiplier" + DELIMITER_5 + "0.5" + DELIMITER_3 +
-		         "Acid" + DELIMITER_3a +
-		            "base_price" + DELIMITER_5 + "1500" + DELIMITER_4 +
-		            "price_variance" + DELIMITER_5 + "400" + DELIMITER_4 +
-		            "icon" + DELIMITER_5 + "1__" +
-		         "Ludes" + DELIMITER_3a +
-		            "base_price" + DELIMITER_5 + "80" + DELIMITER_4 +
-		            "price_variance" + DELIMITER_5 + "20" + DELIMITER_4 +
-		            "icon" + DELIMITER_5 + "2__" +
-		         "Heroin" + DELIMITER_3a +
-		            "base_price" + DELIMITER_5 + "10000" + DELIMITER_4 +
-		            "price_variance" + DELIMITER_5 + "2000" + DELIMITER_4 +
-		            "icon" + DELIMITER_5 + "3%%" +
-		            "high_probability" + DELIMITER_5 + "0.1" + DELIMITER_4 +
-		            "high_multiplier" + DELIMITER_5 + "2.0__" +
-		         "Cocaine" + DELIMITER_3a +
-		            "base_price" + DELIMITER_5 + "20000%%" +
-		            "price_variance" + DELIMITER_5 + "3000%%" +
-		            "icon" + DELIMITER_5 + "4%%" + 
-		            "high_probability" + DELIMITER_5 + "0.1%%" +
-		            "high_multiplier" + DELIMITER_5 + "2.0__" +
-		         "Shrooms" + DELIMITER_3a +
-		            "base_price" + DELIMITER_5 + "1000%%" +
-		            "price_variance" + DELIMITER_5 + "200%%" +
-		            "icon" + DELIMITER_5 + "5__" +
-		         "Speed" + DELIMITER_3a +
-		            "base_price" + DELIMITER_5 + "110%%" +
-		            "price_variance" + DELIMITER_5 + "30%%" +
-		            "icon" + DELIMITER_5 + "6%%" +
-		            "low_probability" + DELIMITER_5 + "0.1%%" +
-		            "low_multiplier" + DELIMITER_5 + "0.5__" +
-			     "Speed2==" +
-			        "base_price::110%%" +
-			        "price_variance::30%%" +
-			        "icon::6%%" +
-			        "low_probability::0.1%%" +
-			        "low_multiplier::0.5__" +
-			     "Speed3==" +
-			       "base_price::110%%" +
-			       "price_variance::30%%" +
-			       "icon::6%%" +
-			       "low_probability::0.1%%" +
-			       "low_multiplier::0.5__" +
-			     "Speed4==" +
-			       "base_price::110%%" +
-			       "price_variance::30%%" +
-			       "icon::6%%" +
-			       "low_probability::0.1%%" +
-			       "low_multiplier::0.5__" +
-			     "Speed5==" +
-			       "base_price::110%%" +
-			       "price_variance::30%%" +
-			       "icon::6%%" +
-			       "low_probability::0.1%%" +
-			       "low_multiplier::0.5__" +
-			     "Speed6==" +
-			       "base_price::110%%" +
-			       "price_variance::30%%" +
-			       "icon::6%%" +
-			       "low_probability::0.1%%" +
-			       "low_multiplier::0.5__" +
-		         "Hashish==" +
-		           "base_price::180%%" +
-		           "price_variance::40%%" +
-		           "icon::7%%" +
-		           "low_probability::0.1%%" +
-		           "low_multiplier::0.5&&" +
-		       "coats--" +
-		         "Gucci==" +
-		           "additional_space::10%%" +
-		           "base_price::2000%%" +
-		           "price_variance::200%%" +
-		           "space_factor::0.2__" +
-		         "D&G==" +
-		           "additional_space::20%%" +
-		           "base_price::4000%%" +
-		           "price_variance::400%%" +
-		           "space_factor::0.4__&&" +
-		       "guns--" +
-		         "Baretta==" +
-		           "firepower::6%%" +
-		           "base_price::500%%" +
-		           "price_variance::100%%" +
-		           "space::5__" +
-		         "Saturday Night Special==" +
-		           "firepower::8%%" +
-		           "base_price::1000%%" +
-		           "price_variance::200%%" +
-		           "space::8__&&" +
-		       "locations--" +
-		         "Brooklyn==" +
-		           "base_drugs::13%%" +
-		           "drug_variance::1%%" +
-		           "map_x::105%%" +
-		           "map_y::220%%" +
-		           "has_bank::1%%" +
-		           "has_loan_shark::1__" +
-		         "Manhattan==" +
-		           "base_drugs::8%%" +
-		           "drug_variance::2%%" +
-		           "map_x::80%%" +
-		           "map_y::5__" +
-		         "Central Park==" +
-		           "base_drugs::8%%" +
-		           "drug_variance::2%%" +
-		           "map_x::73%%" +
-		           "map_y::100__" +
-		         "The Ghetto==" +
-		           "base_drugs::8%%" +
-		           "drug_variance::2%%" +
-		           "map_x::80%%" +
-		           "map_y::335__" +
-		         "The Bronx==" +
-		           "base_drugs::8%%" +
-		           "drug_variance::2%%" +
-		           "map_x::75%%" +
-		           "map_y::143__" +
-		         "Coney Island==" +
-		           "base_drugs::8%%" +
-		           "drug_variance::2%%" +
-		           "map_x::103%%" +
-		           "map_y::60__&&" +
-		       "loan_interest_rate--0.05&&" +
-		       "bank_interest_rate--0.10&&" +
-		       "coat_likelihood--0.1&&" +
-		       "gun_likelihood--0.1&&" +
-		       "cops_likelihood--0.1&&" +
-		       "starting_game_info--" +
-		         "cash--53000##" +
-		         "loan--5500##" +
-		         "location--0##" +
-		         "space--100##" +
-		         "max_space--100##" +
-		         "days_left--10##" +
-		         "bank--0##" +
-		         "dealer_health--100";
-	}
-	
-	// Convenience method to parse a string to integer hash map.
-	private HashMap<String, Integer> parseStringToIntMap(String attribute_string) {
-		HashMap<String, Integer> attributes = new HashMap<String, Integer>();
-		String[] attribute_strings = attribute_string.split(DELIMITER_4);
-		for (int j = 0; j < attribute_strings.length; ++j) {
-			String[] next_attribute = attribute_strings[j].split(DELIMITER_5);
-			if (next_attribute.length != 2) {
-				Log.d("dopewars", "Invalid attribute: " + attribute_strings[j]);
-			}
-			attributes.put(next_attribute[0], Integer.parseInt(next_attribute[1]));
-		}
-		return attributes;
-	}
-	
-	// Convenience method to parse a string to float hash map.
-	public HashMap<String, Float> parseStringToFloatMap(String attribute_string) {
-		HashMap<String, Float> attributes = new HashMap<String, Float>();
-		String[] attribute_strings = attribute_string.split(DELIMITER_4);
-		for (int j = 0; j < attribute_strings.length; ++j) {
-			String[] next_attribute = attribute_strings[j].split(DELIMITER_5);
-			if (next_attribute.length != 2) {
-				Log.d("dopewars", "Invalid attribute: " + attribute_strings[j]);
-			}
-			attributes.put(next_attribute[0], Float.parseFloat(next_attribute[1]));
-		}
-		return attributes;
-	}
-	
-	// Convenience method to parse a multi-level map of strings to strings to floats.
-	public HashMap<String, HashMap<String, Float>> parseStringToStringToFloatMap(
-			String attribute_group_string) {
-		HashMap<String, HashMap<String, Float>> new_attributes =
-			new HashMap<String, HashMap<String, Float>>();
-		String[] elements = attribute_group_string.split(DELIMITER_3);
-		for (int i = 0; i < elements.length; ++i) {
-			
-			// TODO: i did these out of order and then should be re-numbered
-			String[] next_element = elements[i].split(DELIMITER_3a);
-			if (next_element.length != 2) {
-				Log.d("dopewars", "Invalid element description: " + elements[i]);
-			} else {
-				new_attributes.put(next_element[0], parseStringToFloatMap(next_element[1]));
-			}
-		}
-		return new_attributes;
-	}
-	
-	// Convenience method to serialize a string to integer hash map.
-	private String serializeStringToIntMap(HashMap<String, Integer> attribute_map) {
-		String serialized_attributes = "";
-		Iterator<String> names = attribute_map.keySet().iterator();
-		while (names.hasNext()) {
-			String next_attribute = names.next();
-			serialized_attributes += next_attribute + DELIMITER_5 +
-					Integer.toString(attribute_map.get(next_attribute));
-			if (names.hasNext()) {
-				serialized_attributes += DELIMITER_4;
-			}
-		}
-		return serialized_attributes;
-	}
-	
-	// Convenience method to serialize a string to float hash map.
-	public String serializeStringToFloatMap(HashMap<String, Float> attributes) {
-		String serialized_attributes = "";
-		Iterator<String> names = attributes.keySet().iterator();
-		while (names.hasNext()) {
-			String next_attribute = names.next();
-			serialized_attributes += next_attribute + DELIMITER_5 + Float.toString(attributes.get(next_attribute));
-			if (names.hasNext()) {
-				serialized_attributes += DELIMITER_4;
-			}
-		}
-		return serialized_attributes;
-	}
-	
-	// Uses the save format as above to serialize a hash_map of hash_maps into a big
-	// complicated string.
-	public String serializeStringToStringToFloatMap(
-			HashMap<String, HashMap<String, Float>> attribute_group) {
-		String serialized_attributes = "";
-		Iterator<String> elements = attribute_group.keySet().iterator();
-		while (elements.hasNext()) {
-			String next_element = elements.next();
-			serialized_attributes += next_element + DELIMITER_3a + serializeStringToFloatMap(
-					attribute_group.get(next_element));
-			if (elements.hasNext()) {
-				serialized_attributes += DELIMITER_3;
-			}
-		}
-		return serialized_attributes;
-	}
-	
-	// Convenience method to parse a string vector.
-	private Vector<String> parseStringVector(String attribute_string) {
-		Vector<String> strings = new Vector<String>();
-		String[] attribute_strings = attribute_string.split(DELIMITER_4);
-		for (int j = 0; j < attribute_strings.length; ++j) {
-			strings.add(attribute_strings[j]);
-		}
-		return strings;
-	}
-	
-	// Convenience method to serialize a string vector.
-	private String serializeStringVector(Vector<String> strings) {
-		String serialized_strings = "";
-		for (int j = 0; j < strings.size(); ++j) {
-			serialized_strings += strings.elementAt(j);
-			if ((j + 1) < strings.size()) {
-				serialized_strings += DELIMITER_4;
-			}
-		}
-		return serialized_strings;
+		return "game_id:default " +
+			"#drug:name:Weed base_price:400 price_variance:200 icon:0 low_probability:0.1 low_multiplier:0.5# " +
+			"#drug:name:Acid base_price:1500 price_variance:400 icon:1 low_probability:0.1 low_multiplier:0.5# " +
+			"#drug:name:Ludes base_price:80 price_variance:20 icon:2# " +
+			"#drug:name:Heroin base_price:10000 price_variance:2000 icon:3 high_probability:0.1 high_multiplier:2.0# " +
+			"#drug:name:Cocaine base_price:20000 price_variance:3000 icon:4 high_probability:0.1 high_multiplier:2.0# " +
+			"#drug:name:Shrooms base_price:1000 price_variance:1000 icon:5# " +
+			"#drug:name:Speed base_price:110 price_variance:30 icon:6 low_probability:0.1 low_multiplier:0.5# " +
+			"#drug:name:Speed2 base_price:110 price_variance:30 icon:6 low_probability:0.1 low_multiplier:0.5# " +
+			"#drug:name:Speed3 base_price:110 price_variance:30 icon:6 low_probability:0.1 low_multiplier:0.5# " +
+			"#drug:name:Speed4 base_price:110 price_variance:30 icon:6 low_probability:0.1 low_multiplier:0.5# " +
+			"#drug:name:Speed5 base_price:110 price_variance:30 icon:6 low_probability:0.1 low_multiplier:0.5# " +
+			"#drug:name:Speed6 base_price:110 price_variance:30 icon:6 low_probability:0.1 low_multiplier:0.5# " +
+			"#drug:name:Hashish base_price:180 price_variance:40 icon:7 low_probability:0.1 low_multiplier:0.5# " +
+		    "#coat:name:Gucci additional_space:10 base_price:2000 price_variance:200 space_factor:0.2# " +
+			"#coat:name:D&G additional_space:20 base_price:4000 price_variance:400 space_factor:0.4# " +
+			"#gun:name:Baretta firepower:5 base_price:500 price_variance:100 space:5# " +
+			"#gun:\"name:Saturday Night Special\" firepower:8 base_price:1000 price_variance:200 space:8# " +
+			"#location:name:Brooklyn base_drugs:13 drug_variance:1 map_x:105 map_y:220 has_bank:true has_loan_shark:true# " +
+			"#location:name:Manhattan base_drugs:8 drug_variance:2 map_x:80 map_y:5# " +
+			"#location:\"name:Central Park\" base_drugs:8 drug_variance:2 map_x:73 map_y:100# " +
+			"#location:\"name:The Bronx\" base_drugs:8 drug_variance:2 map_x:75 map_y:143# " +
+			"#location:\"name:The Ghetto\" base_drugs:8 drug_variance:2 map_x:80 map_y:335# " +
+			"#location:\"name:Coney Island\" base_drugs:8 drug_variance:2 map_x:103 map_y:60# " +
+			"loan_interest_rate:0.05 " +
+			"bank_interest_rate:0.10 " +
+			"coat_likelihood:0.1 " +
+			"gun_likelihood:0.1 " +
+			"cops_likelihood:0.1 " +
+			"cash:53000 " +
+			"loan:5500 " +
+			"dealer_location:0 " +
+			"space:100 " +
+			"max_space:100 " +
+			"days_left:10 " +
+			"bank:0 " +
+			"dealer_health:100 ";
 	}
 	
 	public String game_id_;
-	public HashMap<String, HashMap<String, Float>> drugs_;
-	public HashMap<String, HashMap<String, Float>> coats_;
-	public HashMap<String, HashMap<String, Float>> guns_;
-	public HashMap<String, HashMap<String, Float>> locations_;
-	public float loan_interest_rate_;
-	public float bank_interest_rate_;
-	public float coat_likelihood_;
-	public float gun_likelihood_;
-	public float cops_likelihood_;
+	public HashMap<String, Drug> drugs_;
+	public HashMap<String, Coat> coats_;
+	public HashMap<String, Gun> guns_;
+	public HashMap<String, Location> locations_;
+	public double loan_interest_rate_;
+	public double bank_interest_rate_;
+	public double coat_likelihood_;
+	public double gun_likelihood_;
+	public double cops_likelihood_;
 	
 	// Current game information, this information is mutable within a game.
 	public int dealer_cash_;
@@ -584,6 +647,7 @@ public class GameInformation {
 	public int dealer_loan_;
 	public int dealer_bank_;
 	public int location_;
+	public int total_days_;
 	public int game_days_left_;
 	public int dealer_health_;
 	public int location_cops_;
@@ -617,6 +681,5 @@ public class GameInformation {
 	public int bank_interest_;
 	
 	public int do_initial_setup_;
-	
-	public String serialized_starting_game_info_;
+
 }
