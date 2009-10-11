@@ -48,6 +48,7 @@ public class GameInformation {
 	public static String DRUG = "drug";
 	public static String DRUG_VARIANCE = "drug_variance";
 	public static String FIGHT_MESSAGES = "fight_messages";
+	public static String FIREPOWER = "firepower";
 	public static String GAME_ID = "game_id";
 	public static String GUN = "gun";
 	public static String GUN_LIKELIHOOD = "gun_likelihood";
@@ -229,6 +230,8 @@ public class GameInformation {
 						space_ = Integer.parseInt(next_attribute[1]);
 					} else if (next_attribute[0].equals(PRICE_VARIANCE)) {
 						price_variance_ = Integer.parseInt(next_attribute[1]);
+					} else if (next_attribute[0].equals(FIREPOWER)) {
+						firepower_ = Integer.parseInt(next_attribute[1]);
 					} else {
 						Log.d("dopewars", "Valid but unrecognized attribute: " +
 								tokenizer.sval);
@@ -241,7 +244,8 @@ public class GameInformation {
 		
 		public String serializeGun() {
 			return stringParam(NAME, name_) + integerParam(BASE_PRICE, base_price_) +
-				integerParam(SPACE, space_) + integerParam(PRICE_VARIANCE, price_variance_);
+				integerParam(SPACE, space_) + integerParam(PRICE_VARIANCE, price_variance_) +
+				integerParam(FIREPOWER, firepower_);
 		}	
 	}
 	

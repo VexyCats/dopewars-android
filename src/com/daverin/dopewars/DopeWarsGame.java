@@ -1255,7 +1255,7 @@ public class DopeWarsGame extends Activity {
     			fight_message += "and " + 
     				Integer.toString(game_information_.location_cops_ - 10) + " deputies ";
     		}
-    		fight_message += "found you!";
+    		fight_message += "are attacking!";
     		game_information_.fight_messages_.add(fight_message);
     	}
 	}
