@@ -30,4 +30,3 @@
   * Sometimes the cops message doesn't show up, seemingly after clearing fight response messages from the fight screen
   * The layout that the messages are being displayed on during fighting isn't big enough
   * Death doesn't happen
-  * Dealer fighting got broken, the firepower tallied up is always 0
