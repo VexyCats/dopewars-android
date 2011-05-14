@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/simple_subway_layout"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:orientation="vertical"
+  >
+<Button
+  android:id="@+id/brooklyn"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="Brooklyn"
+  />
+<Button
+  android:id="@+id/the_bronx"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="The Bronx"
+  />
+<Button
+  android:id="@+id/central_park"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="Central Park"
+  />
+<Button
+  android:id="@+id/coney_island"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="Coney Island"
+  />
+<Button
+  android:id="@+id/the_ghetto"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="The Ghetto"
+  />
+<Button
+  android:id="@+id/manhattan"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="Manhattan"
+  />
+<Button
+  android:id="@+id/queens"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="Queens"
+  />
+<Button
+  android:id="@+id/staten_island"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="Staten Island"
+  />
+</LinearLayout>

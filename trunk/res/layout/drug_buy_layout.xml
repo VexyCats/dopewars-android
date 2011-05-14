@@ -1,22 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:id="@+id/drug_buy_layout"
-  android:orientation="horizontal"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content"
-  >
-<ImageView
-  android:id="@+id/drug_icon"
-  android:layout_width="55px"
-  android:layout_height="55px"
-  android:src="@drawable/weed"
-  android:scaleType="fitCenter"
-/>
-<LinearLayout
   android:orientation="vertical"
   android:layout_width="wrap_content"
-  android:layout_height="fill_parent"
-  android:gravity="center_vertical"
+  android:layout_height="wrap_content"
   >
 <LinearLayout
   android:orientation="horizontal"
@@ -45,7 +32,6 @@
     android:layout_height="wrap_content" 
     android:textSize="20px"
 />
-</LinearLayout>
 <TextView
   android:id="@+id/drug_quantity"
   android:layout_width="fill_parent"
@@ -56,4 +42,22 @@
   android:paddingLeft="8px"
   android:text="0"
   />
+<LinearLayout
+  android:orientation="horizontal"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  >
+<Button
+  android:id="@+id/drug_buy_cancel"
+  android:text="Cancel"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  />
+<Button
+  android:id="@+id/drug_buy_confirm"
+  android:text="Buy"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  />
+</LinearLayout>
 </LinearLayout>
