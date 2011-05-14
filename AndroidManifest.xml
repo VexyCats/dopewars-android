@@ -5,7 +5,7 @@
       android:versionName="1.0">
     <uses-permission android:name="android.permission.INTERNET" />
     <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
-        <activity android:name=".DopeWars"
+        <activity android:name=".DopeWars2"
                   android:configChanges="orientation|keyboardHidden"
                   android:label="@string/app_name">
             <intent-filter>
@@ -13,7 +13,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DopeWarsGame"
+        <activity android:name=".DopeWars2Game"
                   android:configChanges="orientation|keyboardHidden"
                   android:label="@string/app_name">
             <intent-filter>

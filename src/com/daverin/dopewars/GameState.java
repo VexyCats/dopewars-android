@@ -1,26 +1,258 @@
-/**
- * This file, along with the CurrentGameInformation class, mostly facilitates the serialization of
- * game settings for easy storage and retrieval from the database as a string. This has proved to
- * be significantly easier and more efficient (unproven) than making many small database
- * transactions in each function every time information about the game is needed.
- * 
- * TODO: it'd be nice if these were protobufs but I don't think there's a nice Eclipse plugin for
- *       that yet.
- */
-
 package com.daverin.dopewars;
 
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Random;
 import java.util.Vector;
 
 import android.util.Log;
 
-public class GameInformation {
+public class GameState {
+	private static final String TAG = "Dopewars2GameData";
+	public static final String game_data_version = "1";
+	
+	public class Drug {
+		Drug(String drug_name, int base_price, int price_variance,
+				double low_price_probability, double low_price_multiplier,
+				double high_price_probability, double high_price_multiplier) {
+		    drug_name_ = drug_name;
+		    base_price_ = base_price;
+		    price_variance_ = price_variance;
+		    low_price_probability_ = low_price_probability;
+		    low_price_multiplier_ = low_price_multiplier;
+		    high_price_probability_ = high_price_probability;
+		    high_price_multiplier_ = high_price_multiplier;
+		}
+		
+		public int randomPrice() {
+			int drug_price = (int)(base_price_ - price_variance_ / 2.0 +
+					random_.nextDouble() * price_variance_);
+			// Check for price jumps
+			if (random_.nextFloat() < low_price_probability_) {
+				drug_price = (int)(drug_price * low_price_multiplier_);
+				// TODO: add messages
+			} else if (random_.nextFloat() < high_price_probability_) {
+				drug_price = (int)(drug_price * high_price_multiplier_);
+				// TODO: add messages
+			}
+			return drug_price;
+		}
+		
+        public String drug_name_;
+        public int base_price_;
+        public int price_variance_;
+        public double low_price_probability_;
+        public double low_price_multiplier_;
+        public double high_price_probability_;
+        public double high_price_multiplier_;
+	}
+	
+	public class Location {
+		Location(String location_name, int base_drugs, int drug_variance,
+				boolean has_bank, boolean has_loan_shark) {
+			location_name_ = location_name;
+			base_drugs_ = base_drugs;
+			drug_variance_ = drug_variance;
+			has_bank_ = has_bank;
+			has_loan_shark_ = has_loan_shark;
+		}
+		
+		public String location_name_;
+		public int base_drugs_;
+		public int drug_variance_;
+		public boolean has_bank_;
+		public boolean has_loan_shark_;
+	}
+	
+	// Static game info, this stuff is set up once and not changed and is not saved
+	// with saved games.
+	public Vector<Drug> drugs_ = new Vector<Drug>();
+	public Vector<Location> locations_ = new Vector<Location>();
+	
+	public void SetupStaticGameInfo() {
+		drugs_.clear();
+		drugs_.add(new Drug("Acid", 2700, 1700, 0.2, 0.4, 0, 0));
+		drugs_.add(new Drug("Cocaine", 22000, 7000, 0, 0, 0.1, 4.0));
+		drugs_.add(new Drug("Hashish", 880, 400, 0.2, 0.5, 0, 0));
+		drugs_.add(new Drug("Heroin", 9250, 1875, 0, 0, 0.2, 2.0));
+		drugs_.add(new Drug("Ludes", 35, 25, 0.1, 0.3, 0, 0));
+		drugs_.add(new Drug("MDMA", 2950, 1450, 0, 0, 0, 0));
+		drugs_.add(new Drug("Opium", 895, 355, 0, 0, 0.1, 3.0));
+		drugs_.add(new Drug("PCP", 1750, 750, 0, 0, 0, 0));
+		drugs_.add(new Drug("Peyote", 460, 240, 0, 0, 0, 0));
+		drugs_.add(new Drug("Shrooms", 965, 335, 0, 0, 0, 0));
+		drugs_.add(new Drug("Speed", 170, 80, 0, 0, 0.1, 5.0));
+		drugs_.add(new Drug ("Weed", 600, 290, 0.1, 0.2, 0, 0));
+		
+		locations_.clear();
+		locations_.add(new Location("Brooklyn", 6, 2, true, true));
+		locations_.add(new Location("The Bronx", 9, 2, false, false));
+		locations_.add(new Location("Central Park", 9, 2, false, false));
+		locations_.add(new Location("Coney Island", 2, 1, false, false));
+		locations_.add(new Location("The Ghetto", 9, 2, false, false));
+		locations_.add(new Location("Manhattan", 9, 2, false, false));
+		locations_.add(new Location("Queens", 9, 2, false, false));
+		locations_.add(new Location("Staten Island", 9, 2, false, false));
+	}
+	
+	// Dynamic game info, this stuff is initialized at the start of a game but changes
+	// as the game progresses, and is saved as a saved game.
+	public int cash_;
+	public int bank_;
+	public int loan_;
+	public int guns_;
+	public int health_;
+	public int max_space_;
+	public int location_;
+	public int days_left_;
+	public Vector<Integer> dealer_drugs_ = new Vector<Integer>();
+	
+	public Vector<Integer> drug_price_ = new Vector<Integer>();
+	
+	public int game_length;
+	public int game_type;
+	
+	private GameDataBase db_;
+	
+	public GameState(String serialized_game_info) {
+		SetupStaticGameInfo();
 
+		LoadGame(serialized_game_info);
+		
+		if (!GameInitialized()) {
+			cash_ = 5000;
+			bank_ = 0;
+			loan_ = 5000;
+			location_ = 0;
+			max_space_ = 100;
+			health_ = 100;
+			guns_ = 0;
+			days_left_ = 30;
+			drug_price_.clear();
+			for (int i = 0; i < drugs_.size(); ++i) {
+				drug_price_.add(0);
+			}
+			dealer_drugs_.clear();
+			for (int i = 0; i < drugs_.size(); ++i) {
+				dealer_drugs_.add(0);
+			}
+			
+			SetupNewLocation();
+		}
+	}
+	
+	// A game is initialized if there are any drugs at the current location.
+	public boolean GameInitialized() {
+		for (int i = 0; i < drug_price_.size(); ++i) {
+			if (drug_price_.elementAt(i) > 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void SetupNewDrugs() {
+		// First choose candidate prices for all drugs.
+		for (int i = 0; i < drug_price_.size(); ++i) {
+			drug_price_.setElementAt(drugs_.elementAt(i).randomPrice(), i);
+		}
+		
+		// Next determine how many drugs are available at the current location.
+		int base_drugs_count = locations_.elementAt(location_).base_drugs_;
+		int drug_variance = locations_.elementAt(location_).drug_variance_;
+		int num_drugs_present = base_drugs_count + random_.nextInt(drug_variance + 1);
+		if (num_drugs_present < 1) { num_drugs_present = 1; }
+		
+		// Now determine which of the drugs are available by making a list including all the
+		// possible drugs and zeroing the price of random elements until the limit is met.
+		for (int i = 0; i < (drug_price_.size() - num_drugs_present); ++i) {
+			int starting_location = random_.nextInt(drug_price_.size());
+			int zero_location = starting_location;
+			while (drug_price_.elementAt(zero_location) <= 0) {
+				zero_location += 1;
+				zero_location %= drug_price_.size();
+				if (zero_location == starting_location) {
+					break;
+				}
+			}
+			drug_price_.setElementAt(0, zero_location);
+		}
+	}
+	
+	// When moving from one location to another (advancing one turn) this resets all the drugs
+	// that are available and processes all the random events that can happen on a turn-by-turn
+	// basis.
+	public void SetupNewLocation() {
+		SetupNewDrugs();
+	}
+	
+	public int NumDrugsAvailable() {
+		int num_drugs = 0;
+		for (int i = 0; i < drug_price_.size(); ++i) {
+			if (drug_price_.elementAt(i) > 0) {
+				++num_drugs;
+			}
+		}
+		return num_drugs;
+	}
+	public String SerializeGame() {
+		String serialized_game = game_data_version + ",";
+		serialized_game += Integer.toString(cash_) + ",";
+		serialized_game += Integer.toString(bank_) + ",";
+		serialized_game += Integer.toString(loan_) + ",";
+		serialized_game += Integer.toString(guns_) + ",";
+		serialized_game += Integer.toString(health_) + ",";
+		serialized_game += Integer.toString(max_space_) + ",";
+		serialized_game += Integer.toString(location_) + ",";
+		serialized_game += Integer.toString(days_left_) + ",";
+		for (int i = 0; i < drug_price_.size(); ++i) {
+			serialized_game += Integer.toString(drug_price_.elementAt(i)) + ",";
+		}
+		// TODO: handle inventory
+		return serialized_game;
+	}
+	
+	public void LoadGame(String serialized_game_info) {
+		StreamTokenizer tokenizer =
+			new StreamTokenizer(new StringReader(serialized_game_info));
+		tokenizer.quoteChar('"');
+		tokenizer.eolIsSignificant(false);
+		try {
+			tokenizer.nextToken();
+			if (tokenizer.sval != game_data_version) {
+				Log.d(TAG, "Trying to load wrong data version, got " + 
+						tokenizer.sval + ", expected " + game_data_version);
+			}
+			tokenizer.nextToken();
+			cash_ = (int)tokenizer.nval;
+			tokenizer.nextToken();
+			bank_ = (int)tokenizer.nval;
+			tokenizer.nextToken();
+			loan_ = (int)tokenizer.nval;
+			tokenizer.nextToken();
+			guns_ = (int)tokenizer.nval;
+			tokenizer.nextToken();
+			health_ = (int)tokenizer.nval;
+			tokenizer.nextToken();
+			max_space_ = (int)tokenizer.nval;
+			tokenizer.nextToken();
+			location_ = (int)tokenizer.nval;
+			tokenizer.nextToken();
+			days_left_ = (int)tokenizer.nval;
+			for (int i = 0; i < drug_price_.size(); ++i) {
+				tokenizer.nextToken();
+				drug_price_.setElementAt((int)tokenizer.nval, i);
+			}
+			// TODO: handle inventory
+		} catch (IOException e) {
+			Log.d(TAG, "Parsing error with value " + tokenizer.sval);
+		}
+	}
+	
+	// Random number generator for this activity.
+    public static Random random_ = new Random();
+/*
 	// This is hard-coded information about the game, it will probably get softer over time.
 	public static double LOAN_INTEREST_RATE = 0.05;
 	public static double BANK_INTEREST_RATE = 0.10;
@@ -35,7 +267,7 @@ public class GameInformation {
 	public static double[] DRUG_LOW_MULT = new double[]  {  0.4,         0,       0.5,        0,     0.3,     0,       0,     0,        0,         0,       0,    0.2 };
 	public static double[] DRUG_HIGH_PROB = new double[]  {   0,       0.1,         0,      0.2,       0,     0,     0.1,     0,        0,         0,     0.1,      0};
 	public static double[] DRUG_HIGH_MULT = new double[]  {   0,       4.0,         0,      2.0,       0,     0,     3.0,     0,        0,         0,     5.0,      0};
-		
+	
 	public static String[] COAT_NAMES = new String[] { "Gucci", "D&G" };
 	public static int[] COAT_SPACE = new int[]       {      10,    20 };
 	public static int[] COAT_BASE_PRICE = new int[]  {    2000,  4000 };
@@ -149,7 +381,7 @@ public class GameInformation {
 	public static String PARAM_TOTAL_DAYS = "total_days";
 	
 	// Initialize the game info with a serialized version.
-	public GameInformation(String serialized_game_info, int game_type, int game_length) {
+	public GameState(String serialized_game_info) {
 		dealer_drugs_ = new HashMap<String, Integer>();
 		dealer_guns_ = new HashMap<String, Integer>();
 		location_drugs_ = new HashMap<String, Integer>();
@@ -166,14 +398,12 @@ public class GameInformation {
 		
 		setupDynamicGameInformation(serialized_game_info);
 		if (location_drugs_.size() == 0) {
-			initializeGame(game_type, game_length);
+			initializeGame();
 		}
 	}
 	
 	
-	public void initializeGame(int game_type, int game_length) {
-        game_type_ = game_type;
-        
+	public void initializeGame() {
 		dealer_cash_ = 5500;
 		dealer_space_ = 100;
 		dealer_max_space_ = 100;
@@ -183,7 +413,6 @@ public class GameInformation {
 		// TODO: use constants for locations
 		location_ = 0;
 		
-		// TODO: set days left by game length
 		game_days_left_ = 30;
 		total_days_ = 30;
 		dealer_health_ = 100;
@@ -486,5 +715,5 @@ public class GameInformation {
 	public int bank_interest_;
 	
 	public int do_initial_setup_;
-
+*/
 }
