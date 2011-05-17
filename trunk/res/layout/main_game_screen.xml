@@ -31,13 +31,33 @@
   android:layout_height="wrap_content"
   android:orientation="vertical"
   >
-<Button
-  android:id="@+id/bank_button"
+<LinearLayout
+  android:id="@+id/bank_row"
   android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  android:text="Bank"
+  android:layout_height="wrap_content"
+  android:orientation="horizontal"
+  >
+<TextView
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:textColor="#ffffff"
+  android:text="Bank:"
+  />
+<Button
+  android:id="@+id/bank_deposit_button"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:text="Deposit"
   >
 </Button>
+<Button
+  android:id="@+id/bank_withdraw_button"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:text="Withdraw"
+  >
+</Button>
+</LinearLayout>
 <Button
   android:id="@+id/loan_shark_button"
   android:layout_width="fill_parent"
