@@ -69,21 +69,23 @@ public class GameState {
 	// with saved games.
 	public Vector<Drug> drugs_ = new Vector<Drug>();
 	public Vector<Location> locations_ = new Vector<Location>();
+	public double loan_interest_rate_;
+	public double bank_interest_rate_;
 	
 	public void SetupStaticGameInfo() {
 		drugs_.clear();
-		drugs_.add(new Drug("Acid", 2700, 1700, 0.2, 0.4, 0, 0));
-		drugs_.add(new Drug("Cocaine", 22000, 7000, 0, 0, 0.1, 4.0));
-		drugs_.add(new Drug("Hashish", 880, 400, 0.2, 0.5, 0, 0));
-		drugs_.add(new Drug("Heroin", 9250, 1875, 0, 0, 0.2, 2.0));
-		drugs_.add(new Drug("Ludes", 35, 25, 0.1, 0.3, 0, 0));
+		drugs_.add(new Drug("Acid", 2700, 1700, 0.05, 0.4, 0, 0));
+		drugs_.add(new Drug("Cocaine", 22000, 7000, 0, 0, 0.05, 4.0));
+		drugs_.add(new Drug("Hashish", 880, 400, 0.05, 0.5, 0, 0));
+		drugs_.add(new Drug("Heroin", 9250, 3750, 0, 0, 0.05, 2.0));
+		drugs_.add(new Drug("Ludes", 35, 25, 0.05, 0.3, 0, 0));
 		drugs_.add(new Drug("MDMA", 2950, 1450, 0, 0, 0, 0));
-		drugs_.add(new Drug("Opium", 895, 355, 0, 0, 0.1, 3.0));
+		drugs_.add(new Drug("Opium", 895, 355, 0, 0, 0.05, 3.0));
 		drugs_.add(new Drug("PCP", 1750, 750, 0, 0, 0, 0));
 		drugs_.add(new Drug("Peyote", 460, 240, 0, 0, 0, 0));
 		drugs_.add(new Drug("Shrooms", 965, 335, 0, 0, 0, 0));
-		drugs_.add(new Drug("Speed", 170, 80, 0, 0, 0.1, 5.0));
-		drugs_.add(new Drug ("Weed", 600, 290, 0.1, 0.2, 0, 0));
+		drugs_.add(new Drug("Speed", 170, 80, 0, 0, 0.05, 5.0));
+		drugs_.add(new Drug ("Weed", 600, 290, 0.05, 0.2, 0, 0));
 		
 		locations_.clear();
 		locations_.add(new Location("Brooklyn", 6, 2, true, true));
@@ -94,6 +96,9 @@ public class GameState {
 		locations_.add(new Location("Manhattan", 9, 2, false, false));
 		locations_.add(new Location("Queens", 9, 2, false, false));
 		locations_.add(new Location("Staten Island", 9, 2, false, false));
+		
+		loan_interest_rate_ = 0.10;
+		bank_interest_rate_ = 0.05;
 	}
 	
 	// Dynamic game info, this stuff is initialized at the start of a game but changes
@@ -121,9 +126,9 @@ public class GameState {
 		LoadGame(serialized_game_info);
 		
 		if (!GameInitialized()) {
-			cash_ = 5000;
+			cash_ = 2000;
 			bank_ = 0;
-			loan_ = 5000;
+			loan_ = 5500;
 			location_ = 0;
 			max_space_ = 100;
 			health_ = 100;
@@ -196,6 +201,16 @@ public class GameState {
 		}
 		return num_drugs;
 	}
+	
+	public boolean DealerHasDrugs() {
+		for (int i = 0; i < dealer_drugs_.size(); ++i) {
+			if (dealer_drugs_.elementAt(i) > 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public String SerializeGame() {
 		String serialized_game = game_data_version + ",";
 		serialized_game += Integer.toString(cash_) + ",";
