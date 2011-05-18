@@ -118,8 +118,6 @@ public class GameState {
 	public int game_length;
 	public int game_type;
 	
-	private GameDataBase db_;
-	
 	public GameState(String serialized_game_info) {
 		SetupStaticGameInfo();
 
