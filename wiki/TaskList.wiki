@@ -1,0 +1,25 @@
+#summary The immediate task list for DopeWars2
+
+= Programming =
+
+Game Save/Load needs to be implemented.  The saving should be mostly in place, really we just need to check for saved games on the main menu and handle the Continue Game button.
+
+An end-of-game summary/restart needs to be implemented.
+
+Officer HardAss/deputies need to be implemented.
+
+Buying guns and coats needs to be implemented.
+
+And inventory view needs to be implemented.
+
+Drug price extremes need to be checked, they might already be implemented, if not they'll be easy to put in.
+
+Messaging needs to be implemented.
+
+High score networking needs to be implemented.
+
+Network messaging needs to be implemented.
+
+= Graphics/UI =
+
+Really early in this process, mostly a plan needs forming
