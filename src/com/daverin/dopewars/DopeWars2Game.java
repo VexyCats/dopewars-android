@@ -85,7 +85,10 @@ public class DopeWars2Game extends Activity {
 			return GetBankDepositDialog();
 		case DIALOG_BANK_WITHDRAW:
 			return GetBankWithdrawDialog();
+		case DIALOG_HARDASS:
+			return GetHardassDialog();
 		}
+			
         return super.onCreateDialog(id);
 	}
 	
@@ -112,6 +115,8 @@ public class DopeWars2Game extends Activity {
 			break;
 		case DIALOG_BANK_WITHDRAW:
 			PrepareBankWithdrawDialog();
+		case DIALOG_HARDASS:
+			PrepareHardassDialog();
 		}
 	}
 	
@@ -408,6 +413,69 @@ public class DopeWars2Game extends Activity {
         		.setOnClickListener(new BankWithdrawConfirmListener());
 	}
 	
+	// TODO: The hardass dialogs are under development.
+	private Dialog GetHardassDialog() {
+		if (hardass_dialog_ == null) {
+			hardass_dialog_ = new Dialog(this);
+			hardass_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			hardass_dialog_.setContentView(R.layout.hardass_layout);
+			((Button)hardass_dialog_.findViewById(R.id.hardass_fight)).setOnClickListener(
+					new FightHardassListener());
+			((Button)hardass_dialog_.findViewById(R.id.hardass_run)).setOnClickListener(
+					new RunFromHardassListener());
+			((Button)hardass_dialog_.findViewById(R.id.hardass_do_nothing)).setOnClickListener(
+					new DoNothingWithHardassListener());
+		}
+		return hardass_dialog_;
+	}
+	
+	private class FightHardassListener implements View.OnClickListener {
+		public void onClick(View v) {
+			// TODO: fight logic
+			game_state_.hardass_deputies_ = 0;
+			game_state_.hardass_health_ = Math.max(game_state_.hardass_health_ - 5, 0);
+			game_state_.health_ -= 1;
+			dismissDialog(DIALOG_HARDASS);
+			refreshDisplay();
+		}
+	}
+	
+	private class RunFromHardassListener implements View.OnClickListener {
+		public void onClick(View v) {
+			// TODO: run logic
+		    if (rand_gen_.nextFloat() < 0.5) {
+		    	game_state_.hardass_deputies_ = 0;
+		    	game_state_.hardass_health_ = 0;
+		    } else {
+		    	game_state_.health_ -= 1;
+		    }
+			dismissDialog(DIALOG_HARDASS);
+			refreshDisplay();
+		}
+	}
+	
+	private class DoNothingWithHardassListener implements View.OnClickListener {
+		public void onClick(View v) {
+			// TODO: stand there logic
+			game_state_.health_ -= 1;
+			dismissDialog(DIALOG_HARDASS);
+			refreshDisplay();
+		}
+	}
+	
+	// TODO: The hardass dialogs are under development.
+	private void PrepareHardassDialog() {
+		String warning_string = "Officer Hardass and " +
+				Integer.toString(game_state_.hardass_deputies_) +
+				" of his deputies are attacking!  Your health: " +
+				Integer.toString(game_state_.health_);
+        
+        ((TextView)(hardass_dialog_.findViewById(R.id.hardass_message))).setText(
+        		warning_string);
+        hardass_dialog_.findViewById(R.id.hardass_fight).setVisibility(
+        		game_state_.guns_ > 0 ? View.VISIBLE : View.GONE);
+	}
+	
 	// The dialogs available in the game include moving from place to place on the subway,
 	// buying and selling drugs, looking at your inventory, the loan shark, and the bank.
 	public static final int DIALOG_SUBWAY = 2002;
@@ -419,6 +487,7 @@ public class DopeWars2Game extends Activity {
 	public static final int DIALOG_BANK_DEPOSIT = 2008;
 	public static final int DIALOG_BANK_WITHDRAW = 2009;
 	public static final int DIALOG_END_GAME = 2010;
+	public static final int DIALOG_HARDASS = 2011;
 	
 	private class CancelDialogListener implements View.OnClickListener {
 		public CancelDialogListener(int dialog_id) {
@@ -658,6 +727,12 @@ public class DopeWars2Game extends Activity {
 		if (game_state_.days_left_ <= 0) {
 			((Button)findViewById(R.id.subway_button)).setText("End Game");
 			// TODO: change the listener to something that ends the game
+		}
+		
+		// Check for officer hardass.  If he's present, then bring up the
+		// fight or flight dialog.
+		if (game_state_.hardass_health_ > 0) {
+		  showDialog(DIALOG_HARDASS);
 		}
 		
 /*
@@ -1037,6 +1112,7 @@ public class DopeWars2Game extends Activity {
 	Dialog bank_withdraw_dialog_;
 	Dialog end_game_dialog_;
 	Dialog pay_loan_shark_dialog_;
+	Dialog hardass_dialog_;
 
 	String dialog_drug_name_;
 	int dialog_drug_index_;

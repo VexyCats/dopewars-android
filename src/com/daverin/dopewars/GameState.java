@@ -112,8 +112,9 @@ public class GameState {
 	public int location_;
 	public int days_left_;
 	public Vector<Integer> dealer_drugs_ = new Vector<Integer>();
-	
 	public Vector<Integer> drug_price_ = new Vector<Integer>();
+	public int hardass_health_;
+	public int hardass_deputies_;
 	
 	public int game_length;
 	public int game_type;
@@ -140,6 +141,8 @@ public class GameState {
 			for (int i = 0; i < drugs_.size(); ++i) {
 				dealer_drugs_.add(0);
 			}
+			hardass_health_ = 0;
+			hardass_deputies_ = 0;
 			
 			SetupNewLocation();
 		}
@@ -183,11 +186,22 @@ public class GameState {
 		}
 	}
 	
+	public void SetupHardass() {
+		if (hardass_health_ > 0) {
+			return;
+		}
+		if (random_.nextFloat() < 0.1) {
+			hardass_health_ = 10;
+			hardass_deputies_ = 1 + random_.nextInt(3);
+		}
+	}
+	
 	// When moving from one location to another (advancing one turn) this resets all the drugs
 	// that are available and processes all the random events that can happen on a turn-by-turn
 	// basis.
 	public void SetupNewLocation() {
 		SetupNewDrugs();
+		SetupHardass();
 	}
 	
 	public int NumDrugsAvailable() {
@@ -223,6 +237,8 @@ public class GameState {
 			serialized_game += Integer.toString(drug_price_.elementAt(i)) + ",";
 		}
 		// TODO: handle inventory
+		serialized_game += Integer.toString(hardass_health_) + ",";
+		serialized_game += Integer.toString(hardass_deputies_) + ",";
 		return serialized_game;
 	}
 	
@@ -258,6 +274,10 @@ public class GameState {
 				drug_price_.setElementAt((int)tokenizer.nval, i);
 			}
 			// TODO: handle inventory
+			tokenizer.nextToken();
+			hardass_health_ = (int)tokenizer.nval;
+			tokenizer.nextToken();
+			hardass_deputies_ = (int)tokenizer.nval;
 		} catch (IOException e) {
 			Log.d(TAG, "Parsing error with value " + tokenizer.sval);
 		}
