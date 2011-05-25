@@ -4,8 +4,6 @@
 
 == Larger tasks ==
 
-Game Save/Load needs to be implemented.  The saving should be mostly in place, really we just need to check for saved games on the main menu and handle the Continue Game button.
-
 An end-of-game summary/restart needs to be implemented.
 
 Buying guns and coats needs to be implemented.
