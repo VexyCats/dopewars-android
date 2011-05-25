@@ -245,6 +245,7 @@ public class GameState {
 	public void LoadGame(String serialized_game_info) {
 		StreamTokenizer tokenizer =
 			new StreamTokenizer(new StringReader(serialized_game_info));
+		tokenizer.whitespaceChars((int)',', (int)',');
 		tokenizer.quoteChar('"');
 		tokenizer.eolIsSignificant(false);
 		try {
@@ -269,9 +270,13 @@ public class GameState {
 			location_ = (int)tokenizer.nval;
 			tokenizer.nextToken();
 			days_left_ = (int)tokenizer.nval;
-			for (int i = 0; i < drug_price_.size(); ++i) {
+			for (int i = 0; i < drugs_.size(); ++i) {
 				tokenizer.nextToken();
-				drug_price_.setElementAt((int)tokenizer.nval, i);
+				if (drug_price_.size() <= i) {
+					drug_price_.add((int)tokenizer.nval);
+				} else {
+					drug_price_.setElementAt((int)tokenizer.nval, i);
+				}
 			}
 			// TODO: handle inventory
 			tokenizer.nextToken();
