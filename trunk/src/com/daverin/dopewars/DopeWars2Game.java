@@ -4,6 +4,7 @@ import java.util.Random;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -87,6 +88,8 @@ public class DopeWars2Game extends Activity {
 			return GetBankWithdrawDialog();
 		case DIALOG_HARDASS:
 			return GetHardassDialog();
+		case DIALOG_END_GAME:
+			return GetEndGameDialog();
 		}
 			
         return super.onCreateDialog(id);
@@ -117,6 +120,8 @@ public class DopeWars2Game extends Activity {
 			PrepareBankWithdrawDialog();
 		case DIALOG_HARDASS:
 			PrepareHardassDialog();
+		case DIALOG_END_GAME:
+			PrepareEndGameDialog();
 		}
 	}
 	
@@ -476,6 +481,24 @@ public class DopeWars2Game extends Activity {
         		game_state_.guns_ > 0 ? View.VISIBLE : View.GONE);
 	}
 	
+	// TODO: The end game dialogs are under development.
+	private Dialog GetEndGameDialog() {
+		if (end_game_dialog_ == null) {
+			end_game_dialog_ = new Dialog(this);
+			end_game_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			end_game_dialog_.setContentView(R.layout.end_of_game_layout);
+			((Button)end_game_dialog_.findViewById(R.id.main_menu_button)).setOnClickListener(
+					new BackToMainMenuListener());
+		}
+		return end_game_dialog_;
+	}
+	
+	// TODO: The end game dialogs are under development.
+	private void PrepareEndGameDialog() {
+		((TextView)end_game_dialog_.findViewById(R.id.total_cash)).setText(
+				"$" + Integer.toString(game_state_.cash_ + game_state_.bank_ - game_state_.loan_)); 
+	}
+	
 	// The dialogs available in the game include moving from place to place on the subway,
 	// buying and selling drugs, looking at your inventory, the loan shark, and the bank.
 	public static final int DIALOG_SUBWAY = 2002;
@@ -497,6 +520,15 @@ public class DopeWars2Game extends Activity {
 			dismissDialog(dialog_id_);
 		}
 		int dialog_id_;
+	}
+	
+	private class BackToMainMenuListener implements View.OnClickListener {
+		 public void onClick(View v) {
+			 dismissDialog(DIALOG_END_GAME);
+			 Intent i = new Intent();
+     		 setResult(RESULT_OK, i);
+     		 finish();
+		 }
 	}
 	
 	private class BuyDrugsClickListener implements View.OnClickListener {
@@ -525,7 +557,11 @@ public class DopeWars2Game extends Activity {
 		public SubwayClickListener() {
 		}
 		public void onClick(View v) {
-			showDialog(DIALOG_SUBWAY);
+			if (game_state_.days_left_ > 0) {
+			    showDialog(DIALOG_SUBWAY);
+			} else {
+				showDialog(DIALOG_END_GAME);
+			}
 		}
 	}
 	

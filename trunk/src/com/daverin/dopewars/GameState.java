@@ -132,7 +132,7 @@ public class GameState {
 			max_space_ = 100;
 			health_ = 100;
 			guns_ = 0;
-			days_left_ = 30;
+			days_left_ = 3;
 			drug_price_.clear();
 			for (int i = 0; i < drugs_.size(); ++i) {
 				drug_price_.add(0);
