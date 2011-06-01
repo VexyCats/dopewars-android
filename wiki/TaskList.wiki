@@ -4,9 +4,9 @@
 
 == Larger tasks ==
 
-Buying guns and coats needs to be implemented.
-
 An inventory view needs to be implemented.
+
+Random events need to be implemented.
 
 Messaging needs to be implemented.
 
@@ -24,6 +24,10 @@ Money won from killing hardass needs to be implemented.
 Money lost from running from hardass needs to be implemented.
 
 Hardass dialog shouldn't disappear/reappear after making a selection.
+
+Random prices for coats and guns.
+
+Random names and firepowers for guns.
 
 
 = Graphics/UI =
