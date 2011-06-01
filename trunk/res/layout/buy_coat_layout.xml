@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/buy_coat_layout"
+  android:orientation="vertical"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  >
+<TextView
+  android:id="@+id/buy_coat_message"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:textColor="#ffffff"
+  android:text="Wanna buy a coat?"
+  />
+<LinearLayout
+  android:orientation="horizontal"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  >
+<Button
+  android:id="@+id/cancel_button"
+  android:text="Cancel"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  />
+<Button
+  android:id="@+id/buy_coat_button"
+  android:text="Buy"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  />
+</LinearLayout>
+</LinearLayout>

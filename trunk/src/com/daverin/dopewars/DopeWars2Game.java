@@ -90,6 +90,10 @@ public class DopeWars2Game extends Activity {
 			return GetHardassDialog();
 		case DIALOG_END_GAME:
 			return GetEndGameDialog();
+		case DIALOG_BUY_COAT:
+			return GetBuyCoatDialog();
+		case DIALOG_BUY_GUN:
+			return GetBuyGunDialog();
 		}
 			
         return super.onCreateDialog(id);
@@ -118,10 +122,19 @@ public class DopeWars2Game extends Activity {
 			break;
 		case DIALOG_BANK_WITHDRAW:
 			PrepareBankWithdrawDialog();
+			break;
 		case DIALOG_HARDASS:
 			PrepareHardassDialog();
+			break;
 		case DIALOG_END_GAME:
 			PrepareEndGameDialog();
+			break;
+		case DIALOG_BUY_COAT:
+			PrepareBuyCoatDialog();
+			break;
+		case DIALOG_BUY_GUN:
+			PrepareBuyGunDialog();
+			break;
 		}
 	}
 	
@@ -499,6 +512,46 @@ public class DopeWars2Game extends Activity {
 				"$" + Integer.toString(game_state_.cash_ + game_state_.bank_ - game_state_.loan_)); 
 	}
 	
+	// TODO: The coat buying dialogs are under development.
+	private Dialog GetBuyCoatDialog() {
+		if (buy_coat_dialog_ == null) {
+			buy_coat_dialog_ = new Dialog(this);
+			buy_coat_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			buy_coat_dialog_.setContentView(R.layout.buy_coat_layout);
+			((Button)buy_coat_dialog_.findViewById(R.id.buy_coat_button)).setOnClickListener(
+					new BuyCoatListener());
+			((Button)buy_coat_dialog_.findViewById(R.id.cancel_button)).setOnClickListener(
+					new CancelBuyCoatListener());
+		}
+		return buy_coat_dialog_;
+	}
+	
+	// TODO: The coat buying dialogs are under development.
+	private void PrepareBuyCoatDialog() {
+		((TextView)buy_coat_dialog_.findViewById(R.id.buy_coat_message)).setText(
+				"Wanna buy a coat for $" + Integer.toString(game_state_.coat_price_)); 
+	}
+	
+	// TODO: The coat buying dialogs are under development.
+	private Dialog GetBuyGunDialog() {
+		if (buy_gun_dialog_ == null) {
+			buy_gun_dialog_ = new Dialog(this);
+			buy_gun_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			buy_gun_dialog_.setContentView(R.layout.buy_gun_layout);
+			((Button)buy_gun_dialog_.findViewById(R.id.buy_gun_button)).setOnClickListener(
+					new BuyGunListener());
+			((Button)buy_gun_dialog_.findViewById(R.id.cancel_button)).setOnClickListener(
+					new CancelBuyGunListener());
+		}
+		return buy_gun_dialog_;
+	}
+	
+	// TODO: The coat buying dialogs are under development.
+	private void PrepareBuyGunDialog() {
+		((TextView)buy_gun_dialog_.findViewById(R.id.buy_gun_message)).setText(
+				"Wanna buy a gun for $" + Integer.toString(game_state_.gun_price_)); 
+	}
+	
 	// The dialogs available in the game include moving from place to place on the subway,
 	// buying and selling drugs, looking at your inventory, the loan shark, and the bank.
 	public static final int DIALOG_SUBWAY = 2002;
@@ -511,6 +564,8 @@ public class DopeWars2Game extends Activity {
 	public static final int DIALOG_BANK_WITHDRAW = 2009;
 	public static final int DIALOG_END_GAME = 2010;
 	public static final int DIALOG_HARDASS = 2011;
+	public static final int DIALOG_BUY_COAT = 2012;
+	public static final int DIALOG_BUY_GUN = 2013;
 	
 	private class CancelDialogListener implements View.OnClickListener {
 		public CancelDialogListener(int dialog_id) {
@@ -528,6 +583,49 @@ public class DopeWars2Game extends Activity {
 			 Intent i = new Intent();
      		 setResult(RESULT_OK, i);
      		 finish();
+		 }
+	}
+	
+	private class BuyCoatListener implements View.OnClickListener {
+		 public void onClick(View v) {
+			 game_state_.max_space_ += 10;
+			 game_state_.cash_ -= game_state_.coat_price_;
+			 game_state_.coat_price_ = 0;
+			 dismissDialog(DIALOG_BUY_COAT);
+			 refreshDisplay();
+		 }
+	}
+	
+	// This is almost simple enough to be a CancelDialogListener but it needs
+	// to zero out the coat cost or else the dialog will keep showing up every
+	// time the display is refreshed.
+	private class CancelBuyCoatListener implements View.OnClickListener {
+		 public void onClick(View v) {
+			 game_state_.coat_price_ = 0;
+			 dismissDialog(DIALOG_BUY_COAT);
+			 refreshDisplay();
+		 }
+	}
+	
+	private class BuyGunListener implements View.OnClickListener {
+		 public void onClick(View v) {
+			 game_state_.max_space_ -= 8;
+			 game_state_.guns_ += 1;
+			 game_state_.cash_ -= game_state_.gun_price_;
+			 game_state_.gun_price_ = 0;
+			 dismissDialog(DIALOG_BUY_GUN);
+			 refreshDisplay();
+		 }
+	}
+	
+	// This is almost simple enough to be a CancelDialogListener but it needs
+	// to zero out the coat cost or else the dialog will keep showing up every
+	// time the display is refreshed.
+	private class CancelBuyGunListener implements View.OnClickListener {
+		 public void onClick(View v) {
+			 game_state_.gun_price_ = 0;
+			 dismissDialog(DIALOG_BUY_GUN);
+			 refreshDisplay();
 		 }
 	}
 	
@@ -768,7 +866,11 @@ public class DopeWars2Game extends Activity {
 		// Check for officer hardass.  If he's present, then bring up the
 		// fight or flight dialog.
 		if (game_state_.hardass_health_ > 0) {
-		  showDialog(DIALOG_HARDASS);
+		    showDialog(DIALOG_HARDASS);
+		} else if (game_state_.coat_price_ > 0) {
+	        showDialog(DIALOG_BUY_COAT);
+		} else if (game_state_.gun_price_ > 0) {
+			showDialog(DIALOG_BUY_GUN);
 		}
 		
 /*
@@ -1149,6 +1251,8 @@ public class DopeWars2Game extends Activity {
 	Dialog end_game_dialog_;
 	Dialog pay_loan_shark_dialog_;
 	Dialog hardass_dialog_;
+	Dialog buy_coat_dialog_;
+	Dialog buy_gun_dialog_;
 
 	String dialog_drug_name_;
 	int dialog_drug_index_;
