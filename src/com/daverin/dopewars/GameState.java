@@ -115,6 +115,8 @@ public class GameState {
 	public Vector<Integer> drug_price_ = new Vector<Integer>();
 	public int hardass_health_;
 	public int hardass_deputies_;
+	public int coat_price_;
+	public int gun_price_;
 	
 	public int game_length;
 	public int game_type;
@@ -143,6 +145,8 @@ public class GameState {
 			}
 			hardass_health_ = 0;
 			hardass_deputies_ = 0;
+			coat_price_ = 0;
+			gun_price_ = 0;
 			
 			SetupNewLocation();
 		}
@@ -196,12 +200,36 @@ public class GameState {
 		}
 	}
 	
+	public void SetupCoats() {
+		if (coat_price_ > 0) {
+			return;
+		}
+		if (random_.nextFloat() < 0.8) {
+			coat_price_ = 1000;
+		} else {
+			coat_price_ = 0;
+		}
+	}
+	
+	public void SetupGuns() {
+		if (gun_price_ > 0) {
+			return;
+		}
+		if (random_.nextFloat() < 0.8) {
+			gun_price_ = 1000;
+		} else {
+			gun_price_ = 0;
+		}
+	}
+	
 	// When moving from one location to another (advancing one turn) this resets all the drugs
 	// that are available and processes all the random events that can happen on a turn-by-turn
 	// basis.
 	public void SetupNewLocation() {
 		SetupNewDrugs();
 		SetupHardass();
+		SetupCoats();
+		SetupGuns();
 	}
 	
 	public int NumDrugsAvailable() {
@@ -236,9 +264,13 @@ public class GameState {
 		for (int i = 0; i < drug_price_.size(); ++i) {
 			serialized_game += Integer.toString(drug_price_.elementAt(i)) + ",";
 		}
-		// TODO: handle inventory
+		for (int i = 0; i < dealer_drugs_.size(); ++i) {
+			serialized_game += Integer.toString(dealer_drugs_.elementAt(i)) + ",";
+		}
 		serialized_game += Integer.toString(hardass_health_) + ",";
 		serialized_game += Integer.toString(hardass_deputies_) + ",";
+		serialized_game += Integer.toString(coat_price_) + ",";
+		serialized_game += Integer.toString(gun_price_) + ",";
 		return serialized_game;
 	}
 	
@@ -278,11 +310,22 @@ public class GameState {
 					drug_price_.setElementAt((int)tokenizer.nval, i);
 				}
 			}
-			// TODO: handle inventory
+			for (int i = 0; i < drugs_.size(); ++i) {
+				tokenizer.nextToken();
+				if (dealer_drugs_.size() <= i) {
+					dealer_drugs_.add((int)tokenizer.nval);
+				} else {
+					dealer_drugs_.setElementAt((int)tokenizer.nval, i);
+				}
+			}
 			tokenizer.nextToken();
 			hardass_health_ = (int)tokenizer.nval;
 			tokenizer.nextToken();
 			hardass_deputies_ = (int)tokenizer.nval;
+			tokenizer.nextToken();
+			coat_price_ = (int)tokenizer.nval;
+			tokenizer.nextToken();
+			gun_price_ = (int)tokenizer.nval;
 		} catch (IOException e) {
 			Log.d(TAG, "Parsing error with value " + tokenizer.sval);
 		}
