@@ -5,52 +5,24 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_weight="1.0"
-    android:gravity="center"
-    android:textColor="#fff"
-    android:textSize="16pt"
-    android:text="Drugs"
-    />
+<ScrollView
+  android:id="@+id/big_ol_scrollview"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:layout_weight="1"
+  >
 <LinearLayout
-    android:id="@+id/inventory_drugs_layout"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
+  android:id="@+id/drug_list"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical"
+  >
 </LinearLayout>
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_weight="1.0"
-    android:gravity="center"
-    android:textColor="#fff"
-    android:textSize="16pt"
-    android:text="Guns"
-    />
-<LinearLayout
-    android:id="@+id/inventory_guns_layout"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
-</LinearLayout>
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_weight="1.0"
-    android:gravity="center"
-    android:textColor="#fff"
-    android:textSize="16pt"
-    android:text="Money"
-    />
-<LinearLayout
-    android:id="@+id/inventory_money_layout"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
-</LinearLayout>
+</ScrollView>
+<Button
+  android:id="@+id/ok_button"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="Ok"
+  />
 </LinearLayout>

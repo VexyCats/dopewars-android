@@ -48,30 +48,32 @@
   android:layout_width="wrap_content"
   android:layout_height="wrap_content"
   android:text="Deposit"
-  >
-</Button>
+  />
 <Button
   android:id="@+id/bank_withdraw_button"
   android:layout_width="wrap_content"
   android:layout_height="wrap_content"
   android:text="Withdraw"
-  >
-</Button>
+  />
 </LinearLayout>
+<Button
+  android:id="@+id/inventory_button"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="Inventory"
+  />
 <Button
   android:id="@+id/loan_shark_button"
   android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
+  android:layout_height="wrap_content"
   android:text="Loan Shark"
-  >
-</Button>
+  />
 <Button
   android:id="@+id/subway_button"
   android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
+  android:layout_height="wrap_content"
   android:text="Subway"
-  >
-</Button>
+  />
 <LinearLayout
   android:layout_width="fill_parent"
   android:layout_height="wrap_content"
