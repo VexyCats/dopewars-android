@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -34,6 +35,8 @@ public class DopeWars2Game extends Activity {
         		new BankWithdrawListener());
         ((Button)findViewById(R.id.loan_shark_button)).setOnClickListener(
         		new PayLoanSharkClickListener());
+        ((Button)findViewById(R.id.inventory_button)).setOnClickListener(
+        		new InventoryClickListener());
     }
 
 	// onResume is the key method for restoring saved data.  This will go to
@@ -74,26 +77,17 @@ public class DopeWars2Game extends Activity {
 	@Override
     protected Dialog onCreateDialog(int id) {
 		switch(id) {
-		case DIALOG_DRUG_BUY:
-			return GetDrugBuyDialog();
-		case DIALOG_DRUG_SELL:
-			return GetDrugSellDialog();
-		case DIALOG_SUBWAY:
-			return GetSubwayDialog();
-		case DIALOG_PAY_LOAN_SHARK:
-			return GetPayLoanSharkDialog();
-		case DIALOG_BANK_DEPOSIT:
-			return GetBankDepositDialog();
-		case DIALOG_BANK_WITHDRAW:
-			return GetBankWithdrawDialog();
-		case DIALOG_HARDASS:
-			return GetHardassDialog();
-		case DIALOG_END_GAME:
-			return GetEndGameDialog();
-		case DIALOG_BUY_COAT:
-			return GetBuyCoatDialog();
-		case DIALOG_BUY_GUN:
-			return GetBuyGunDialog();
+		case DIALOG_DRUG_BUY:       return GetDrugBuyDialog();
+		case DIALOG_DRUG_SELL:      return GetDrugSellDialog();
+		case DIALOG_SUBWAY:         return GetSubwayDialog();
+		case DIALOG_PAY_LOAN_SHARK: return GetPayLoanSharkDialog();
+		case DIALOG_BANK_DEPOSIT:   return GetBankDepositDialog();
+		case DIALOG_BANK_WITHDRAW:  return GetBankWithdrawDialog();
+		case DIALOG_HARDASS:        return GetHardassDialog();
+		case DIALOG_END_GAME:       return GetEndGameDialog();
+		case DIALOG_BUY_COAT:       return GetBuyCoatDialog();
+		case DIALOG_BUY_GUN:        return GetBuyGunDialog();
+		case DIALOG_INVENTORY:      return GetInventoryDialog();
 		}
 			
         return super.onCreateDialog(id);
@@ -105,36 +99,17 @@ public class DopeWars2Game extends Activity {
 	@Override
     protected void onPrepareDialog(int id, Dialog d) {
 		switch(id) {
-		case DIALOG_SUBWAY:
-			PrepareSubwayDialog();
-	        break;
-		case DIALOG_DRUG_BUY:
-			PrepareDrugBuyDialog();
-	        break;
-		case DIALOG_DRUG_SELL:
-			PrepareDrugSellDialog();
-	        break;
-		case DIALOG_PAY_LOAN_SHARK:
-			PreparePayLoanSharkDialog();
-			break;
-		case DIALOG_BANK_DEPOSIT:
-			PrepareBankDepositDialog();
-			break;
-		case DIALOG_BANK_WITHDRAW:
-			PrepareBankWithdrawDialog();
-			break;
-		case DIALOG_HARDASS:
-			PrepareHardassDialog();
-			break;
-		case DIALOG_END_GAME:
-			PrepareEndGameDialog();
-			break;
-		case DIALOG_BUY_COAT:
-			PrepareBuyCoatDialog();
-			break;
-		case DIALOG_BUY_GUN:
-			PrepareBuyGunDialog();
-			break;
+		case DIALOG_SUBWAY:         PrepareSubwayDialog(); break;
+		case DIALOG_DRUG_BUY:       PrepareDrugBuyDialog(); break;
+		case DIALOG_DRUG_SELL:      PrepareDrugSellDialog(); break;
+		case DIALOG_PAY_LOAN_SHARK: PreparePayLoanSharkDialog(); break;
+		case DIALOG_BANK_DEPOSIT:   PrepareBankDepositDialog(); break;
+		case DIALOG_BANK_WITHDRAW:  PrepareBankWithdrawDialog(); break;
+		case DIALOG_HARDASS:        PrepareHardassDialog(); break;
+		case DIALOG_END_GAME:       PrepareEndGameDialog(); break;
+		case DIALOG_BUY_COAT:       PrepareBuyCoatDialog(); break;
+		case DIALOG_BUY_GUN:        PrepareBuyGunDialog(); break;
+		case DIALOG_INVENTORY:      PrepareInventoryDialog(); break;
 		}
 	}
 	
@@ -552,6 +527,63 @@ public class DopeWars2Game extends Activity {
 				"Wanna buy a gun for $" + Integer.toString(game_state_.gun_price_)); 
 	}
 	
+	// TODO: The inventory dialogs are under development.
+	private Dialog GetInventoryDialog() {
+		if (inventory_dialog_ == null) {
+			inventory_dialog_ = new Dialog(this);
+			inventory_dialog_.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			inventory_dialog_.setContentView(R.layout.inventory_layout);
+			((Button)inventory_dialog_.findViewById(R.id.ok_button)).setOnClickListener(
+					new CancelDialogListener(DIALOG_INVENTORY));
+		}
+		return inventory_dialog_;
+	}
+	
+	// TODO: this is very incomplete, because we haven't worked out what the
+	// target layout is going to be, so for now, simplicity rules.
+	private LinearLayout ConstructInventoryDrugLayout(int drug_index) {
+		LinearLayout drug_layout = new LinearLayout(this);
+		drug_layout.setOrientation(LinearLayout.HORIZONTAL);
+		drug_layout.setLayoutParams(new LinearLayout.LayoutParams(
+    			LinearLayout.LayoutParams.FILL_PARENT,
+    			LinearLayout.LayoutParams.WRAP_CONTENT));
+		
+		TextView drug_name = new TextView(this);
+		drug_name.setTextColor(Color.WHITE);
+		drug_name.setTextSize(14);
+		drug_name.setGravity(Gravity.LEFT);
+		drug_name.setLayoutParams(new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT));
+		drug_name.setText(game_state_.drugs_.elementAt(drug_index).drug_name_);
+		
+		TextView drug_quantity = new TextView(this);
+		drug_quantity.setTextColor(Color.WHITE);
+		drug_quantity.setTextSize(14);
+		drug_quantity.setGravity(Gravity.LEFT);
+		drug_quantity.setLayoutParams(new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.WRAP_CONTENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT));
+		drug_quantity.setText(Integer.toString(game_state_.dealer_drugs_.elementAt(drug_index)));
+		
+		drug_layout.addView(drug_name);
+		drug_layout.addView(drug_quantity);
+		
+		return drug_layout;
+	}
+	
+	// TODO: The coat buying dialogs are under development.
+	private void PrepareInventoryDialog() {
+		LinearLayout container = (LinearLayout)inventory_dialog_.findViewById(
+				R.id.drug_list);
+		container.removeAllViews();
+		for (int i = 0; i < game_state_.dealer_drugs_.size(); ++i) {
+			if (game_state_.dealer_drugs_.elementAt(i) > 0) {
+				container.addView(ConstructInventoryDrugLayout(i));
+			}
+		}
+	}
+	
 	// The dialogs available in the game include moving from place to place on the subway,
 	// buying and selling drugs, looking at your inventory, the loan shark, and the bank.
 	public static final int DIALOG_SUBWAY = 2002;
@@ -649,6 +681,14 @@ public class DopeWars2Game extends Activity {
 			showDialog(DIALOG_DRUG_SELL);
 		}
 		int drug_index_;
+	}
+	
+	public class InventoryClickListener implements View.OnClickListener {
+		public InventoryClickListener() {
+		}
+		public void onClick(View v) {
+			showDialog(DIALOG_INVENTORY);
+		}
 	}
 	
 	public class SubwayClickListener implements View.OnClickListener {
