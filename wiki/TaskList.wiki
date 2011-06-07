@@ -4,8 +4,6 @@
 
 == Larger tasks ==
 
-An inventory view needs to be implemented.
-
 Random events need to be implemented.
 
 Messaging needs to be implemented.
@@ -28,6 +26,10 @@ Hardass dialog shouldn't disappear/reappear after making a selection.
 Random prices for coats and guns.
 
 Random names and firepowers for guns.
+
+Inventory needs information about guns, possibly coats.
+
+Inventory needs historical pricing.
 
 
 = Graphics/UI =
